@@ -5,12 +5,16 @@ import (
 	"github.com/bitly/go-simplejson"
 	"os"
 	"strings"
+	"sync"
 )
 
 const (
 	ConfigType_FileConfig = iota
 	ConfigType_ContentConfig
 )
+
+var configMgrMap map[string]*configManager = make(map[string]*configManager)
+var configMapListLock sync.Mutex
 
 type configManager struct {
 	config     string
@@ -22,8 +26,14 @@ func IsFileExixt(path string) bool {
 	return err == nil || os.IsExist(err)
 }
 
-func NewConfigFileManager(config string) *configManager {
-	return &configManager{config, ConfigType_FileConfig}
+func GetConfigFileManager(config string) *configManager {
+	configMapListLock.Lock()
+	defer configMapListLock.Unlock()
+	if value, ok := configMgrMap[config]; ok {
+		return value
+	}
+	configMgrMap[config] = &configManager{config, ConfigType_FileConfig}
+	return configMgrMap[config]
 }
 
 func NewConfigContentManager(content string) *configManager {
@@ -51,6 +61,55 @@ func (c *configManager) loadConfigFileContent() string {
 	}
 }
 
+func transfer(value interface{}) interface{} {
+	switch value.(type) {
+	case int:
+		return value
+	case int32:
+		return value
+	case string:
+		return value
+	case int64:
+		return value
+	case float32:
+		return value
+	case float64:
+		return value
+	case []string:
+		return value
+	case []int:
+		return value
+	case []int64:
+		return value
+	case []float32:
+		return value
+	case json.Number:
+		realValue := value.(json.Number)
+		if v, o := realValue.Int64(); o == nil {
+			return v
+		}
+		if v, o := realValue.Float64(); o == nil {
+			return v
+		}
+		return realValue.String()
+	case map[string]interface{}:
+		var retMap map[string]interface{} = make(map[string]interface{})
+		realMap := value.(map[string]interface{})
+		for k, v := range realMap {
+			retMap[k] = transfer(v)
+		}
+		return retMap
+	case []interface{}:
+		realList := value.([]interface{})
+		var retList []interface{}
+		for _, v := range realList {
+			retList = append(retList, transfer(v))
+		}
+		return retList
+	}
+	return nil
+}
+
 func (c *configManager) ReadConfig(key string) interface{} {
 	content := ""
 	if c.configType == ConfigType_FileConfig {
@@ -67,17 +126,7 @@ func (c *configManager) ReadConfig(key string) interface{} {
 				value := root
 				for i := range keyList {
 					if i == len(keyList)-1 {
-						retValue := value[keyList[i]]
-						if realValue, ok := retValue.(json.Number); ok {
-							if v, o := realValue.Int64(); o == nil {
-								return v
-							}
-							if v, o := realValue.Float64(); o == nil {
-								return v
-							}
-							return realValue.String()
-						}
-						return retValue
+						return transfer(value[keyList[i]])
 					}
 					var ok bool = true
 					if value, ok = value[keyList[i]].(map[string]interface{}); !ok {

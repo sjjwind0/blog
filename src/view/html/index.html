@@ -1,74 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title></title>
-	<link rel="stylesheet" href="/css/global.css">
+	<meta charset="utf-8" />
+	<meta property="wb:webmaster" content="ec68cbf32bb1042d" />
+	<meta property="qc:admins" content="66062230477671641641656375" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>小风的个人博客</title>
+	<link rel="stylesheet" href="/css/global.css" />
 </head>
 <body>
 	<div class="body">
-	<div id="nav">
-		<ul class="clear">
-			<li class="active"><a href="">首页</a></li>
-			<li><a href="/blog">技术圈子</a></li>
-			<li><a href="/high">High玩</a></li>
-			<li><a href="/about">关于</a></li>
-		</ul>
-	</div>
-	<div class="container">
-		<div class="header">
-			
+		<div id="nav">
+			<ul class="clear">
+				<li class="active"><a href="">首页</a></li>
+				<li><a href="/blog">技术圈子</a></li>
+				<li><a href="/high">High玩</a></li>
+				<li><a href="/about">关于</a></li>
+			</ul>
 		</div>
-		<div class="content">
-			<article class="excerpt">
-				<header><h2><a target="_blank" href="http://cuiqingcai.com/455.html" title="第一篇博客">第一篇博客 </a></h2>
-				</header>
-				<div class="focus"><a target="_blank" href="http://cuiqingcai.com/455.html"><img class="thumb" src="/blog?id=1.html" alt="第一篇博客"></a></div>
-					<span class="note"> 第一篇博客...</span>
-				<p class="auth-span">
-						<span class="muted"><i class="fa fa-user"></i> <a href="http://cuiqingcai.com/author/cqcre">风</a></span>
-						<span class="muted"><i class="fa fa-clock-o"></i> 4个月前 (12-24)</span>	<span class="muted"><i class="fa fa-eye"></i> 6268℃</span>	<span class="muted"><i class="fa fa-comments-o"></i> <a target="_blank" href="http://cuiqingcai.com/455.html#comments">7评论</a></span><span class="muted">
-				<a href="javascript:;" data-action="ding" data-id="455" id="Addlike" class="action"><i class="fa fa-heart-o"></i><span class="count">51</span>喜欢</a></span></p>
-					</article>
-					<article class="excerpt">
-						<header><h2><a target="_blank" href="http://cuiqingcai.com/455.html" title="第一篇博客">第一篇博客 </a></h2>
-						</header>
-						<div class="focus"><a target="_blank" href="http://cuiqingcai.com/455.html"><img class="thumb" src="http://cuiqingcai.com/wp-content/themes/Yusi/timthumb.php?src=http://qiniu.cuiqingcai.com/wp-content/uploads/2014/11/wallpaper_5226844-1-e1416818686775.jpg&amp;h=123&amp;w=200&amp;q=90&amp;zc=1&amp;ct=1" alt="第一篇博客"></a></div>
-							<span class="note"> 第一篇博客...</span>
-				<p class="auth-span">
-						<span class="muted"><i class="fa fa-user"></i> <a href="http://cuiqingcai.com/author/cqcre">风</a></span>
-						<span class="muted"><i class="fa fa-clock-o"></i> 4个月前 (12-24)</span>	<span class="muted"><i class="fa fa-eye"></i> 6268℃</span>	<span class="muted"><i class="fa fa-comments-o"></i> <a target="_blank" href="http://cuiqingcai.com/455.html#comments">7评论</a></span><span class="muted">
-				<a href="javascript:;" data-action="ding" data-id="455" id="Addlike" class="action"><i class="fa fa-heart-o"></i><span class="count">51</span>喜欢</a></span></p>
-			</article>
-		</div>
-		<div class="side">
-			<div class="widget widget_archive"><div class="small_title"><h2>文章归档</h2></div>		
+		<div class="container">
+			<div class="header">
+			</div>
+			<div class="content">
+				{{range .BlogList}}
+				<article class="excerpt">
+					<header>
+						<a class="label label-important" href="./sort/{{.BlogSortType}}">{{.BlogSortType}}
+							<i class="label-arrow"></i>
+						</a>
+						<h2><a target="_blank" href="./blog?id={{.BlogID}}" title="{{.BlogTitle}}">{{.BlogTitle}}</a></h2>
+					</header>
+					<div class="focus"><a target="_blank" href="./blog?id={{.BlogID}}"><img class="thumb" src="./img?id={{.BlogUUID}}" height="123" width="200" alt="{{.BlogTitle}}"></a></div>
+						<span class="note"> {{.BlogDescription}}</span>
+					<p class="auth-span">
+							<span class="muted"><i class="fa fa-user"></i> <a href="./about">{{.BlogAuthor}}</a></span>
+							<span class="muted"><i class="fa fa-clock-o"></i> {{.BlogTime}}</span>	<span class="muted"><i class="fa fa-eye"></i> {{.BlogVisitCount}}℃</span>	<span class="muted"><i class="fa fa-comments-o"></i> <a target="_blank" href="./blog?id={{.BlogID}}#comments">{{.BlogCommentCount}}评论</a></span><span class="muted">
+					<a href="javascript:;" data-action="ding" data-id="{{.BlogID}}" id="Addlike" class="action"><i class="fa fa-heart-o"></i><span class="count">{{.BlogPraiseCount}}</span>喜欢</a></span></p>
+				</article>
+				{{end}}
+			</div>
+			<div class="side">
+				<div class="widget widget_archive"><div class="small_title"><h2>文章归档</h2></div>		
 				<ul>
-					<li><a href="http://cuiqingcai.com/date/2016/03">2016年三月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2016/02">2016年二月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2016/01">2016年一月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/12">2015年十二月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/11">2015年十一月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/10">2015年十月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/09">2015年九月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/08">2015年八月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/07">2015年七月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/06">2015年六月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/05">2015年五月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/04">2015年四月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/03">2015年三月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/02">2015年二月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2015/01">2015年一月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2014/12">2014年十二月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2014/11">2014年十一月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2014/10">2014年十月</a></li>
-					<li><a href="http://cuiqingcai.com/date/2014/09">2014年九月</a></li>
+					{{range .BlogTimeList}}
+					<li><a href="./date/{{.Year}}/{{.Month}}">{{.Date}}</a></li>
+					{{end}}
 				</ul>
 			</div>
-			<div class="widget d_tag"><div class="small_title"><h2>标签云</h2></div><div class="d_tags"><a title="" href="http://cuiqingcai.com/tag/python" data-original-title="28个话题">Python (28)</a><a title="" href="http://cuiqingcai.com/tag/php" data-original-title="27个话题">PHP (27)</a><a title="" href="http://cuiqingcai.com/tag/%e7%88%ac%e8%99%ab" data-original-title="24个话题">爬虫 (24)</a><a title="" href="http://cuiqingcai.com/tag/js" data-original-title="18个话题">JS (18)</a><a title="" href="http://cuiqingcai.com/tag/opengl" data-original-title="11个话题">OpenGL (11)</a><a title="" href="http://cuiqingcai.com/tag/html" data-original-title="10个话题">HTML (10)</a><a title="" href="http://cuiqingcai.com/tag/jquery" data-original-title="9个话题">jQuery (9)</a><a title="" href="http://cuiqingcai.com/tag/linux" data-original-title="7个话题">Linux (7)</a><a title="" href="http://cuiqingcai.com/tag/winpcap" data-original-title="7个话题">Winpcap (7)</a><a title="" href="http://cuiqingcai.com/tag/wordpress" data-original-title="6个话题">WordPress (6)</a><a title="" href="http://cuiqingcai.com/tag/security" data-original-title="6个话题">Security (6)</a><a title="" href="http://cuiqingcai.com/tag/git" data-original-title="4个话题">Git (4)</a><a title="" href="http://cuiqingcai.com/tag/net" data-original-title="4个话题">Net (4)</a><a title="" href="http://cuiqingcai.com/tag/java" data-original-title="3个话题">Java (3)</a><a title="" href="http://cuiqingcai.com/tag/mysql" data-original-title="3个话题">Mysql (3)</a><a title="" href="http://cuiqingcai.com/tag/css" data-original-title="3个话题">CSS (3)</a><a title="" href="http://cuiqingcai.com/tag/cocos2d-x" data-original-title="2个话题">Cocos2d-x (2)</a><a title="" href="http://cuiqingcai.com/tag/jsp" data-original-title="2个话题">JSP (2)</a><a title="" href="http://cuiqingcai.com/tag/matlab" data-original-title="2个话题">Matlab (2)</a><a title="" href="http://cuiqingcai.com/tag/bootstrap" data-original-title="2个话题">Bootstrap (2)</a><a title="" href="http://cuiqingcai.com/tag/photoshop" data-original-title="2个话题">Photoshop (2)</a><a title="" href="http://cuiqingcai.com/tag/less" data-original-title="2个话题">LESS (2)</a><a title="" href="http://cuiqingcai.com/tag/json" data-original-title="1个话题">Json (1)</a><a title="" href="http://cuiqingcai.com/tag/redis" data-original-title="1个话题">Redis (1)</a><a title="" href="http://cuiqingcai.com/tag/nginx" data-original-title="1个话题">Nginx (1)</a></div></div>
+				<div class="widget d_tag">
+					<div class="small_title">
+						<h2>标签</h2>
+					</div>
+					<div class="d_tags">
+						{{range .BlogTagList}}
+						<a title="" href="./tag/{{.Tag}}" data-original-title="{{.Count}}个话题">{{.Tag}} ({{.Count}})</a>
+						{{end}}
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
-	</div>
 </body>
+<script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="101324961" data-redirecturi="http://blog.windy.live/login?type=qq" charset="utf-8" ></script>
+
+<span id="qqLoginBtn" ></span>
+
+<script type="text/javascript">
+QC.Login({
+	btnId : "qqLoginBtn", 
+	size : "A_XL", 
+	scope : "get_user_info" 
+}, function(reqData, opts) {  
+	console.log("aaaa");
+	if(QC.Login.check()){  
+	    QC.Login.getMe(function(openId, accessToken){  
+	        console.log("openId: ", openId);
+	        console.log("accessToken: ", accessToken); 
+	    });  
+	}  
+}, function(opts) {
+	console.log("注销");
+});
+</script>
 </html>

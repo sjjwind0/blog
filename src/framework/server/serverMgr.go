@@ -38,11 +38,11 @@ func ShareServerMgrInstance() *serverMgr {
 	return serverMgrInstance
 }
 
-func (s *serverMgr) RegisterController(path string, controller Controller) {
+func (s *serverMgr) RegisterController(controller Controller) {
 	if s.controllerList == nil {
 		s.controllerList = list.New()
 	}
-	s.controllerList.PushBack(&controllerElement{path, controller})
+	s.controllerList.PushBack(controller)
 }
 
 func (s *serverMgr) RegisterStaticFile(webPath string, localPath string) {
@@ -60,8 +60,17 @@ func (s *serverMgr) StartServer() {
 	// register controller
 	if s.controllerList != nil {
 		for controller := s.controllerList.Front(); controller != nil; controller = controller.Next() {
-			element := controller.Value.(*controllerElement)
-			http.HandleFunc(element.webPath, element.controller.HandlerAction)
+			element := controller.Value.(Controller)
+			path := element.Path()
+			switch path.(type) {
+			case string:
+				http.HandleFunc(path.(string), element.HandlerAction)
+			case []string:
+				pathList := path.([]string)
+				for _, p := range pathList {
+					http.HandleFunc(p, element.HandlerAction)
+				}
+			}
 		}
 	}
 

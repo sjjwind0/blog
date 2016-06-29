@@ -2,6 +2,7 @@ package database
 
 import (
 	"container/list"
+	"fmt"
 	"sync"
 )
 
@@ -31,7 +32,10 @@ func (d *databaseRunner) Start() {
 	if d.modeList != nil {
 		for model := d.modeList.Front(); model != nil; model = model.Next() {
 			databaseInterface := model.Value.(DatabaseInterface)
-			databaseInterface.CreateTable()
+			err := databaseInterface.CreateTable()
+			if err != nil {
+				fmt.Println("CreateTable error: ", err)
+			}
 		}
 	}
 }

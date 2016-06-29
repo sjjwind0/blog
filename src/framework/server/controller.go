@@ -6,4 +6,5 @@ import (
 
 type Controller interface {
 	HandlerAction(w http.ResponseWriter, r *http.Request)
+	Path() interface{}
 }
