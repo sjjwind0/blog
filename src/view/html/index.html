@@ -7,16 +7,24 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>小风的个人博客</title>
 	<link rel="stylesheet" href="/css/global.css" />
+	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 	<div class="body">
 		<div id="nav">
-			<ul class="clear">
-				<li class="active"><a href="">首页</a></li>
-				<li><a href="/blog">技术圈子</a></li>
-				<li><a href="/high">High玩</a></li>
-				<li><a href="/about">关于</a></li>
-			</ul>
+			<div class="nav-center">
+				<ul class="clear">
+					<li class="active"><a href="">首页</a></li>
+					<li><a href="/blog">技术圈子</a></li>
+					<li><a href="/high">High玩</a></li>
+					<li><a href="/about">关于</a></li>
+				</ul>
+			</div>
+			<!-- <div class="nav-right">
+				<a class="login-account" href="javascript:void(0);">登出</a>
+				<p class="nick">风惜殇</p>
+				<img class="pic" src="http://qzapp.qlogo.cn/qzapp/101324961/7F51567FDE8B946F800365B75FA5EBBF/100">
+			</div> -->
 		</div>
 		<div class="container">
 			<div class="header">
@@ -61,25 +69,4 @@
 		</div>
 	</div>
 </body>
-<script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="101324961" data-redirecturi="http://blog.windy.live/login?type=qq" charset="utf-8" ></script>
-
-<span id="qqLoginBtn" ></span>
-
-<script type="text/javascript">
-QC.Login({
-	btnId : "qqLoginBtn", 
-	size : "A_XL", 
-	scope : "get_user_info" 
-}, function(reqData, opts) {  
-	console.log("aaaa");
-	if(QC.Login.check()){  
-	    QC.Login.getMe(function(openId, accessToken){  
-	        console.log("openId: ", openId);
-	        console.log("accessToken: ", accessToken); 
-	    });  
-	}  
-}, function(opts) {
-	console.log("注销");
-});
-</script>
 </html>

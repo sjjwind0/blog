@@ -1,9 +1,11 @@
-console.log("1111");
-
 window.onload = function() {
-	$(".btn-fw + .btn-bf + .single-btn-bf").click(function() {
+	$(".ds-qq").click(function() {
+		Account.loginByQQ();
+	});
+
+	$(".single-btn-bf").click(function() {
 		var content = $(".wrap-text-f").val();
-		Talk.sendTalk(1, 1, -1, content);
+		Talk.sendTalk(Blog.getBlogId(), -1, content);
 	});
 
 	$(".evt-reply").click(function() {
@@ -26,7 +28,7 @@ window.onload = function() {
 			var id = parseInt(parentCommentId.attr("cid"));
 		}
 		var content = $(this).parents(".post-wrap-w").children(".wrap-area-w").children(".area-textarea-w").children().val()
-		Talk.sendTalk(1, 1, id, content);
+		Talk.sendTalk(Blog.getBlogId(), id, content);
 	});
 	var allHref = $(window.frames["blog"].document).find("a");
 	for (var i = 0; i < allHref.length; i++) {
@@ -41,11 +43,10 @@ window.onload = function() {
 
 var Talk = Talk || {}
 
-Talk.sendTalk = function (userId, blogId, commentId, content) {
+Talk.sendTalk = function (blogId, commentId, content) {
 	var url = "../api";
 	var content = {
 		"type": "talk",
-		"userId": userId,
 		"blogId": blogId,
 		"commentId": commentId,
 		"content": content
@@ -64,3 +65,38 @@ Talk.sendTalk = function (userId, blogId, commentId, content) {
 		}
 	});
 }
+
+var Account = Account || {}
+
+Account.loginInfo = {
+	userName: "",
+	sex: "",
+	pic: "",
+}
+
+Account.loginByQQ = function() {
+	var url = "https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=101324961&redirect_uri=http%3A%2F%2Fblog.windy.live%2Flogin%3Ftype%3Dqq&scope=get_user_info";
+	window.open(url);
+	// $.get("http://blog.windy.live/login?type=connect", function (data) {
+	// 	console.log("data: " + data);
+	// });
+}
+
+Account.loginByWeixin = function() {
+	// not implement
+}
+
+Account.loginByWeibo = function() {
+	// not implement
+}
+
+var Blog = Blog || {}
+
+Blog.blogInfo = {
+	blogId: "",
+}
+
+Blog.getBlogId = function() {
+	return parseInt($(".blog").attr("bid"));
+}
+

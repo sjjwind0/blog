@@ -4,14 +4,14 @@ const (
 	firstComment = `<div class="comment-node clear-g block-cont-gw block-cont-bg" datatype="time" cid={{.CommentID}}> 
 	<div class="cont-head-gw"> 
 		<div class="head-img-gw">
-			<a href="javascript:void(0)" commhref="http://www.douban.com/people/94809862/"><img src="http://qiniu.cuiqingcai.com/wp-content/uploads/2015/05/20150525111154.jpg" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" uid="{{.UserID}}"></a>
+			<img src={{.User.SmallFigureurl}} width="42" height="42" uid="{{.UserID}}"></img>
         </div> 
 	</div> 
 	<div class="cont-msg-gw"> 
 		<div class="msg-wrap-gw"> 
 			<div class="wrap-user-gw global-clear-spacing"> 
 				<span class="user-time-gw user-time-bg evt-time">{{.CommentTime}}</span> 
-				<span class="user-name-gw" title="{{.UserName}}"><a href="javascript:void(0)" commhref="http://www.douban.com/people/94809862/" uid="-1990645212">{{.UserName}}</a></span> 
+				<span class="user-name-gw" title="{{.User.UserName}}"><a href="javascript:void(0)" href="{{.User.SmallFigureurl}}" uid="-1990645212">{{.User.UserName}}</a></span> 
 			</div> 
 			{{.ChildContent}}
 			<div class="wrap-issue-gw"> 
@@ -61,7 +61,11 @@ const (
 			{{.ChildContent}}
 			<div class="wrap-user-gw global-clear-spacing"> 
 				<span class="user-time-gw user-time-bg user-floor-gw">{{.Floor}}</span> 
-				<span class="user-name-gw"><a href="javascript:void(0)" commhref="http://www.douban.com/people/94809862/" title="{{.UserName}}" uid="{{.UserID}}">{{.UserName}}</a></span> 
+				<span class="user-name-gw">
+					<img style="height: 44px; width: 44px;" src="{{.User.SmallFigureurl}}" title="{{.User.UserName}}" uid="{{.UserID}}">
+						<a href="javascript:void(0)" style="margin-left: 5px;">{{.User.UserName}}</a>
+					</img>
+				</span> 
 			</div> 
 			<div class="wrap-issue-gw"> 
 				<p class="issue-wrap-gw"> <span class="wrap-word-bg ">{{.CommentContent}}</span> </p> 

@@ -18,7 +18,7 @@ func (f *FileController) Path() interface{} {
 	return "/file"
 }
 
-func (s *FileController) HandlerAction(w http.ResponseWriter, r *http.Request) {
+func (s *FileController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		r.ParseMultipartForm(32 << 20)
 		file, handler, err := r.FormFile("uploadfile")

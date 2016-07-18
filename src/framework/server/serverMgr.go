@@ -64,11 +64,11 @@ func (s *serverMgr) StartServer() {
 			path := element.Path()
 			switch path.(type) {
 			case string:
-				http.HandleFunc(path.(string), element.HandlerAction)
+				http.HandleFunc(path.(string), element.HandlerRequest)
 			case []string:
 				pathList := path.([]string)
 				for _, p := range pathList {
-					http.HandleFunc(p, element.HandlerAction)
+					http.HandleFunc(p, element.HandlerRequest)
 				}
 			}
 		}

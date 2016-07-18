@@ -52,7 +52,7 @@ func (c *commentModel) CreateTable() error {
 		%s int(32) NULL DEFAULT '0',
 		%s varchar(1024) DEFAULT '',
 		PRIMARY KEY (%s)
-	) ENGINE=MyISAM DEFAULT CHARSET=utf8;`, kCommentTableName, kCommentId,
+	) CHARSET=utf8;`, kCommentTableName, kCommentId,
 		kCommentBlogId, kCommentParentId, kCommentUserId, kCommentContent, kCommentTime,
 		kCommentPraise, kCommentDissent, kCommentAddress, kCommentId)
 	_, err := database.DatabaseInstance().DB.Exec(sql)

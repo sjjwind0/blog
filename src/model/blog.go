@@ -53,7 +53,7 @@ func (c *blogModel) CreateTable() error {
 		%s int(32) DEFAULT '0',
 		%s int(32) DEFAULT '0',
 		PRIMARY KEY (%s)
-	) ENGINE=MyISAM DEFAULT CHARSET=utf8;`, kBlogTableName, kBlogId,
+	) CHARSET=utf8;`, kBlogTableName, kBlogId,
 		kBlogUUID, kBlogTitle, kBlogSortType, kBlogTag, kBlogTime, kBlogVisitCount,
 		kBlogPraiseCount, kBlogDissentCount, kBlogId)
 	_, err := database.DatabaseInstance().DB.Exec(sql)

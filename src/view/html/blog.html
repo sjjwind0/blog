@@ -4,19 +4,22 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Test Title</title>
-	<link rel="stylesheet" href="/css/global.css">
 	<link rel="stylesheet" href="/css/talk.css">
-	<script src="js/jquery-2.1.1.js" type="text/javascript" charset="utf-8"></script>
+	<link rel="stylesheet" href="/css/global.css">
+	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/jquery-cookie.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/blog.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 	<div id="nav">
-		<ul class="clear">
-			<li class="active"><a href="">首页</a></li>
-			<li><a href="/blog">技术圈子</a></li>
-			<li><a href="/high">High玩</a></li>
-			<li><a href="/about">关于</a></li>
-		</ul>
+		<div class="nav-center">
+			<ul class="clear">
+				<li class="active"><a href="">首页</a></li>
+				<li><a href="/blog">技术圈子</a></li>
+				<li><a href="/high">High玩</a></li>
+				<li><a href="/about">关于</a></li>
+			</ul>
+	</div>
 	</div>
 	<div class="container">
 		<div class="header">
@@ -38,10 +41,23 @@
 						<span class="muted"><i class="fa fa-comments-o"></i> <a href="./blog?id={{.BlogID}}.html#comments">{{.BlogCommentCount}}条评论</a></span>	
 					</div>
 			</header>
-			<div class="blog">
+			<div class="blog" bid="{{.BlogID}}">
 				<iframe class="blog-frame" name="blog" scrolling="no" frameborder="0" width="100%" onload="this.height=this.contentWindow.document.documentElement.scrollHeight;" src="./article?id={{.BlogID}}"></iframe>
 			</div>
 			<div class="talk">
+				{{if .User.IsLogin}}
+				{{else}}
+				<div class="ds-login-buttons">
+				  <p>社交帐号登录:</p>
+				  <div class="ds-social-links">
+				   <ul class="ds-service-list">
+				     <li><a href="javascript:void(0);" rel="nofollow" class="ds-service-link ds-weixin">微信</a></li>
+				     <li><a href="javascript:void(0);" rel="nofollow" class="ds-service-link ds-weibo">微博</a></li>
+				     <li><a href="javascript:void(0);" rel="nofollow" class="ds-service-link ds-qq">QQ</a></li>
+				   </ul>
+				  </div>
+			   </div>
+				{{end}}
 				<div id="SOHUCS" sid="{{.BlogID}}" style="width: 100%; height: auto;">
 				 <div id="SOHU_MAIN">
 				  <div id="SOHU-comment-main" class="sohu-comment-wrapper">
@@ -51,6 +67,10 @@
 				      <div class="join-wrap-w join-wrap-b">
 				       <strong class="wrap-name-w wrap-name-b">评论</strong>
 				       <span class="wrap-join-w wrap-join-b">(<em class="join-strong-gw join-strong-bg">{{.BlogCommentPeopleCount}}</em><span node-type="involved">人参与</span><i class="gap-b">，</i><em class="join-strong-gw join-strong-bg">{{.BlogCommentCount}}</em><span node-type="comments">条评论</span>)</span>
+				       {{if .User.IsLogin}}
+						<a href="javascript:void(0);" rel="nofollow" class="user-logout wrap-name-logout">登出</a>
+						<strong class="wrap-name-nick">{{.User.NickName}}</strong>
+				       {{end}}
 				      </div> 
 				     </div> 
 				     <div class="title-user-w"> 
@@ -69,13 +89,19 @@
 				     <div class="clear-g cbox-block-w"> 
 				      <div class="block-head-w"> 
 				       <div class="head-img-w"> 
-				        <a node-type="user-avatar" href="javascript:void(0)" target="_self"><img src="http://assets.changyan.sohu.com/upload/asset/scs/images/pic/pic42_null.gif" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" /></a> 
+				        <a node-type="user-avatar" href="javascript:void(0)" target="_self">
+				        {{if .User.IsLogin}}
+				        <img src="{{.User.Pic}}" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
+				        {{else}}
+				        <img src="http://assets.changyan.sohu.com/upload/asset/scs/images/pic/pic42_null.gif" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
+				        {{end}}
+				        </a> 
 				       </div> 
 				      </div> 
 				      <div class="block-post-w">
 				       <div class="post-default-w post-default-b" style="border: 1px solid rgb(204, 212, 217);">
 				        <div class="clear-g default-wrap-w">
-				         <input type="text" name="" value="来说两句吧..." class="wrap-text-f " />
+				         <input type="text" name="" placeholder="来说两句吧..." class="wrap-text-f " />
 				         <button class="btn-fw btn-bf single-btn-bf">发布</button>
 				        </div>
 				       </div>

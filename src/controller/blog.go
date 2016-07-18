@@ -7,6 +7,7 @@ import (
 	"framework"
 	"framework/config"
 	"framework/response"
+	"framework/server"
 	"html/template"
 	"info"
 	"model"
@@ -25,7 +26,15 @@ type commentRender struct {
 	CommentContent string
 	CommentTime    string
 	Floor          int
+	User           *info.UserInfo
 	ChildContent   template.HTML
+}
+
+type userRender struct {
+	IsLogin  bool
+	UserID   string
+	NickName string
+	Pic      string
 }
 
 type blogRender struct {
@@ -39,9 +48,11 @@ type blogRender struct {
 	BlogVisitCount         string
 	BlogCommentCount       string
 	BlogCommentPeopleCount string
+	User                   userRender
 }
 
 type BlogController struct {
+	server.SessionController
 	blogContentMap map[string]*[]byte
 }
 
@@ -55,6 +66,10 @@ func (b *BlogController) Path() interface{} {
 	return []string{"/blog", "/article", "/img"}
 }
 
+func (b *BlogController) SessionPath() string {
+	return "/"
+}
+
 func (b *BlogController) buildCommentRender(info *info.CommentInfo, childComment *string,
 	floor *int) commentRender {
 	var render commentRender
@@ -65,6 +80,10 @@ func (b *BlogController) buildCommentRender(info *info.CommentInfo, childComment
 	render.UserID = string(info.UserID)
 	render.UserName = "测试"
 	render.Floor = *floor
+	userInfo, err := model.ShareUserModel().GetUserInfoById(info.UserID)
+	if err == nil {
+		render.User = userInfo
+	}
 	(*floor)++
 	return render
 }
@@ -195,10 +214,33 @@ func (b *BlogController) readBlogHtml(w http.ResponseWriter, blogId int) {
 	render.BlogCommentPeopleCount = strconv.Itoa(peopleCount)
 	render.BlogVisitCount = strconv.Itoa(blogInfo.BlogVisitCount)
 	render.CommentContent = template.HTML(content)
+	v, err := b.SessionController.WebSession.Get("status")
+	if err == nil {
+		if v.(string) == "login" {
+			render.User.IsLogin = true
+			userId, err := b.SessionController.WebSession.Get("id")
+			fmt.Println("userId: ", userId)
+			if err == nil {
+				userInfo, err := model.ShareUserModel().GetUserInfoById(userId.(int64))
+				if err == nil && userInfo != nil {
+					fmt.Println("userRender: ", render.User.UserID)
+					render.User.NickName = userInfo.UserName
+					render.User.Pic = userInfo.SmallFigureurl
+					render.User.UserID = strconv.Itoa(int(userId.(int64)))
+				} else {
+					render.User.IsLogin = false
+				}
+			}
+		} else {
+			render.User.IsLogin = false
+		}
+	} else {
+		render.User.IsLogin = false
+	}
 	t.Execute(w, render)
 }
 
-func (b *BlogController) HandlerAction(w http.ResponseWriter, r *http.Request) {
+func (b *BlogController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	if r.URL.Path == "/article" {
 		id, err := strconv.Atoi(r.Form["id"][0])
@@ -210,6 +252,7 @@ func (b *BlogController) HandlerAction(w http.ResponseWriter, r *http.Request) {
 	} else if r.URL.Path == "/img" {
 		b.readImg(w, r.Form["id"][0])
 	} else {
+		b.SessionController.HandlerRequest(b, w, r)
 		id, err := strconv.Atoi(r.Form["id"][0])
 		if err != nil {
 			response.JsonResponseWithMsg(w, framework.ErrorParamError, "param error")

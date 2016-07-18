@@ -1,39 +1,38 @@
 package session
 
-import (
-	"sync"
-)
+var sessionMgrInstance *SessoinMgr = nil
+var sessionMap map[string]*SessoinMgr = make(map[string]*SessoinMgr)
 
-var sessionMgrInstance *sessoinMgr = nil
-var sessionMgrOnce sync.Once
-
-type sessoinMgr struct {
-	storage *SessionStorage
+type SessoinMgr struct {
+	storage SessionStorage
 }
 
-func GetSessionMgrInstance() *sessoinMgr {
-	sessionMgrOnce.Do(func() {
-		sessoinMgr = &sessoinMgr{}
-	})
-	return sessoinMgr
+func GetSessionManager(name string) *SessoinMgr {
+	if v, ok := sessionMap[name]; ok {
+		return v
+	}
+	sessionMgrInstance = &SessoinMgr{}
+	sessionMap[name] = sessionMgrInstance
+	return sessionMgrInstance
 }
 
-func (s *sessoinMgr) SetStorage(storage *SessionStorage) {
+func (s *SessoinMgr) SetStorage(storage SessionStorage) {
 	s.storage = storage
 }
 
-func (s *sessoinMgr) QuerySessionById(sessionId string) (*Session, error) {
-	return s.storage.Get(sessionId)
+func (s *SessoinMgr) QuerySessionById(sessionId string) (Session, error) {
+	ss, err := s.storage.Get(sessionId)
+	return ss, err
 }
 
-func (s *sessoinMgr) AddSession(session *Session) error {
-	return s.storage.Get(session.SessionID(), session)
+func (s *SessoinMgr) AddSession(session Session) error {
+	return s.storage.Add(session.SessionID(), session)
 }
 
-func (s *sessoinMgr) DeleteSession(sessionId string) error {
-	s.storage.Delete(sessionId)
+func (s *SessoinMgr) DeleteSession(sessionId string) error {
+	return s.storage.Delete(sessionId)
 }
 
-func (s *sessoinMgr) ReloadSession() {
+func (s *SessoinMgr) ReloadSession() {
 	// not implement
 }

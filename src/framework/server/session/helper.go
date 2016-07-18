@@ -1,6 +1,7 @@
 package session
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"io"
 )

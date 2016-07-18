@@ -8,12 +8,14 @@ import (
 	"encoding/json"
 	"framework"
 	"framework/response"
+	"framework/server"
 	"io/ioutil"
 	"model"
 	"net/http"
 )
 
 type APIController struct {
+	server.SessionController
 }
 
 func NewAPIController() *APIController {
@@ -24,7 +26,26 @@ func (a *APIController) Path() interface{} {
 	return "/api"
 }
 
+func (a *APIController) SessionPath() string {
+	return "/"
+}
+
 func (a *APIController) handlePublicCommentAction(w http.ResponseWriter, info map[string]interface{}) {
+	status, err := a.WebSession.Get("status")
+	if err != nil {
+		response.JsonResponseWithMsg(w, framework.ErrorAccountNotLogin, err.Error())
+		return
+	}
+	if status != "login" {
+		response.JsonResponseWithMsg(w, framework.ErrorAccountNotLogin, "account not login")
+		return
+	}
+	uid, err := a.WebSession.Get("id")
+	if err != nil {
+		response.JsonResponseWithMsg(w, framework.ErrorAccountNotLogin, err.Error())
+		return
+	}
+	var userId int = int(uid.(int64))
 	parseInt := func(name string, retValue *int) bool {
 		var ok bool
 		if _, ok = info[name]; ok {
@@ -42,9 +63,9 @@ func (a *APIController) handlePublicCommentAction(w http.ResponseWriter, info ma
 		}
 		return false
 	}
-	var blogId, userId, commentId int
+	var blogId, commentId int
 	var content string
-	if parseInt("blogId", &blogId) && parseInt("userId", &userId) && parseInt("commentId", &commentId) {
+	if parseInt("blogId", &blogId) && parseInt("commentId", &commentId) {
 		if _, ok := info["content"]; ok {
 			switch info["content"].(type) {
 			case string:
@@ -63,7 +84,7 @@ func (a *APIController) handlePublicCommentAction(w http.ResponseWriter, info ma
 	response.JsonResponse(w, framework.ErrorParamError)
 }
 
-func (a *APIController) HandlerAction(w http.ResponseWriter, r *http.Request) {
+func (a *APIController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		response.JsonResponse(w, framework.ErrorMethodError)
 		return
@@ -84,6 +105,7 @@ func (a *APIController) HandlerAction(w http.ResponseWriter, r *http.Request) {
 			case string:
 				switch api.(string) {
 				case "talk":
+					a.SessionController.HandlerRequest(a, w, r)
 					a.handlePublicCommentAction(w, info)
 					return
 				case "blog":

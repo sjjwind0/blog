@@ -92,7 +92,7 @@ func (s *SyncController) uploadBlog(w http.ResponseWriter, r *http.Request) {
 	response.JsonResponseWithMsg(w, framework.ErrorParamError, err.Error())
 }
 
-func (s *SyncController) HandlerAction(w http.ResponseWriter, r *http.Request) {
+func (s *SyncController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		response.JsonResponse(w, framework.ErrorMethodError)
 		return

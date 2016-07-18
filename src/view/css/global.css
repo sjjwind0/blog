@@ -42,12 +42,12 @@ input,textarea,.uneditable-input{width:206px}textarea{height:auto}textarea,input
 	vertical-align: top;
 }
 
-#nav a {
+#nav .nav-center a {
 	text-decoration: none;
 	color: #666;
 }
 
-#nav a:hover {
+#nav .nav-center a:hover {
 	text-decoration: underline;
 	color: #518900;
 }
@@ -110,7 +110,7 @@ body {
 }
 
 #nav ul {
-	width: 1000px;
+	width: 80%;
 	margin: 0 auto;
 	padding-top: 0px;
 }
@@ -123,19 +123,19 @@ body {
 	float: left;
 }
 
-#nav a {
+#nav .nav-center a {
 	display: block;
 	padding: 0 22px;
 	font: 16px/44px 'microsoft yahei',STXihei;
 	color: #fff;
 }
 
-#nav a:hover {
+#nav .nav-center a:hover {
 	background-color: #09a709;
 	text-decoration: none;
 }
 
-#nav .active {
+#nav .nav-center .active {
 	background-color: #09ae09;
 }
 
@@ -409,6 +409,54 @@ article {
     background-color: #00a67c;
 }
 
+.nav-center {
+	float: left;
+	width: 70%;
+}
+
+.nav-right {
+	float:right;
+	width: 25%;
+}
+
+.nav-right img {
+	padding: 2px;
+	float: right;
+	width: 40px;
+	height: 40px;
+	margin-right: 5%;
+}
+
+.nav-right p {
+	float: right;
+	height: 22px;
+	margin-top: 11px;
+	margin-bottom: 11px;
+    text-decoration: none;
+    color: #fff;
+}
+
+.nav-right a {
+	float: right;
+	height: 22px;
+	margin-top: 11px;
+	margin-bottom: 11px;
+    text-decoration: none;
+    color: #fff;
+}
+
+.nav-right .login-account {
+	margin-right: 30%;
+}
+
+.nav-right .logout {
+	margin-right: 30%;
+}
+
+.nav-right .nick {
+	margin-right: 5%;
+}
+
 #SOHU_MAIN {
     width: initial !important;
     padding: 0 50px !important;
@@ -566,4 +614,81 @@ article {
 
 #SOHUCS #SOHU_MAIN .global-clear-spacing * {
     letter-spacing: normal;
+}
+
+#SOHUCS #SOHU_MAIN .wrap-name-nick {
+	float: right;
+    display: inline;
+    margin-right: 5%;
+    font-size: 14px;
+}
+
+#SOHUCS #SOHU_MAIN .wrap-name-logout {
+	float: right;
+    margin-right: 0%;
+    display: inline;
+}
+
+.ds-login-buttons {
+	padding: 0 50px !important;
+	margin: 0;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0;
+    border: 0;
+    font-weight: 400;
+    text-align: left;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.ds-login-buttons .ds-social-links {
+    float: left;
+    width: 306px;
+}
+
+.ds-login-buttons p {
+	float: left;
+}
+
+.ds-login-buttons a {
+    cursor: pointer;
+    text-decoration: none;
+    color: #777;
+    background-color: transparent;
+    -webkit-transition: color .15s linear;
+    -moz-transition: color .15s linear;
+    transition: color .15s linear;
+}
+.ds-login-buttons .ds-service-list a {
+    vertical-align: middle;
+    padding-right: 3px;
+}
+.ds-login-buttons .ds-weixin {
+    background-position: 0 -272px;
+}
+
+.ds-login-buttons .ds-weibo {
+    background-position: 0 0;
+}
+
+.ds-login-buttons .ds-qq {
+    background-position: 0 -192px;
+}
+
+.ds-service-link {
+    height: 16px !important;
+    line-height: 16px;
+    padding-left: 20px;
+    display: block;
+    background: url("//static.duoshuo.com/images/service-icons-color.png?v=2") no-repeat;
+    overflow: hidden;
+}
+
+.ds-login-buttons li {
+    float: left;
+    height: 16px;
+    width: 54px;
+    margin: 0 0 0 6px;
 }

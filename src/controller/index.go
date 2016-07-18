@@ -55,7 +55,7 @@ func (i *IndexController) Path() interface{} {
 	return []string{"/index", "/"}
 }
 
-func (i *IndexController) HandlerAction(w http.ResponseWriter, r *http.Request) {
+func (i *IndexController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("./src/view/html/index.html")
 	if err != nil {
 		log.Println(err)

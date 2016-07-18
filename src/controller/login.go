@@ -1,68 +1,109 @@
 package controller
 
 import (
+	"controller/login"
 	"fmt"
-	"framework/config"
-	"io/ioutil"
+	"framework"
+	"framework/response"
+	"framework/server"
+	"info"
+	"model"
 	"net/http"
-	"strings"
+	"time"
 )
 
-const kQQOAuthURL = "https://graph.qq.com/oauth2.0/me"
-
 type LoginController struct {
+	server.SessionController
+	appKey         string
+	appSecret      string
+	longConnectMap map[string]chan bool
 }
 
 func NewLoginController() *LoginController {
-	return &LoginController{}
+	ret := &LoginController{}
+	ret.init()
+	return ret
+}
+
+func (l *LoginController) init() {
+
 }
 
 func (i *LoginController) Path() interface{} {
-	return []string{"/login"}
+	return []string{"/login", "/connect"}
 }
 
-func (l *LoginController) getOpenId(accessToken string) (string, string, error) {
-	url := fmt.Sprintf("%s?access_token=%s", accessToken)
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", "", err
-	}
-
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", "", err
-	}
-	response := string(body)
-	begin := strings.Index(response, "{")
-	end := strings.LastIndex(response, "}")
-	jsonBody := response[begin:end]
-	fmt.Println(jsonBody)
-	c := config.NewConfigContentManager(jsonBody)
-	clientId := c.ReadConfig("client_id").(string)
-	openId := c.ReadConfig("open_id").(string)
-	fmt.Println("client_id: ", clientId)
-	fmt.Println("open_id: ", openId)
-	fmt.Println(string(body))
-	return clientId, openId, err
+func (l *LoginController) SessionPath() string {
+	return "/"
 }
 
-func (l *LoginController) HandlerAction(w http.ResponseWriter, r *http.Request) {
+func (l *LoginController) writeLoginInfo(from string, userInfo *info.UserInfo) {
+	fmt.Println("writeLoginInfo: ", userInfo.UserID)
+	l.WebSession.Set("from", from)
+	l.WebSession.Set("id", userInfo.UserID)
+	l.WebSession.Set("status", "login")
+}
+
+func (l *LoginController) handleLoginConnect(w http.ResponseWriter, successChan chan bool) {
+	var index int = 0
+	var maxIndex = 10
+	var stop bool = false
+	go func(stop *bool) {
+		for {
+			if *stop {
+				break
+			}
+			heart := []byte(`{"code": 0}`)
+			w.Write(heart)
+			w.(http.Flusher).Flush()
+			time.Sleep(10 * time.Second)
+			index++
+			if index >= maxIndex {
+				res := []byte(`{"code": 2}`)
+				w.Write(res)
+				delete(l.longConnectMap, l.WebSession.SessionID())
+				return
+			}
+		}
+	}(&stop)
+	<-successChan
+	stop = true
+	res := []byte(`{"code": 1}`)
+	w.Write(res)
+	delete(l.longConnectMap, l.WebSession.SessionID())
+}
+
+func (l *LoginController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
+	l.SessionController.HandlerRequest(l, w, r)
 	loginType := r.Form.Get("type")
 	switch loginType {
 	case "qq":
-		fmt.Println("login from qq")
-		fmt.Println("r.Form: ", r.Form)
-		accessToken := r.Form.Get("access_token")
-		fmt.Println("access_token: ", accessToken)
-		if len(accessToken) != 0 {
-			fmt.Println(l.getOpenId(accessToken))
-			// https://graph.qq.com/oauth2.0/me?access_token=47D98E8D58D74E553D9A7566C35F3C1A
-
+		code := r.Form.Get("code")
+		if len(code) != 0 {
+			userInfo, err := login.GetQQLoginInstance().Login(code)
+			if err != nil {
+				response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, err.Error())
+			} else {
+				err = model.ShareUserModel().Login(info.AccountTypeQQ, userInfo)
+				if err != nil {
+					response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, err.Error())
+					return
+				}
+				l.writeLoginInfo("qq", userInfo)
+				if _, ok := l.longConnectMap[l.WebSession.SessionID()]; ok {
+					l.longConnectMap[l.WebSession.SessionID()] <- true
+					response.JsonResponse(w, framework.ErrorOK)
+				} else {
+					response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, "login timeout")
+				}
+			}
 		}
 	case "weibo":
 		fmt.Println("login from weibo")
+	case "connect":
+		l.longConnectMap[l.WebSession.SessionID()] = make(chan bool)
+		l.handleLoginConnect(w, l.longConnectMap[l.WebSession.SessionID()])
+		fmt.Println("login connect")
 	}
-	fmt.Fprintf(w, "success")
 }

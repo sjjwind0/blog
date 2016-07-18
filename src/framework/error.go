@@ -10,4 +10,10 @@ const (
 
 	// blog
 	ErrorBlogExist = 1000
+
+	// runtime
+	ErrorRunTimeError = 2000
+
+	// account
+	ErrorAccountNotLogin = 3000
 )

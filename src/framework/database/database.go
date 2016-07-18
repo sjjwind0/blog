@@ -35,7 +35,6 @@ func (this *Database) Open() error {
 			return err
 		}
 	}
-	fmt.Println("open success")
 	this.ref++
 	return nil
 }
@@ -49,7 +48,6 @@ func (this *Database) Close() {
 
 func (this *Database) DoesTableExist(tableName string) bool {
 	rows, err := this.DB.Query("select * from `INFORMATION_SCHEMA`.`TABLES` where table_name =? and TABLE_SCHEMA=?", tableName, kDatabaseName)
-	fmt.Println("err = ", err)
 	defer rows.Close()
 	if err == nil {
 		if rows.Next() {

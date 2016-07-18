@@ -13,6 +13,8 @@ const (
 	ConfigType_ContentConfig
 )
 
+const kDefaultConfigName = "default.conf"
+
 var configMgrMap map[string]*configManager = make(map[string]*configManager)
 var configMapListLock sync.Mutex
 
@@ -24,6 +26,10 @@ type configManager struct {
 func IsFileExixt(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil || os.IsExist(err)
+}
+
+func GetDefaultConfigFileManager() *configManager {
+	return GetConfigFileManager(kDefaultConfigName)
 }
 
 func GetConfigFileManager(config string) *configManager {
@@ -63,25 +69,7 @@ func (c *configManager) loadConfigFileContent() string {
 
 func transfer(value interface{}) interface{} {
 	switch value.(type) {
-	case int:
-		return value
-	case int32:
-		return value
-	case string:
-		return value
-	case int64:
-		return value
-	case float32:
-		return value
-	case float64:
-		return value
-	case []string:
-		return value
-	case []int:
-		return value
-	case []int64:
-		return value
-	case []float32:
+	case int, int32, string, int64, float32, float64, []string, []int, []int64, []float32:
 		return value
 	case json.Number:
 		realValue := value.(json.Number)

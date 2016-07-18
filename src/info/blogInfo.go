@@ -3,7 +3,7 @@ package info
 type CommentInfo struct {
 	CommentID       int
 	BlogID          int
-	UserID          int
+	UserID          int64
 	ParentCommentID int
 	Content         string
 	Time            int64

@@ -28,8 +28,12 @@ func StartServer() {
 	server.ShareServerMgrInstance().RegisterStaticFile("/img/", localWebResourcePath)
 	server.ShareServerMgrInstance().RegisterStaticFile("/font/", localWebResourcePath)
 
+	// 评论表
 	database.ShareDatabaseRunner().RegisterModel(model.ShareCommentModel())
+	// 博客表
 	database.ShareDatabaseRunner().RegisterModel(model.ShareBlogModel())
+	// 用户表
+	database.ShareDatabaseRunner().RegisterModel(model.ShareUserModel())
 	database.ShareDatabaseRunner().Start()
 
 	server.ShareServerMgrInstance().StartServer()
