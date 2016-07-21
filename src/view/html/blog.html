@@ -14,10 +14,9 @@
 	<div id="nav">
 		<div class="nav-center">
 			<ul class="clear">
-				<li class="active"><a href="">首页</a></li>
-				<li><a href="/blog">技术圈子</a></li>
-				<li><a href="/high">High玩</a></li>
-				<li><a href="/about">关于</a></li>
+				<li class="active"><a href="{{.Host.Host}}/index">博客</a></li>
+				<li><a href="{{.Host.Host}}/high">High玩</a></li>
+				<li><a href="{{.Host.Host}}/about">关于</a></li>
 			</ul>
 	</div>
 	</div>
@@ -29,20 +28,24 @@
 			<div class="breadcrumbs">
 				<a title="返回首页" href=".">
 					<i class="fa fa-home"></i>
-					</a> <small>&gt;</small><a href="./category/technique">Blog</a> <small>&gt;</small> <a href="./category/technique/other">{{.BlogSortType}}</a> <small>&gt;</small> 
+					</a> <small>&gt;</small><a href="{{.Host.Host}}/category/technique">Blog</a> <small>&gt;</small> <a href="{{.Host.Host}}/category/technique/other">{{.BlogSortType}}</a> <small>&gt;</small> 
 					<span class="muted">{{.BlogTitle}}</span>
 			</div>
 			<header class="article-header">
-					<h1 class="article-title"><a href="./blog?id={{.BlogID}}.html#comments">{{.BlogTitle}}</a></h1>
+					<h1 class="article-title"><a href="{{.Host.Host}}/blog?id={{.BlogID}}#comments">{{.BlogTitle}}</a></h1>
 					<div class="meta">
-						<span id="mute-category" class="muted"><i class="fa fa-list-alt"></i><a href="./category/technique/other"> {{.BlogSortType}}</a></span>				<span class="muted"><i class="fa fa-user"></i> <a href="./author/cqcre">{{.Author}}</a></span>
+						<span id="mute-category" class="muted">
+							<i class="fa fa-list-alt"></i>
+							<a href="{{.Host.Host}}/sort?type={{.BlogSortType}}"> {{.BlogSortType}}</a>
+						</span>				
+						<span class="muted"><i class="fa fa-user"></i> <a href="{{.Host.Host}}/about">{{.Author}}</a></span>
 						<time class="muted"><i class="fa fa-clock-o"></i>{{.BlogTime}}</time>
 						<span class="muted"><i class="fa fa-eye"></i> {{.BlogVisitCount}}</span>
-						<span class="muted"><i class="fa fa-comments-o"></i> <a href="./blog?id={{.BlogID}}.html#comments">{{.BlogCommentCount}}条评论</a></span>	
+						<span class="muted"><i class="fa fa-comments-o"></i> <a href="{{.Host.Host}}/blog?id={{.BlogID}}#comments">{{.BlogCommentCount}}条评论</a></span>	
 					</div>
 			</header>
 			<div class="blog" bid="{{.BlogID}}">
-				<iframe class="blog-frame" name="blog" scrolling="no" frameborder="0" width="100%" onload="this.height=this.contentWindow.document.documentElement.scrollHeight;" src="./article?id={{.BlogID}}"></iframe>
+				<iframe class="blog-frame" name="blog" scrolling="no" frameborder="0" width="100%" onload="this.height=this.contentWindow.document.documentElement.scrollHeight;" src="{{.Host.Host}}/article?id={{.BlogID}}"></iframe>
 			</div>
 			<div class="talk">
 				{{if .User.IsLogin}}
@@ -138,23 +141,20 @@
 		</div>
 		<div class="side">
 			<div class="widget widget_archive"><div class="small_title"><h2>文章归档</h2></div>		
-			<ul>
-				<li><a href="./date/2016/05">2016年六月</a></li>
-				<li><a href="./date/2016/04">2016年五月</a></li>
-				<li><a href="./date/2016/03">2016年四月</a></li>
-				<li><a href="./date/2016/02">2016年二月</a></li>
-				<li><a href="./date/2016/03">2016年三月</a></li>
-				<li><a href="./date/2016/02">2016年二月</a></li>
-			</ul>
-		</div>
+				<ul>
+					{{range .Side.BlogTimeList}}
+					<li><a href="{{$.Host.Host}}/date?time={{.Year}}.{{.Month}}">{{.Date}}</a></li>
+					{{end}}
+				</ul>
+			</div>
 			<div class="widget d_tag">
 				<div class="small_title">
 					<h2>标签</h2>
 				</div>
 				<div class="d_tags">
-					<a title="" href="./tag/python" data-original-title="2个话题">C++ (2)</a>
-					<a title="" href="./tag/php" data-original-title="1个话题">其它 (1)</a>
-					<a title="" href="./tag/%e7%88%ac%e8%99%ab" data-original-title="4个话题">Java (4)</a>
+					{{range .Side.BlogTagList}}
+					<a title="" href="{{$.Host.Host}}/tag?type={{.Tag}}" data-original-title="{{.Count}}个话题">{{.Tag}} ({{.Count}})</a>
+					{{end}}
 				</div>
 			</div>
 		</div>

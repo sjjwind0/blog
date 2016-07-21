@@ -49,6 +49,8 @@ type blogRender struct {
 	BlogCommentCount       string
 	BlogCommentPeopleCount string
 	User                   userRender
+	Side                   *sideRender
+	Host                   *hostRender
 }
 
 type BlogController struct {
@@ -75,10 +77,9 @@ func (b *BlogController) buildCommentRender(info *info.CommentInfo, childComment
 	var render commentRender
 	render.ChildContent = template.HTML(*childComment)
 	render.CommentContent = info.Content
-	render.CommentTime = "2016年12月1日 03:22"
+	render.CommentTime = FormatTime(info.Time)
 	render.CommentID = strconv.Itoa(info.CommentID)
 	render.UserID = string(info.UserID)
-	render.UserName = "测试"
 	render.Floor = *floor
 	userInfo, err := model.ShareUserModel().GetUserInfoById(info.UserID)
 	if err == nil {
@@ -203,10 +204,11 @@ func (b *BlogController) readBlogHtml(w http.ResponseWriter, blogId int) {
 		return
 	}
 	var render blogRender
+	render.Host = buildHostRender()
 	render.BlogID = strconv.Itoa(blogInfo.BlogID)
 	render.BlogSortType = blogInfo.BlogSortType
 	render.BlogTitle = blogInfo.BlogTitle
-	render.BlogTime = "2015年"
+	render.BlogTime = FormatRealTime(blogInfo.BlogTime)
 	render.BlogTag = strings.Join(blogInfo.BlogTagList, "||")
 	commentCount, err := model.ShareCommentModel().FetchCommentCount(blogInfo.BlogID)
 	render.BlogCommentCount = strconv.Itoa(commentCount)
@@ -214,16 +216,15 @@ func (b *BlogController) readBlogHtml(w http.ResponseWriter, blogId int) {
 	render.BlogCommentPeopleCount = strconv.Itoa(peopleCount)
 	render.BlogVisitCount = strconv.Itoa(blogInfo.BlogVisitCount)
 	render.CommentContent = template.HTML(content)
+	render.Author = config.GetDefaultConfigFileManager().ReadConfig("owner.name").(string)
 	v, err := b.SessionController.WebSession.Get("status")
 	if err == nil {
 		if v.(string) == "login" {
 			render.User.IsLogin = true
 			userId, err := b.SessionController.WebSession.Get("id")
-			fmt.Println("userId: ", userId)
 			if err == nil {
 				userInfo, err := model.ShareUserModel().GetUserInfoById(userId.(int64))
 				if err == nil && userInfo != nil {
-					fmt.Println("userRender: ", render.User.UserID)
 					render.User.NickName = userInfo.UserName
 					render.User.Pic = userInfo.SmallFigureurl
 					render.User.UserID = strconv.Itoa(int(userId.(int64)))
@@ -236,6 +237,10 @@ func (b *BlogController) readBlogHtml(w http.ResponseWriter, blogId int) {
 		}
 	} else {
 		render.User.IsLogin = false
+	}
+	blogList, err := model.ShareBlogModel().FetchAllBlog()
+	if err == nil {
+		render.Side = buildSideRender(blogList)
 	}
 	t.Execute(w, render)
 }
@@ -253,7 +258,7 @@ func (b *BlogController) HandlerRequest(w http.ResponseWriter, r *http.Request) 
 		b.readImg(w, r.Form["id"][0])
 	} else {
 		b.SessionController.HandlerRequest(b, w, r)
-		id, err := strconv.Atoi(r.Form["id"][0])
+		id, err := strconv.Atoi(r.Form.Get("id"))
 		if err != nil {
 			response.JsonResponseWithMsg(w, framework.ErrorParamError, "param error")
 			return

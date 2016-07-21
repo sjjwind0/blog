@@ -64,8 +64,8 @@ func (c *commentModel) AddComment(userId int, blogId int, commentId int, comment
 		kCommentTableName, kCommentUserId, kCommentBlogId, kCommentParentId,
 		kCommentContent, kCommentTime)
 	stat, err := database.DatabaseInstance().DB.Prepare(sql)
-	defer stat.Close()
 	if err == nil {
+		defer stat.Close()
 		_, err := stat.Exec(userId, blogId, commentId, commentContent, time.Now().Unix())
 		return err
 	}
@@ -76,9 +76,9 @@ func (c *commentModel) AddComment(userId int, blogId int, commentId int, comment
 func (c *commentModel) FetchAllCommentByBlogId(blogId int) (*list.List, error) {
 	sql := fmt.Sprintf("select * from %s where %s = ? order by %s desc", kCommentTableName, kCommentBlogId, kCommentId)
 	rows, err := database.DatabaseInstance().DB.Query(sql, blogId)
-	defer rows.Close()
 	var blogList *list.List = list.New()
 	if err == nil {
+		defer rows.Close()
 		for rows.Next() {
 			var commentInfo info.CommentInfo
 			err = rows.Scan(&commentInfo.CommentID, &commentInfo.BlogID, &commentInfo.ParentCommentID,
@@ -97,8 +97,8 @@ func (c *commentModel) FetchAllCommentByBlogId(blogId int) (*list.List, error) {
 func (b *commentModel) FetchCommentCount(blogId int) (int, error) {
 	sql := fmt.Sprintf("select count(*) from %s where %s = ?", kCommentTableName, kCommentBlogId)
 	rows, err := database.DatabaseInstance().DB.Query(sql, blogId)
-	defer rows.Close()
 	if err == nil {
+		defer rows.Close()
 		for rows.Next() {
 			var count int
 			err = rows.Scan(&count)
@@ -112,15 +112,15 @@ func (b *commentModel) FetchCommentCount(blogId int) (int, error) {
 
 func (b *commentModel) FetchCommentPeopleCount(blogId int) (int, error) {
 	sql := fmt.Sprintf("select count(distinct(%s)) from %s where %s = ?",
-		kCommentBlogId, kCommentTableName, kCommentUserId)
+		kCommentUserId, kCommentTableName, kCommentBlogId)
 	rows, err := database.DatabaseInstance().DB.Query(sql, blogId)
-	defer rows.Close()
 	if err == nil {
+		defer rows.Close()
 		for rows.Next() {
-			var count int
+			var count int64
 			err = rows.Scan(&count)
 			if err == nil {
-				return count, nil
+				return int(count), nil
 			}
 		}
 	}

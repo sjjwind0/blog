@@ -81,11 +81,11 @@ func (u *userModel) accountHasLogin(accountType int, openId string) (bool, error
 	sql := fmt.Sprintf("select %s from %s where %s = ? and %s = ?",
 		kUserId, kUserTableName, kUserType, kUserOpenId)
 	stat, err := database.DatabaseInstance().DB.Prepare(sql)
-	defer stat.Close()
 	if err == nil {
+		defer stat.Close()
 		rows, err := stat.Query(accountType, openId)
-		defer rows.Close()
 		if err == nil {
+			defer rows.Close()
 			for rows.Next() {
 				return true, nil
 			}
@@ -95,7 +95,7 @@ func (u *userModel) accountHasLogin(accountType int, openId string) (bool, error
 }
 
 func (u *userModel) updateAccountInfo(accountType int, userInfo *info.UserInfo) error {
-	sql := fmt.Sprintf("update %s set %s = ? and %s = ? and %s = ? and %s = ? and %s = ? where %s = ? and %s = ?",
+	sql := fmt.Sprintf("update %s set %s = ?, %s = ?, %s = ?, %s = ?, %s = ? where %s = ? and %s = ?",
 		kUserTableName, kUserName, kUserSex, kUserBigPicutreURL,
 		kUserSmallPicutreURL, kUserLastLoginTime, kUserType, kUserOpenId)
 	currentTime := time.Now().Unix()
@@ -105,8 +105,8 @@ func (u *userModel) updateAccountInfo(accountType int, userInfo *info.UserInfo) 
 		sql = fmt.Sprintf("select %s from %s where %s = ? and %s = ?", kUserId,
 			kUserTableName, kUserType, kUserOpenId)
 		rows, err := database.DatabaseInstance().DB.Query(sql, accountType, userInfo.UserOpenID)
-		defer rows.Close()
 		if err == nil {
+			defer rows.Close()
 			for rows.Next() {
 				rows.Scan(&userInfo.UserID)
 				return nil
@@ -141,8 +141,8 @@ func (u *userModel) GetUserInfoById(userId int64) (*info.UserInfo, error) {
 	sql := fmt.Sprintf("select %s, %s, %s from %s where %s = ?", kUserName, kUserSex,
 		kUserSmallPicutreURL, kUserTableName, kUserId)
 	rows, err := database.DatabaseInstance().DB.Query(sql, userId)
-	defer rows.Close()
 	if err == nil {
+		defer rows.Close()
 		for rows.Next() {
 			var userInfo info.UserInfo
 			rows.Scan(&userInfo.UserName, &userInfo.Sex, &userInfo.SmallFigureurl)

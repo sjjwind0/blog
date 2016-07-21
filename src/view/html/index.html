@@ -14,17 +14,11 @@
 		<div id="nav">
 			<div class="nav-center">
 				<ul class="clear">
-					<li class="active"><a href="">首页</a></li>
-					<li><a href="/blog">技术圈子</a></li>
-					<li><a href="/high">High玩</a></li>
-					<li><a href="/about">关于</a></li>
+					<li class="active"><a href="{{.Host.Host}}/index">博客</a></li>
+					<li><a href="{{.Host.Host}}/high">High玩</a></li>
+					<li><a href="{{.Host.Host}}/about">关于</a></li>
 				</ul>
 			</div>
-			<!-- <div class="nav-right">
-				<a class="login-account" href="javascript:void(0);">登出</a>
-				<p class="nick">风惜殇</p>
-				<img class="pic" src="http://qzapp.qlogo.cn/qzapp/101324961/7F51567FDE8B946F800365B75FA5EBBF/100">
-			</div> -->
 		</div>
 		<div class="container">
 			<div class="header">
@@ -33,35 +27,35 @@
 				{{range .BlogList}}
 				<article class="excerpt">
 					<header>
-						<a class="label label-important" href="./sort/{{.BlogSortType}}">{{.BlogSortType}}
+						<a class="label label-important" href="{{$.Host.Host}}/sort/{{.BlogSortType}}">{{.BlogSortType}}
 							<i class="label-arrow"></i>
 						</a>
-						<h2><a target="_blank" href="./blog?id={{.BlogID}}" title="{{.BlogTitle}}">{{.BlogTitle}}</a></h2>
+						<h2><a target="_blank" href="{{$.Host.Host}}/blog?id={{.BlogID}}" title="{{.BlogTitle}}">{{.BlogTitle}}</a></h2>
 					</header>
-					<div class="focus"><a target="_blank" href="./blog?id={{.BlogID}}"><img class="thumb" src="./img?id={{.BlogUUID}}" height="123" width="200" alt="{{.BlogTitle}}"></a></div>
+					<div class="focus"><a target="_blank" href="{{$.Host.Host}}/blog?id={{.BlogID}}"><img class="thumb" src="{{$.Host.Host}}/img?id={{.BlogUUID}}" height="123" width="200" alt="{{.BlogTitle}}"></a></div>
 						<span class="note"> {{.BlogDescription}}</span>
 					<p class="auth-span">
-							<span class="muted"><i class="fa fa-user"></i> <a href="./about">{{.BlogAuthor}}</a></span>
-							<span class="muted"><i class="fa fa-clock-o"></i> {{.BlogTime}}</span>	<span class="muted"><i class="fa fa-eye"></i> {{.BlogVisitCount}}℃</span>	<span class="muted"><i class="fa fa-comments-o"></i> <a target="_blank" href="./blog?id={{.BlogID}}#comments">{{.BlogCommentCount}}评论</a></span><span class="muted">
+							<span class="muted"><i class="fa fa-user"></i> <a href="{{$.Host.Host}}/about">{{.BlogAuthor}}</a></span>
+							<span class="muted"><i class="fa fa-clock-o"></i> {{.BlogTime}}</span>	<span class="muted"><i class="fa fa-eye"></i> {{.BlogVisitCount}}℃</span>	<span class="muted"><i class="fa fa-comments-o"></i> <a target="_blank" href="{{$.Host.Host}}/blog?id={{.BlogID}}#comments">{{.BlogCommentCount}}评论</a></span><span class="muted">
 					<a href="javascript:;" data-action="ding" data-id="{{.BlogID}}" id="Addlike" class="action"><i class="fa fa-heart-o"></i><span class="count">{{.BlogPraiseCount}}</span>喜欢</a></span></p>
 				</article>
 				{{end}}
 			</div>
 			<div class="side">
 				<div class="widget widget_archive"><div class="small_title"><h2>文章归档</h2></div>		
-				<ul>
-					{{range .BlogTimeList}}
-					<li><a href="./date/{{.Year}}/{{.Month}}">{{.Date}}</a></li>
-					{{end}}
-				</ul>
-			</div>
+					<ul>
+						{{range .Side.BlogTimeList}}
+						<li><a href="{{$.Host.Host}}/date?time={{.Year}}.{{.Month}}">{{.Date}}</a></li>
+						{{end}}
+					</ul>
+				</div>
 				<div class="widget d_tag">
 					<div class="small_title">
 						<h2>标签</h2>
 					</div>
 					<div class="d_tags">
-						{{range .BlogTagList}}
-						<a title="" href="./tag/{{.Tag}}" data-original-title="{{.Count}}个话题">{{.Tag}} ({{.Count}})</a>
+						{{range .Side.BlogTagList}}
+						<a title="" href="{{$.Host.Host}}/tag?type={{.Tag}}" data-original-title="{{.Count}}个话题">{{.Tag}} ({{.Count}})</a>
 						{{end}}
 					</div>
 				</div>

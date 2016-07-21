@@ -110,7 +110,7 @@ body {
 }
 
 #nav ul {
-	width: 80%;
+	width: 70%;
 	margin: 0 auto;
 	padding-top: 0px;
 }
@@ -407,11 +407,6 @@ article {
 
 .label-important, .badge-important {
     background-color: #00a67c;
-}
-
-.nav-center {
-	float: left;
-	width: 70%;
 }
 
 .nav-right {

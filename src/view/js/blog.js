@@ -60,8 +60,9 @@ Talk.sendTalk = function (blogId, commentId, content) {
 		success: function(result) {
 			if (result.code == 0) {
 				console.log("send talk success");
+			} else {
+				alert("评论失败, err: " + result.msg)
 			}
-			console.log("failed");
 		}
 	});
 }

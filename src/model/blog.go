@@ -66,8 +66,8 @@ func (b *blogModel) InsertBlog(uuid string, title string, sortType string, tagLi
 	sql := fmt.Sprintf("insert into %s(%s, %s, %s, %s, %s) values(?, ?, ?, ?, ?)",
 		kBlogTableName, kBlogUUID, kBlogTitle, kBlogSortType, kBlogTag, kBlogTime)
 	stat, err := database.DatabaseInstance().DB.Prepare(sql)
-	defer stat.Close()
 	if err == nil {
+		defer stat.Close()
 		_, err := stat.Exec(uuid, title, sortType, tag, currentTime)
 		return err
 	}
@@ -77,8 +77,8 @@ func (b *blogModel) InsertBlog(uuid string, title string, sortType string, tagLi
 func (b *blogModel) BlogIsExist(uuid string) (bool, error) {
 	sql := fmt.Sprintf("select * from %s where %s = ?", kBlogTableName, kBlogUUID)
 	rows, err := database.DatabaseInstance().DB.Query(sql, uuid)
-	defer rows.Close()
 	if err == nil {
+		defer rows.Close()
 		for rows.Next() {
 			return true, nil
 		}
@@ -89,8 +89,8 @@ func (b *blogModel) BlogIsExist(uuid string) (bool, error) {
 func (b *blogModel) FetchAllBlog() (*list.List, error) {
 	sql := fmt.Sprintf("select * from %s", kBlogTableName)
 	rows, err := database.DatabaseInstance().DB.Query(sql)
-	defer rows.Close()
 	if err == nil {
+		defer rows.Close()
 		var blogList *list.List = list.New()
 		for rows.Next() {
 			var blog info.BlogInfo
@@ -112,8 +112,8 @@ func (b *blogModel) FetchAllBlog() (*list.List, error) {
 func (b *blogModel) FetchBlogByBlogID(blogID int) (*info.BlogInfo, error) {
 	sql := fmt.Sprintf("select* from %s where %s = ?", kBlogTableName, kBlogId)
 	rows, err := database.DatabaseInstance().DB.Query(sql, blogID)
-	defer rows.Close()
 	if err == nil {
+		defer rows.Close()
 		for rows.Next() {
 			var blog info.BlogInfo
 			var tag string
@@ -133,8 +133,8 @@ func (b *blogModel) FetchBlogByBlogID(blogID int) (*info.BlogInfo, error) {
 func (b *blogModel) GetBlogUUIDByBlogID(blogID int) (string, error) {
 	sql := fmt.Sprintf("select %s from %s where %s = ?", kBlogUUID, kBlogTableName, kBlogId)
 	rows, err := database.DatabaseInstance().DB.Query(sql, blogID)
-	defer rows.Close()
 	if err == nil {
+		defer rows.Close()
 		for rows.Next() {
 			var uuid string
 			err = rows.Scan(&uuid)
@@ -150,8 +150,8 @@ func (b *blogModel) GetBlogUUIDByBlogID(blogID int) (string, error) {
 func (b *blogModel) FetchBlogByUUID(uuid string) (*info.BlogInfo, error) {
 	sql := fmt.Sprintf("select* from %s where %s = ?", kBlogTableName, kBlogUUID)
 	rows, err := database.DatabaseInstance().DB.Query(sql, uuid)
-	defer rows.Close()
 	if err == nil {
+		defer rows.Close()
 		for rows.Next() {
 			var blog info.BlogInfo
 			var tag string
@@ -171,8 +171,8 @@ func (b *blogModel) FetchBlogByUUID(uuid string) (*info.BlogInfo, error) {
 func (b *blogModel) FetchAllSortType() ([]string, error) {
 	sql := fmt.Sprintf("select %s from %s distinct", kBlogSortType, kBlogTableName)
 	rows, err := database.DatabaseInstance().DB.Query(sql)
-	defer rows.Close()
 	if err == nil {
+		defer rows.Close()
 		var sortTypeList []string
 		for rows.Next() {
 			var sortType string
@@ -187,10 +187,32 @@ func (b *blogModel) FetchAllSortType() ([]string, error) {
 }
 
 func (b *blogModel) FetchAllBlogBySortType(sortType string) (*list.List, error) {
-	sql := fmt.Sprintf("select * from %s where %s = ?", kBlogTitle, kBlogSortType)
+	sql := fmt.Sprintf("select * from %s where %s = ?", kBlogTableName, kBlogSortType)
 	rows, err := database.DatabaseInstance().DB.Query(sql, sortType)
-	defer rows.Close()
 	if err == nil {
+		defer rows.Close()
+		var blogList *list.List = list.New()
+		for rows.Next() {
+			var blog info.BlogInfo
+			var tag string
+			err = rows.Scan(&blog.BlogID, &blog.BlogUUID, &blog.BlogTitle,
+				&blog.BlogSortType, &tag, &blog.BlogTime, &blog.BlogVisitCount,
+				&blog.BlogPraiseCount, &blog.BlogDissentCount)
+			if err == nil {
+				blog.BlogTagList = strings.Split(tag, "||")
+				blogList.PushBack(blog)
+			}
+		}
+		return blogList, err
+	}
+	return nil, err
+}
+
+func (b *blogModel) FetchAllBlogByTime(beginTime int64, endTime int64) (*list.List, error) {
+	sql := fmt.Sprintf("select * from %s where %s >= ? and %s <= ?", kBlogTableName, kBlogTime, kBlogTime)
+	rows, err := database.DatabaseInstance().DB.Query(sql, beginTime, endTime)
+	if err == nil {
+		defer rows.Close()
 		var blogList *list.List = list.New()
 		for rows.Next() {
 			var blog info.BlogInfo

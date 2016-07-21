@@ -24,6 +24,11 @@ func FormatTime(t int64) string {
 	}
 }
 
+func FormatRealTime(t int64) string {
+	publishTime := time.Unix(t, 0)
+	return publishTime.Format("2006年01月02日")
+}
+
 type BlogTime struct {
 	Tag  string
 	Time int64
