@@ -71,7 +71,6 @@ func (s *SessionController) HandlerRequest(controller SessionControllerInterface
 				http.SetCookie(w, &cc)
 				s.WebSession = sss
 			} else {
-				fmt.Println("MaxAge: ", s.WebSession.MaxAge())
 				cc := http.Cookie{Name: "s", Value: c.SessionID(), Path: cookiePath, MaxAge: s.WebSession.MaxAge()}
 				http.SetCookie(w, &cc)
 			}

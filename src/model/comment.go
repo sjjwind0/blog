@@ -59,18 +59,36 @@ func (c *commentModel) CreateTable() error {
 	return err
 }
 
-func (c *commentModel) AddComment(userId int, blogId int, commentId int, commentContent string) error {
+func (c *commentModel) AddComment(userId int, blogId int, commentId int, commentContent string) (int, error) {
 	sql := fmt.Sprintf("insert into %s(%s, %s, %s, %s, %s) values(?, ?, ?, ?, ?)",
 		kCommentTableName, kCommentUserId, kCommentBlogId, kCommentParentId,
 		kCommentContent, kCommentTime)
 	stat, err := database.DatabaseInstance().DB.Prepare(sql)
 	if err == nil {
 		defer stat.Close()
-		_, err := stat.Exec(userId, blogId, commentId, commentContent, time.Now().Unix())
-		return err
+		result, err := stat.Exec(userId, blogId, commentId, commentContent, time.Now().Unix())
+		if err == nil {
+			insertId, err := result.LastInsertId()
+			return int(insertId), err
+		}
 	}
-	fmt.Println(err)
-	return err
+	return 0, err
+}
+
+func (c *commentModel) FetchCommentByCommentId(commentId int) (*info.CommentInfo, error) {
+	sql := fmt.Sprintf("select * from %s where %s = ?", kCommentTableName, kCommentId)
+	rows, err := database.DatabaseInstance().DB.Query(sql, commentId)
+	if err == nil {
+		defer rows.Close()
+		if rows.Next() {
+			var commentInfo info.CommentInfo
+			err = rows.Scan(&commentInfo.CommentID, &commentInfo.BlogID, &commentInfo.ParentCommentID,
+				&commentInfo.UserID, &commentInfo.Content, &commentInfo.Time,
+				&commentInfo.Praise, &commentInfo.Dissent, &commentInfo.Address)
+			return &commentInfo, nil
+		}
+	}
+	return nil, err
 }
 
 func (c *commentModel) FetchAllCommentByBlogId(blogId int) (*list.List, error) {

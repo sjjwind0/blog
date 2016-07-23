@@ -43,7 +43,7 @@ const (
 			            <div class="clear-g action-issue-w">
 			                <div class="issue-btn-w">
 			                    <a href="javascript:void(0)">
-			                        <button node-type="issue" class="btn-fw">发布</button>
+			                        <button node-type="issue" class="btn-fw btn-reply">发布</button>
 			                    </a>
 			                </div>
 			                <div class="issue-icon-w" node-type="share-icons">
@@ -96,7 +96,7 @@ const (
 			            <div class="clear-g action-issue-w">
 			                <div class="issue-btn-w">
 			                    <a href="javascript:void(0)">
-			                        <button node-type="issue" class="btn-fw">发布</button>
+			                        <button node-type="issue" class="btn-fw btn-reply">发布</button>
 			                    </a>
 			                </div>
 			                <div class="issue-icon-w" node-type="share-icons">

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:wb="http://open.weibo.com/wb">
 <head>
 	<meta charset="utf-8" />
 	<meta property="wb:webmaster" content="ec68cbf32bb1042d" />
@@ -7,18 +7,17 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>小风的个人博客</title>
 	<link rel="stylesheet" href="/css/global.css" />
-	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 	<div class="body">
 		<div id="nav">
-			<div class="nav-center">
-				<ul class="clear">
-					<li class="active"><a href="{{.Host.Host}}/index">博客</a></li>
-					<li><a href="{{.Host.Host}}/high">High玩</a></li>
-					<li><a href="{{.Host.Host}}/about">关于</a></li>
-				</ul>
-			</div>
+		<div class="nav-center">
+			<ul class="clear">
+				<li><a href="{{.Host.Host}}/blog">技术圈子</a></li>
+				<li><a href="{{.Host.Host}}/high">High玩</a></li>
+				<li><a href="{{.Host.Host}}/about">关于</a></li>
+			</ul>
+		</div>
 		</div>
 		<div class="container">
 			<div class="header">
@@ -27,7 +26,7 @@
 				{{range .BlogList}}
 				<article class="excerpt">
 					<header>
-						<a class="label label-important" href="{{$.Host.Host}}/sort/{{.BlogSortType}}">{{.BlogSortType}}
+						<a class="label label-important" href="{{$.Host.Host}}/sort?type={{.BlogSortType}}">{{.BlogSortType}}
 							<i class="label-arrow"></i>
 						</a>
 						<h2><a target="_blank" href="{{$.Host.Host}}/blog?id={{.BlogID}}" title="{{.BlogTitle}}">{{.BlogTitle}}</a></h2>

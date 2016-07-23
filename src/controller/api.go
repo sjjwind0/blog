@@ -5,14 +5,29 @@ package controller
  */
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"framework"
 	"framework/response"
 	"framework/server"
+	"html/template"
+	"info"
 	"io/ioutil"
 	"model"
 	"net/http"
 )
+
+type apiCommentRender struct {
+	UserID         string
+	UserName       string
+	Pic            string
+	CommentID      string
+	CommentContent string
+	CommentTime    string
+	Floor          int
+	User           *info.UserInfo
+	ChildContent   template.HTML
+}
 
 type APIController struct {
 	server.SessionController
@@ -28,6 +43,27 @@ func (a *APIController) Path() interface{} {
 
 func (a *APIController) SessionPath() string {
 	return "/"
+}
+
+func (a *APIController) buildComment(commentId int) (string, error) {
+	var commentList []*info.CommentInfo = nil
+	for commentId != -1 {
+		comment, err := model.ShareCommentModel().FetchCommentByCommentId(commentId)
+		if err != nil {
+			return "", err
+		}
+		commentList = append(commentList, comment)
+		commentId = comment.ParentCommentID
+	}
+	// 逆序
+	commentListLength := len(commentList)
+	for i := 0; i < commentListLength/2; i++ {
+		tmp := commentList[i]
+		commentList[i] = commentList[commentListLength-i-1]
+		commentList[commentListLength-i-1] = tmp
+	}
+	comment := buildOneCommentFromCommentList(&commentList)
+	return comment, nil
 }
 
 func (a *APIController) handlePublicCommentAction(w http.ResponseWriter, info map[string]interface{}) {
@@ -70,12 +106,17 @@ func (a *APIController) handlePublicCommentAction(w http.ResponseWriter, info ma
 			switch info["content"].(type) {
 			case string:
 				content = info["content"].(string)
-				err := model.ShareCommentModel().AddComment(userId, blogId, commentId, content)
+				commentId, err := model.ShareCommentModel().AddComment(userId, blogId, commentId, content)
 				if err == nil {
-					response.JsonResponse(w, framework.ErrorOK)
-				} else {
-					response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
+					comment, err := a.buildComment(commentId)
+					if err == nil {
+						var data map[string]interface{} = make(map[string]interface{})
+						data["comment"] = base64.StdEncoding.EncodeToString([]byte(comment))
+						response.JsonResponseWithData(w, framework.ErrorOK, "", data)
+						return
+					}
 				}
+				response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
 				return
 			}
 		}

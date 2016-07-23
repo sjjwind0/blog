@@ -21,6 +21,7 @@ func StartServer() {
 	server.ShareServerMgrInstance().RegisterController(controller.NewBlogController())
 	server.ShareServerMgrInstance().RegisterController(controller.NewAPIController())
 	server.ShareServerMgrInstance().RegisterController(controller.NewLoginController())
+	server.ShareServerMgrInstance().RegisterController(controller.NewNotImplController())
 	server.ShareServerMgrInstance().RegisterController(personal.NewSyncController())
 
 	server.ShareServerMgrInstance().RegisterStaticFile("/js/", localWebResourcePath)

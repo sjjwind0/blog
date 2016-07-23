@@ -1,9 +1,6 @@
 package controller
 
 import (
-	"bufio"
-	"bytes"
-	"fmt"
 	"framework"
 	"framework/config"
 	"framework/response"
@@ -18,7 +15,7 @@ import (
 	"strings"
 )
 
-type commentRender struct {
+type blogCommentRender struct {
 	UserID         string
 	UserName       string
 	Pic            string
@@ -72,56 +69,7 @@ func (b *BlogController) SessionPath() string {
 	return "/"
 }
 
-func (b *BlogController) buildCommentRender(info *info.CommentInfo, childComment *string,
-	floor *int) commentRender {
-	var render commentRender
-	render.ChildContent = template.HTML(*childComment)
-	render.CommentContent = info.Content
-	render.CommentTime = FormatTime(info.Time)
-	render.CommentID = strconv.Itoa(info.CommentID)
-	render.UserID = string(info.UserID)
-	render.Floor = *floor
-	userInfo, err := model.ShareUserModel().GetUserInfoById(info.UserID)
-	if err == nil {
-		render.User = userInfo
-	}
-	(*floor)++
-	return render
-}
-
-func (b *BlogController) buildCommentString(child *string, info *info.CommentInfo,
-	step int, floor *int) string {
-	var tmpl string = ""
-	if step == 0 {
-		tmpl = firstComment
-	} else {
-		tmpl = secondComment
-	}
-	t, err := template.New("test").Parse(tmpl)
-	buf := bytes.NewBuffer(make([]byte, 0))
-	strIO := bufio.NewWriter(buf)
-	if err == nil {
-		t.Execute(strIO, b.buildCommentRender(info, child, floor))
-	} else {
-		fmt.Println(err)
-	}
-	strIO.Flush()
-	return string(buf.Bytes())
-}
-
-func (b *BlogController) buildComment(commentTree *map[int]*info.CommentInfo,
-	info *info.CommentInfo, step int, floor *int) string {
-	var childComment = ""
-	if info.ParentCommentID == -1 {
-		return b.buildCommentString(&childComment, info, step, floor)
-	}
-	// 首先build 子元素
-	childInfo := (*commentTree)[info.ParentCommentID]
-	childComment = b.buildComment(commentTree, childInfo, step+1, floor)
-	return b.buildCommentString(&childComment, info, step, floor)
-}
-
-func (b *BlogController) FetchCommentContent(blogId int) (string, error) {
+func (b *BlogController) fetchCommentContent(blogId int) (string, error) {
 	commentList, err := model.ShareCommentModel().FetchAllCommentByBlogId(blogId)
 	if err != nil {
 		return "", err
@@ -135,8 +83,7 @@ func (b *BlogController) FetchCommentContent(blogId int) (string, error) {
 	var rawComment string = ""
 	for iter := commentList.Front(); iter != nil; iter = iter.Next() {
 		info := iter.Value.(info.CommentInfo)
-		var floor = 1
-		rawComment += b.buildComment(&commentTree, &info, 0, &floor)
+		rawComment += buildOneCommentFromCommentTree(&commentTree, &info)
 	}
 	return rawComment, nil
 }
@@ -193,7 +140,7 @@ func (b *BlogController) readBlogHtml(w http.ResponseWriter, blogId int) {
 		response.JsonResponseWithMsg(w, framework.ErrorRenderError, err.Error())
 		return
 	}
-	content, err := b.FetchCommentContent(blogId)
+	content, err := b.fetchCommentContent(blogId)
 	if err != nil {
 		response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
 		return

@@ -2,6 +2,7 @@ package response
 
 import (
 	"fmt"
+	"framework/util/json"
 	"net/http"
 )
 
@@ -10,7 +11,11 @@ func JsonResponse(w http.ResponseWriter, errorCode int) {
 }
 
 func JsonResponseWithMsg(w http.ResponseWriter, errorCode int, msg string) {
-	fmt.Fprintf(w, `{"code": %d, "msg": %s}`, errorCode, msg)
+	fmt.Fprintf(w, `{"code": %d, "msg": "%s"}`, errorCode, msg)
+}
+
+func JsonResponseWithData(w http.ResponseWriter, errorCode int, msg string, data map[string]interface{}) {
+	fmt.Fprintf(w, `{"code": %d, "msg": "%s", "data": %s}`, errorCode, msg, json.ToJsonString(data))
 }
 
 func NotFoundResponse() {
