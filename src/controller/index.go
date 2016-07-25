@@ -37,11 +37,11 @@ type indexRender struct {
 
 func buildBlogElementRender(info *info.BlogInfo) *blogElementRender {
 	var uuid string = info.BlogUUID
-	storageName := config.GetConfigFileManager("default.conf").ReadConfig("storage.blog").(string)
+	storageName := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
 	descriptionPath := filepath.Join(storageName, uuid, "blog.info")
 	description := config.GetConfigFileManager(descriptionPath).ReadConfig("descript").(string)
 	var render blogElementRender
-	render.BlogAuthor = config.GetDefaultConfigFileManager().ReadConfig("owner.name").(string)
+	render.BlogAuthor = config.GetDefaultConfigFileManager().ReadConfig("blog.owner.name").(string)
 	render.BlogTitle = info.BlogTitle
 	render.BlogDescription = description
 	render.BlogID = info.BlogID

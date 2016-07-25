@@ -1,31 +1,25 @@
 package session
 
-var sessionMgrInstance *SessoinMgr = nil
-var sessionMap map[string]*SessoinMgr = make(map[string]*SessoinMgr)
-
 type SessoinMgr struct {
 	storage SessionStorage
 }
 
-func GetSessionManager(name string) *SessoinMgr {
-	if v, ok := sessionMap[name]; ok {
-		return v
-	}
-	sessionMgrInstance = &SessoinMgr{}
-	sessionMap[name] = sessionMgrInstance
+func NewSessionManager(storage SessionStorage) *SessoinMgr {
+	sessionMgrInstance := &SessoinMgr{}
+	sessionMgrInstance.storage = storage
 	return sessionMgrInstance
-}
-
-func (s *SessoinMgr) SetStorage(storage SessionStorage) {
-	s.storage = storage
 }
 
 func (s *SessoinMgr) QuerySessionById(sessionId string) (Session, error) {
 	ss, err := s.storage.Get(sessionId)
+	if err == nil {
+		ss.setSessionStorage(s.storage)
+	}
 	return ss, err
 }
 
 func (s *SessoinMgr) AddSession(session Session) error {
+	session.setSessionStorage(s.storage)
 	return s.storage.Add(session.SessionID(), session)
 }
 

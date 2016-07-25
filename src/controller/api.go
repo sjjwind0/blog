@@ -15,6 +15,7 @@ import (
 	"io/ioutil"
 	"model"
 	"net/http"
+	"strconv"
 )
 
 type apiCommentRender struct {
@@ -77,11 +78,11 @@ func (a *APIController) handlePublicCommentAction(w http.ResponseWriter, info ma
 		return
 	}
 	uid, err := a.WebSession.Get("id")
+	userId, err := strconv.Atoi(uid.(string))
 	if err != nil {
 		response.JsonResponseWithMsg(w, framework.ErrorAccountNotLogin, err.Error())
 		return
 	}
-	var userId int = int(uid.(int64))
 	parseInt := func(name string, retValue *int) bool {
 		var ok bool
 		if _, ok = info[name]; ok {

@@ -13,6 +13,9 @@ func NewMemoryStorage() *memoryStorage {
 	return &memoryStorage{}
 }
 
+func (m *memoryStorage) SetSessionName(name string) {
+}
+
 func (m *memoryStorage) Add(sessionId string, s session.Session) error {
 	if m.sessionMap == nil {
 		m.sessionMap = make(map[string]*memorySession)

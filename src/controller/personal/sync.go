@@ -67,8 +67,8 @@ func (s *SyncController) uploadBlog(w http.ResponseWriter, r *http.Request) {
 	tagList := strings.Split(tag, "||")
 	imgContent := r.MultipartForm.Value["img"][0]
 
-	blogStorageFilePath := config.GetConfigFileManager("default.conf").ReadConfig("storage.blog").(string)
-	imgStorageFilePath := config.GetConfigFileManager("default.conf").ReadConfig("storage.img").(string)
+	blogStorageFilePath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
+	imgStorageFilePath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.img").(string)
 
 	blogStorageFilePath = filepath.Join(blogStorageFilePath, uuid)
 	fmt.Println("blogStorageFilePath: ", blogStorageFilePath)

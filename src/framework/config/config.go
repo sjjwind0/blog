@@ -29,10 +29,10 @@ func IsFileExixt(path string) bool {
 }
 
 func GetDefaultConfigFileManager() *configManager {
-	return GetConfigFileManager(kDefaultConfigName)
+	return GetGlobalConfigFileManager(kDefaultConfigName)
 }
 
-func GetConfigFileManager(config string) *configManager {
+func GetGlobalConfigFileManager(config string) *configManager {
 	configMapListLock.Lock()
 	defer configMapListLock.Unlock()
 	if value, ok := configMgrMap[config]; ok {
@@ -40,6 +40,10 @@ func GetConfigFileManager(config string) *configManager {
 	}
 	configMgrMap[config] = &configManager{config, ConfigType_FileConfig}
 	return configMgrMap[config]
+}
+
+func GetConfigFileManager(config string) *configManager {
+	return &configManager{config, ConfigType_FileConfig}
 }
 
 func NewConfigContentManager(content string) *configManager {

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"framework"
 	"framework/config"
 	"framework/response"
@@ -111,7 +112,7 @@ func (b *BlogController) readBlog(w http.ResponseWriter, blogId int) {
 		response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
 		return
 	}
-	blogPath := config.GetConfigFileManager("default.conf").ReadConfig("storage.blog").(string)
+	blogPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
 	blogPath = filepath.Join(blogPath, uuid, uuid+".html")
 	blogContent := b.readFileContent(blogPath)
 	w.Header().Set("Accept", "*/*")
@@ -121,7 +122,7 @@ func (b *BlogController) readBlog(w http.ResponseWriter, blogId int) {
 }
 
 func (b *BlogController) readImg(w http.ResponseWriter, imgId string) {
-	imgPath := config.GetConfigFileManager("default.conf").ReadConfig("storage.img").(string)
+	imgPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.img").(string)
 	imgPath = filepath.Join(imgPath, imgId)
 	imgContent := b.readFileContent(imgPath)
 	w.Header().Set("Accept", "*/*")
@@ -163,21 +164,24 @@ func (b *BlogController) readBlogHtml(w http.ResponseWriter, blogId int) {
 	render.BlogCommentPeopleCount = strconv.Itoa(peopleCount)
 	render.BlogVisitCount = strconv.Itoa(blogInfo.BlogVisitCount)
 	render.CommentContent = template.HTML(content)
-	render.Author = config.GetDefaultConfigFileManager().ReadConfig("owner.name").(string)
+	render.Author = config.GetDefaultConfigFileManager().ReadConfig("blog.owner.name").(string)
 	v, err := b.SessionController.WebSession.Get("status")
 	if err == nil {
 		if v.(string) == "login" {
 			render.User.IsLogin = true
-			userId, err := b.SessionController.WebSession.Get("id")
+			uid, err := b.SessionController.WebSession.Get("id")
 			if err == nil {
-				userInfo, err := model.ShareUserModel().GetUserInfoById(userId.(int64))
+				userId, err := strconv.Atoi(uid.(string))
+				userInfo, err := model.ShareUserModel().GetUserInfoById(int64(userId))
 				if err == nil && userInfo != nil {
 					render.User.NickName = userInfo.UserName
 					render.User.Pic = userInfo.SmallFigureurl
-					render.User.UserID = strconv.Itoa(int(userId.(int64)))
+					render.User.UserID = uid.(string)
 				} else {
 					render.User.IsLogin = false
 				}
+			} else {
+				fmt.Println("err: ", err)
 			}
 		} else {
 			render.User.IsLogin = false

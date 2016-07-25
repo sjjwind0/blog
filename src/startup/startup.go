@@ -9,10 +9,8 @@ import (
 	"model"
 )
 
-const defaultConfigPath = "default.conf"
-
 func StartServer() {
-	config := config.GetConfigFileManager(defaultConfigPath)
+	config := config.GetDefaultConfigFileManager()
 	localWebResourcePath := config.ReadConfig("resource.localpath").(string)
 	port := int(config.ReadConfig("net.port").(int64))
 

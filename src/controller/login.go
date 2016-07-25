@@ -9,6 +9,7 @@ import (
 	"info"
 	"model"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -40,7 +41,7 @@ func (l *LoginController) SessionPath() string {
 func (l *LoginController) writeLoginInfo(from string, userInfo *info.UserInfo) {
 	fmt.Println("writeLoginInfo: ", userInfo.UserID)
 	l.WebSession.Set("from", from)
-	l.WebSession.Set("id", userInfo.UserID)
+	l.WebSession.Set("id", strconv.Itoa(int(userInfo.UserID)))
 	l.WebSession.Set("status", "login")
 }
 

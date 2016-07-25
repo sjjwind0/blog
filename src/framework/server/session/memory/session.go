@@ -3,18 +3,16 @@ package memory
 import (
 	"errors"
 	"framework/server/session"
-	"time"
 )
 
 type memorySession struct {
-	session.SessionExpire
-	sessionId string
-	content   map[string]interface{}
+	session.BaseSession
+	content map[string]interface{}
 }
 
 func NewMemorySession() *memorySession {
 	s := &memorySession{}
-	s.sessionId = session.NewSessionID()
+	s.SessionId = session.NewSessionID()
 	return s
 }
 
@@ -51,12 +49,4 @@ func (m *memorySession) Delete(key string) error {
 	}
 	delete(m.content, key)
 	return nil
-}
-
-func (m *memorySession) SessionID() string {
-	return m.sessionId
-}
-
-func (m *memorySession) CreateTime() int64 {
-	return time.Now().Unix()
 }
