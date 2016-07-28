@@ -97,7 +97,38 @@ Account.loginInfo = {
 	pic: "",
 }
 
-Account.loginByQQ = function() {
+Account.waitingLogin = function () {
+	// 创建长连接
+	var listener = function(event) {
+		// 登录成功
+		var url = "http://blog.windy.live/api";
+		$.ajax({
+			url: url,
+			type: "POST",
+			data: JSON.stringify({"type": "getUserInfo"}),
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function(data) {
+				if (data.code == 0) {
+					var nickName = data.data.name;
+					var pic = data.data.pic;
+					$(".ds-login-buttons").css("display", "none");
+					$(".no-user-name-login").css("display", "none");
+					$(".user-name-login").css("display", "block");
+					$(".user-name-login + .wrap-name-nick").html(nickName);
+					$(".userPic").attr("src", pic);
+					window.removeEventListener('login', this);
+				} else {
+					alert("login failed: " + data.msg);
+				}
+			}
+		});
+	};
+	window.addEventListener('message', listener, false);
+}
+
+Account.loginByQQ = function(clientId, redirectUri) {
+	Account.waitingLogin();
 	var url = "https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=101324961&redirect_uri=http%3A%2F%2Fblog.windy.live%2Flogin%3Ftype%3Dqq&scope=get_user_info";
 	window.open(url);
 }

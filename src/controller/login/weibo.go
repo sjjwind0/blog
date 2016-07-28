@@ -41,12 +41,9 @@ func (l *loginByWeb) init() {
 
 func (l *loginByWeb) getTokenByCode(code string) (string, string, error) {
 	weburl := fmt.Sprintf(sWeiboOauth2AccessTokenUrl, l.appKey, l.appSecret, sWeiboRedirectUrl, code)
-	fmt.Println("weibo START")
-	fmt.Println(weburl)
 	client := &http.Client{}
 	req, _ := http.NewRequest("POST", weburl, nil)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	fmt.Printf("%+v\n", req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", "", err
@@ -56,21 +53,16 @@ func (l *loginByWeb) getTokenByCode(code string) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	fmt.Println(string(data), err)
 	var accessToken string
 	var uid string
 	parse := config.NewConfigContentManager(string(data))
-	// accessToken = js.Get("access_token").MustString()
 	accessToken = parse.ReadConfig("access_token").(string)
 	uid = parse.ReadConfig("uid").(string)
-	fmt.Println("test")
 	return accessToken, uid, err
 }
 
 func (l *loginByWeb) getUserInfo(accessToken string, openid string) (*info.UserInfo, error) {
-	fmt.Println("getUserInfo")
 	weburl := fmt.Sprintf(sWeiboUserShowUrl, accessToken, openid)
-
 	resp, err := http.Get(weburl)
 	if err != nil {
 		return nil, err
@@ -92,14 +84,12 @@ func (l *loginByWeb) getUserInfo(accessToken string, openid string) (*info.UserI
 
 func (l *loginByWeb) Login(code string) (*info.UserInfo, error) {
 	accessToken, openid, err := l.getTokenByCode(code)
-	fmt.Println("get tokon start")
 	if err != nil {
 		return nil, err
 	}
 	userinfo, err := l.getUserInfo(accessToken, openid)
 	fmt.Println(accessToken)
 	fmt.Println(openid)
-	// l.getTokenByCode(code)
 	if err != nil {
 		return nil, err
 	}

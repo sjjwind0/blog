@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	{{if .IsLoginSuccess}}
+	<title>登录成功</title>
+	{{else}}
+	<title>登录失败</title>
+	{{end}}
+	<link rel="stylesheet" href="">
+</head>
+<body>
+	{{if .IsLoginSuccess}}
+	<p>登录成功</p>
+	<script type="text/javascript" charset="utf-8">
+		window.onload = function () {
+			window.parent.postMessage('login', '/');
+		};
+	</script>
+	{{else}}
+	<p>Login Failed: {{.Code}}</p>
+	<script type="text/javascript" charset="utf-8">
+		window.onload = function () {
+			window.parent.postMessage('login', '/');
+		};
+	</script>
+	{{end}}
+</body>
+</html>

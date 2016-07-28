@@ -43,19 +43,19 @@ func (r *redisStorage) addSession(sessionId string, s session.Session) error {
 	key := "com.session.object." + r.sessionName + "." + sessionId
 	// add value
 	value := "value.null"
-	err := r.client.Set(key, value, 0).Err()
+	err := r.client.Set(key, value, s.MaxDuration()).Err()
 	if err != nil {
 		return err
 	}
 	// add createTime
 	key = "com.session.create." + r.sessionName + "." + sessionId
-	err = r.client.Set(key, s.CreateTime(), 0).Err()
+	err = r.client.Set(key, s.CreateTime(), s.MaxDuration()).Err()
 	if err != nil {
 		return err
 	}
 	// add expireTime
 	key = "com.session.expire." + r.sessionName + "." + sessionId
-	err = r.client.Set(key, s.ExpireTime(), 0).Err()
+	err = r.client.Set(key, s.ExpireTime(), s.MaxDuration()).Err()
 	return err
 }
 
@@ -85,7 +85,7 @@ func (r *redisStorage) deleteSession(sessionId string) error {
 func (r *redisStorage) setSessionContent(s session.Session, key string, value interface{}) error {
 	sessionId := s.SessionID()
 	insertKey := "com.session.object." + r.sessionName + "." + sessionId + "." + key
-	return r.client.Set(insertKey, value, 0).Err()
+	return r.client.Set(insertKey, value, s.MaxDuration()).Err()
 }
 
 func (r *redisStorage) querySessionContent(s session.Session, key string) (string, error) {

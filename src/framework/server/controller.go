@@ -11,7 +11,7 @@ import (
 
 // session两天过期
 const (
-	kSessionMaxAge = 60 * 24 * 2
+	kSessionMaxAge = 60 * 60 * 24 * 2
 )
 
 var sessionMgrInstance *session.SessoinMgr = nil

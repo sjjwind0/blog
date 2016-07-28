@@ -11,6 +11,7 @@ type Session interface {
 	CreateTime() int64
 	ExpireTime() int64
 	MaxAge() int
+	MaxDuration() time.Duration
 	IsExpired() bool
 	setSessionStorage(storage SessionStorage)
 	GetStorage() SessionStorage
@@ -50,6 +51,10 @@ func (b *BaseSession) MaxAge() int {
 		return 0
 	}
 	return int((b.createTime + b.expireTime - time.Now().Unix()))
+}
+
+func (b *BaseSession) MaxDuration() time.Duration {
+	return time.Duration(b.MaxAge()) * time.Second
 }
 
 func (b *BaseSession) IsExpired() bool {
