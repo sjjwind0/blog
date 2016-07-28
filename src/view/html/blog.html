@@ -71,8 +71,11 @@
 				       <strong class="wrap-name-w wrap-name-b">评论</strong>
 				       <span class="wrap-join-w wrap-join-b">(<em class="join-strong-gw join-strong-bg">{{.BlogCommentPeopleCount}}</em><span node-type="involved">人参与</span><i class="gap-b">，</i><em class="join-strong-gw join-strong-bg">{{.BlogCommentCount}}</em><span node-type="comments">条评论</span>)</span>
 				       {{if .User.IsLogin}}
-						<a href="javascript:void(0);" rel="nofollow" class="user-logout wrap-name-logout">登出</a>
-						<strong class="wrap-name-nick">{{.User.NickName}}</strong>
+						<a href="javascript:void(0);" rel="nofollow" class="no-user-name-login user-is-login user-logout wrap-name-logout">登出</a>
+						<strong class="no-user-name-login user-is-login wrap-name-nick">{{.User.NickName}}</strong>
+					   {{else}}
+					    <a style="display:none;" href="javascript:void(0);" rel="nofollow" class="user-name-login user-logout wrap-name-logout">登出</a>
+						<strong style="display:none;" class="user-name-login wrap-name-nick"></strong>
 				       {{end}}
 				      </div> 
 				     </div> 
@@ -94,9 +97,9 @@
 				       <div class="head-img-w"> 
 				        <a node-type="user-avatar" href="javascript:void(0)" target="_self">
 				        {{if .User.IsLogin}}
-				        <img src="{{.User.Pic}}" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
+				        <img class="userPic" src="{{.User.Pic}}" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
 				        {{else}}
-				        <img src="http://assets.changyan.sohu.com/upload/asset/scs/images/pic/pic42_null.gif" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
+				        <img class="userPic" src="http://assets.changyan.sohu.com/upload/asset/scs/images/pic/pic42_null.gif" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
 				        {{end}}
 				        </a> 
 				       </div> 

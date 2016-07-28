@@ -7,6 +7,7 @@ package controller
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"framework"
 	"framework/response"
 	"framework/server"
@@ -126,6 +127,33 @@ func (a *APIController) handlePublicCommentAction(w http.ResponseWriter, info ma
 	response.JsonResponse(w, framework.ErrorParamError)
 }
 
+func (a *APIController) handleGetUserInfoRequest(w http.ResponseWriter) {
+	status, err := a.WebSession.Get("status")
+	if err != nil {
+		response.JsonResponseWithMsg(w, framework.ErrorAccountNotLogin, err.Error())
+		return
+	}
+	if status != "login" {
+		response.JsonResponseWithMsg(w, framework.ErrorAccountNotLogin, "account not login")
+		return
+	}
+	uid, err := a.WebSession.Get("id")
+	userId, err := strconv.Atoi(uid.(string))
+	if err != nil {
+		response.JsonResponseWithMsg(w, framework.ErrorAccountNotLogin, err.Error())
+		return
+	}
+	userInfo, err := model.ShareUserModel().GetUserInfoById(int64(userId))
+	if err != nil {
+		response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, err.Error())
+		return
+	}
+	response.JsonResponseWithData(w, framework.ErrorOK, "", map[string]interface{}{
+		"name": userInfo.UserName,
+		"pic":  userInfo.SmallFigureurl,
+	})
+}
+
 func (a *APIController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		response.JsonResponse(w, framework.ErrorMethodError)
@@ -151,6 +179,11 @@ func (a *APIController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
 					a.handlePublicCommentAction(w, info)
 					return
 				case "blog":
+				case "getUserInfo":
+					fmt.Println("getUserInfo")
+					a.SessionController.HandlerRequest(a, w, r)
+					a.handleGetUserInfoRequest(w)
+					return
 				}
 			}
 		}
