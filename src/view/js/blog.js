@@ -2,7 +2,10 @@ window.onload = function() {
 	$(".ds-qq").click(function() {
 		Account.loginByQQ();
 	});
-
+	$(".ds-weibo").click(function() {
+		console.log("loginByWeibo");
+		Account.loginByWeibo();
+	});
 	$(".btn-send").click(function() {
 		var content = $(".wrap-text-f").val();
 		Talk.sendTalk(Blog.getBlogId(), -1, content, function() {
@@ -101,10 +104,14 @@ Account.loginByQQ = function() {
 
 Account.loginByWeixin = function() {
 	// not implement
+
 }
 
 Account.loginByWeibo = function() {
 	// not implement
+	console.log("weibo login");
+	var url = "https://api.weibo.com/oauth2/authorize?client_id=1523189451&response_type=code&redirect_uri=http%3A%2F%2Fblog.windy.live%2Flogin%3Ftype%3Dweibo"
+	window.open(url);
 }
 
 var Blog = Blog || {}

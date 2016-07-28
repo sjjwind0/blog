@@ -67,11 +67,14 @@ func (u *userModel) CreateTable() error {
 }
 
 func (u *userModel) Login(accountType int, userInfo *info.UserInfo) error {
+	fmt.Println("userModel login model start")
 	isLogin, err := u.accountHasLogin(accountType, userInfo.UserOpenID)
 	if err != nil {
+		fmt.Println("userModel login error")
 		return err
 	}
 	if isLogin {
+		fmt.Println("userModel login model update")
 		return u.updateAccountInfo(accountType, userInfo)
 	}
 	return u.insertAccountInfo(accountType, userInfo)
