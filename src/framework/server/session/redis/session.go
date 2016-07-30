@@ -37,6 +37,11 @@ func (r *redisSession) Get(key string) (interface{}, error) {
 	return value, err
 }
 
+func (r *redisSession) ResetDuration(duration int64) error {
+	r.BaseSession.ResetDuration(duration)
+	return r.GetStorage().(*redisStorage).refreshSessionDuration(r, r.MaxDuration())
+}
+
 func (r *redisSession) Delete(key string) error {
 	if key == "" {
 		return errors.New("key must not be empty")

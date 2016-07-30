@@ -75,6 +75,10 @@ func (s *SessionController) GetSessionMgr() *session.SessoinMgr {
 	return sessionMgrInstance
 }
 
+func (s *SessionController) ResetSessionDuration() {
+	s.WebSession.ResetDuration(kSessionMaxAge)
+}
+
 func (s *SessionController) newSession() session.Session {
 	sessionType := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.session.type").(string)
 	switch sessionType {

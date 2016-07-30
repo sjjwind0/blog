@@ -72,7 +72,6 @@ func (l *loginByWeb) getUserInfo(accessToken string, openid string) (*info.UserI
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(body))
 	parse := config.NewConfigContentManager(string(body))
 	var info info.UserInfo
 	info.UserName = parse.ReadConfig("name").(string)
@@ -88,8 +87,6 @@ func (l *loginByWeb) Login(code string) (*info.UserInfo, error) {
 		return nil, err
 	}
 	userinfo, err := l.getUserInfo(accessToken, openid)
-	fmt.Println(accessToken)
-	fmt.Println(openid)
 	if err != nil {
 		return nil, err
 	}

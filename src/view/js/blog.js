@@ -45,6 +45,11 @@ window.onload = function() {
 		});
 	}
 	setReply();
+
+	$("#logout").click(function() {
+		Account.logout();
+	});
+
 	var allHref = $(window.frames["blog"].document).find("a");
 	for (var i = 0; i < allHref.length; i++) {
 		var url = $(allHref[i]).attr("href");
@@ -119,7 +124,6 @@ Account.waitingLogin = function () {
 						$(".user-name-login").css("display", "block");
 						$(".user-name-login + .wrap-name-nick").html(nickName);
 						$(".userPic").attr("src", pic);
-						window.removeEventListener('login', this);
 					} else {
 						alert("login failed: " + data.msg);
 					}
@@ -147,9 +151,29 @@ Account.loginByWeixin = function() {
 
 Account.loginByWeibo = function() {
 	// not implement
-	console.log("weibo login");
+	Account.waitingLogin();
 	var url = "https://api.weibo.com/oauth2/authorize?client_id=1523189451&response_type=code&redirect_uri=http%3A%2F%2Fblog.windy.live%2Flogin%3Ftype%3Dweibo"
-	window.open(url);
+	var child = window.open(url);
+	Account.timer = setInterval(function() {
+		  var message = "helo";
+			child.postMessage(message, "/");
+	}, 200);
+}
+
+Account.logout = function() {
+	var url = "http://blog.windy.live/login?type=logout"
+	$.get(url, function(result) {
+		var data = JSON.parse(result);
+		if (data.code == 0) {
+			// logout success
+			$(".ds-login-buttons").css("display", "block");
+			$(".no-user-name-login").css("display", "blog");
+			$(".user-name-login").css("display", "none");
+			$(".userPic").attr("src", "http://assets.changyan.sohu.com/upload/asset/scs/images/pic/pic42_null.gif");
+		} else {
+			alert("login failed", data.msg);
+		}
+	});
 }
 
 var Blog = Blog || {}

@@ -1,9 +1,9 @@
 package redis
 
 import (
-	"errors"
 	"framework/server/session"
 	"gopkg.in/redis.v4"
+	"time"
 )
 
 type redisStorage struct {
@@ -32,7 +32,7 @@ func (r *redisStorage) Get(sessionId string) (session.Session, error) {
 }
 
 func (r *redisStorage) Delete(sessionId string) error {
-	return errors.New("404 not found")
+	return r.deleteSession(sessionId)
 }
 
 func (r *redisStorage) SetSessionName(name string) {
@@ -79,7 +79,73 @@ func (r *redisStorage) getSession(sessionId string) (session.Session, error) {
 }
 
 func (r *redisStorage) deleteSession(sessionId string) error {
-	return nil
+	key := "com.session.object." + r.sessionName + "." + sessionId
+	err := r.client.Del(key).Err()
+	if err == nil {
+		key = "com.session.create." + r.sessionName + "." + sessionId
+		err = r.client.Del(key).Err()
+
+		key = "com.session.expire." + r.sessionName + "." + sessionId
+		err = r.client.Del(key).Err()
+
+		if err != nil {
+			return err
+		}
+
+		sessionObjectKeys := "com.session.object." + r.sessionName + "." + sessionId + "."
+		allKeys, err := r.client.Keys(sessionObjectKeys).Result()
+		if err != nil {
+			return err
+		}
+		for _, key := range allKeys {
+			err = r.client.Del(key).Err()
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return err
+}
+
+func (r *redisStorage) refreshSessionDuration(s session.Session, duration time.Duration) error {
+	sessionId := s.SessionID()
+	var resetDurationFunc = func(sessionId, key string, duration time.Duration) error {
+		value, err := r.client.Get(key).Result()
+		if err != nil {
+			return err
+		}
+		return r.client.Set(key, value, duration).Err()
+	}
+	key := "com.session.object." + r.sessionName + "." + sessionId
+	err := resetDurationFunc(sessionId, key, duration)
+	if err != nil {
+		return err
+	}
+
+	key = "com.session.create." + r.sessionName + "." + sessionId
+	err = resetDurationFunc(sessionId, key, duration)
+	if err != nil {
+		return err
+	}
+
+	key = "com.session.expire." + r.sessionName + "." + sessionId
+	err = resetDurationFunc(sessionId, key, duration)
+	if err != nil {
+		return err
+	}
+
+	sessionObjectKeys := "com.session.object." + r.sessionName + "." + sessionId + "."
+	allKeys, err := r.client.Keys(sessionObjectKeys).Result()
+	if err != nil {
+		return err
+	}
+	for _, key := range allKeys {
+		err = resetDurationFunc(sessionId, key, duration)
+		if err != nil {
+			return err
+		}
+	}
+	return err
 }
 
 func (r *redisStorage) setSessionContent(s session.Session, key string, value interface{}) error {

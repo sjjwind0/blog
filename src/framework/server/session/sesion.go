@@ -5,6 +5,7 @@ import "time"
 type Session interface {
 	Set(key string, value interface{}) error
 	Get(key string) (interface{}, error)
+	ResetDuration(duration int64) error
 	Delete(key string) error
 	SessionID() string
 	InitBaseSession(expireTime int64)
@@ -22,6 +23,11 @@ type BaseSession struct {
 	expireTime int64
 	storage    SessionStorage
 	SessionId  string
+}
+
+func (b *BaseSession) ResetDuration(duration int64) error {
+	b.expireTime = time.Now().Unix() + duration
+	return nil
 }
 
 func (b *BaseSession) SessionID() string {

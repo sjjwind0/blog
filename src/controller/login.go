@@ -48,6 +48,51 @@ func (l *LoginController) writeLoginInfo(from string, userInfo *info.UserInfo) {
 	l.WebSession.Set("from", from)
 	l.WebSession.Set("id", strconv.Itoa(int(userInfo.UserID)))
 	l.WebSession.Set("status", "login")
+	l.ResetSessionDuration()
+}
+
+func (l *LoginController) handleLoginInfo(w http.ResponseWriter, userInfo *info.UserInfo, err error) {
+	var render *loginRender = nil
+	if err != nil {
+		render = &loginRender{
+			Code:           framework.ErrorRunTimeError,
+			Msg:            err.Error(),
+			IsLoginSuccess: false,
+		}
+	} else {
+		err = model.ShareUserModel().Login(info.AccountTypeQQ, userInfo)
+		if err != nil {
+			render = &loginRender{
+				Code:           framework.ErrorRunTimeError,
+				Msg:            err.Error(),
+				IsLoginSuccess: false,
+			}
+		} else {
+			l.writeLoginInfo("qq", userInfo)
+			render = &loginRender{
+				Code:           framework.ErrorOK,
+				Msg:            "",
+				IsLoginSuccess: true,
+			}
+		}
+	}
+	t, err := template.ParseFiles("./src/view/html/login-result.html")
+	t.Execute(w, render)
+}
+
+func (l *LoginController) handleLogout(w http.ResponseWriter) {
+	status, err := l.WebSession.Get("status")
+	if err == nil {
+		if status == "login" {
+			// 已经登录
+			err = l.GetSessionMgr().DeleteSession(l.WebSession.SessionID())
+			if err == nil {
+				response.JsonResponse(w, framework.ErrorOK)
+				return
+			}
+		}
+	}
+	response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, err.Error())
 }
 
 func (l *LoginController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
@@ -59,59 +104,17 @@ func (l *LoginController) HandlerRequest(w http.ResponseWriter, r *http.Request)
 		code := r.Form.Get("code")
 		if len(code) != 0 {
 			userInfo, err := login.GetQQLoginInstance().Login(code)
-			var render *loginRender = nil
-			if err != nil {
-				render = &loginRender{
-					Code:           framework.ErrorRunTimeError,
-					Msg:            err.Error(),
-					IsLoginSuccess: false,
-				}
-			} else {
-				err = model.ShareUserModel().Login(info.AccountTypeWeibo, userInfo)
-				if err != nil {
-					render = &loginRender{
-						Code:           framework.ErrorRunTimeError,
-						Msg:            err.Error(),
-						IsLoginSuccess: false,
-					}
-				} else {
-					l.writeLoginInfo("qq", userInfo)
-					render = &loginRender{
-						Code:           framework.ErrorOK,
-						Msg:            "",
-						IsLoginSuccess: true,
-					}
-				}
-			}
-			t, err := template.ParseFiles("./src/view/html/login-result.html")
-			t.Execute(w, render)
-			return
+			l.handleLoginInfo(w, userInfo, err)
 		}
 	case "weibo":
 		code := r.Form.Get("code")
 		if len(code) != 0 {
-			userinfo, err := login.GetWebLoginInstance().Login(code)
-			if err != nil {
-				response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, err.Error())
-			} else {
-				err = model.ShareUserModel().Login(info.AccountTypeWeibo, userinfo)
-				if err != nil {
-					response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, err.Error())
-					return
-				}
-				l.writeLoginInfo("weibo", userinfo)
-				if _, ok := l.longConnectMap[l.WebSession.SessionID()]; ok {
-					l.longConnectMap[l.WebSession.SessionID()] <- true
-					response.JsonResponse(w, framework.ErrorOK)
-				} else {
-					response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, "login timeout")
-				}
-			}
+			userInfo, err := login.GetWebLoginInstance().Login(code)
+			l.handleLoginInfo(w, userInfo, err)
 		}
-	case "connect":
-		l.longConnectMap[l.WebSession.SessionID()] = make(chan bool)
-		l.handleLoginConnect(w, l.longConnectMap[l.WebSession.SessionID()])
-		fmt.Println("login connect")
+	case "logout":
+		l.handleLogout(w)
+	default:
+		response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, "unsupport login type")
 	}
-	response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, "unsupport login type")
 }
