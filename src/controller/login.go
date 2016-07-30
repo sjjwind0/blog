@@ -67,7 +67,7 @@ func (l *LoginController) HandlerRequest(w http.ResponseWriter, r *http.Request)
 					IsLoginSuccess: false,
 				}
 			} else {
-				err = model.ShareUserModel().Login(info.AccountTypeQQ, userInfo)
+				err = model.ShareUserModel().Login(info.AccountTypeWeibo, userInfo)
 				if err != nil {
 					render = &loginRender{
 						Code:           framework.ErrorRunTimeError,
@@ -88,7 +88,30 @@ func (l *LoginController) HandlerRequest(w http.ResponseWriter, r *http.Request)
 			return
 		}
 	case "weibo":
-		fmt.Println("login from weibo")
+		code := r.Form.Get("code")
+		if len(code) != 0 {
+			userinfo, err := login.GetWebLoginInstance().Login(code)
+			if err != nil {
+				response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, err.Error())
+			} else {
+				err = model.ShareUserModel().Login(info.AccountTypeWeibo, userinfo)
+				if err != nil {
+					response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, err.Error())
+					return
+				}
+				l.writeLoginInfo("weibo", userinfo)
+				if _, ok := l.longConnectMap[l.WebSession.SessionID()]; ok {
+					l.longConnectMap[l.WebSession.SessionID()] <- true
+					response.JsonResponse(w, framework.ErrorOK)
+				} else {
+					response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, "login timeout")
+				}
+			}
+		}
+	case "connect":
+		l.longConnectMap[l.WebSession.SessionID()] = make(chan bool)
+		l.handleLoginConnect(w, l.longConnectMap[l.WebSession.SessionID()])
+		fmt.Println("login connect")
 	}
 	response.JsonResponseWithMsg(w, framework.ErrorRunTimeError, "unsupport login type")
 }

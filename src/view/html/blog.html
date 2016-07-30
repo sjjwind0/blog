@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="/css/global.css">
 	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/jquery-cookie.js" type="text/javascript" charset="utf-8"></script>
-	<script src="js/blog.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/blog.js?1003" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 	<div id="nav">
@@ -22,13 +22,13 @@
 	</div>
 	<div class="container">
 		<div class="header">
-			
+
 		</div>
 		<div class="content">
 			<div class="breadcrumbs">
 				<a title="返回首页" href=".">
 					<i class="fa fa-home"></i>
-					</a> <small>&gt;</small><a href="{{.Host.Host}}/category/technique">Blog</a> <small>&gt;</small> <a href="{{.Host.Host}}/category/technique/other">{{.BlogSortType}}</a> <small>&gt;</small> 
+					</a> <small>&gt;</small><a href="{{.Host.Host}}/category/technique">Blog</a> <small>&gt;</small> <a href="{{.Host.Host}}/category/technique/other">{{.BlogSortType}}</a> <small>&gt;</small>
 					<span class="muted">{{.BlogTitle}}</span>
 			</div>
 			<header class="article-header">
@@ -37,11 +37,11 @@
 						<span id="mute-category" class="muted">
 							<i class="fa fa-list-alt"></i>
 							<a href="{{.Host.Host}}/sort?type={{.BlogSortType}}"> {{.BlogSortType}}</a>
-						</span>				
+						</span>
 						<span class="muted"><i class="fa fa-user"></i> <a href="{{.Host.Host}}/about">{{.Author}}</a></span>
 						<time class="muted"><i class="fa fa-clock-o"></i>{{.BlogTime}}</time>
 						<span class="muted"><i class="fa fa-eye"></i> {{.BlogVisitCount}}</span>
-						<span class="muted"><i class="fa fa-comments-o"></i> <a href="{{.Host.Host}}/blog?id={{.BlogID}}#comments">{{.BlogCommentCount}}条评论</a></span>	
+						<span class="muted"><i class="fa fa-comments-o"></i> <a href="{{.Host.Host}}/blog?id={{.BlogID}}#comments">{{.BlogCommentCount}}条评论</a></span>
 					</div>
 			</header>
 			<div class="blog" bid="{{.BlogID}}">
@@ -64,9 +64,9 @@
 				<div id="SOHUCS" sid="{{.BlogID}}" style="width: 100%; height: auto;">
 				 <div id="SOHU_MAIN">
 				  <div id="SOHU-comment-main" class="sohu-comment-wrapper">
-				   <div id="article_info_sohu"> 
-				    <div class="reset-g clear-g section-title-w  section-title-logoutStyle"> 
-				     <div class="title-join-w"> 
+				   <div id="article_info_sohu">
+				    <div class="reset-g clear-g section-title-w  section-title-logoutStyle">
+				     <div class="title-join-w">
 				      <div class="join-wrap-w join-wrap-b">
 				       <strong class="wrap-name-w wrap-name-b">评论</strong>
 				       <span class="wrap-join-w wrap-join-b">(<em class="join-strong-gw join-strong-bg">{{.BlogCommentPeopleCount}}</em><span node-type="involved">人参与</span><i class="gap-b">，</i><em class="join-strong-gw join-strong-bg">{{.BlogCommentCount}}</em><span node-type="comments">条评论</span>)</span>
@@ -77,14 +77,14 @@
 					    <a style="display:none;" href="javascript:void(0);" rel="nofollow" class="user-name-login user-logout wrap-name-logout">登出</a>
 						<strong style="display:none;" class="user-name-login wrap-name-nick"></strong>
 				       {{end}}
-				      </div> 
-				     </div> 
-				     <div class="title-user-w"> 
+				      </div>
+				     </div>
+				     <div class="title-user-w">
 				      <div node-type="sohu-pact" class="title-link-w" style="display: none;">
 				       <a href="http://zt.pinglun.sohu.com/s2014/sljyhgy/index.shtml" target="_blank">搜狐“我来说两句”用户公约</a>
-				      </div> 
-				     </div> 
-				    </div> 
+				      </div>
+				     </div>
+				    </div>
 				   </div>
 				   <div id="login_sohu"></div>
 				   <div id="comment_sohu">
@@ -92,18 +92,18 @@
 				     <div style="width:1px;height:1px;overflow:hidden;">
 				      <img src="http://changyan.itc.cn/v2.5/v20160405176/src/css/imgs/vcode.jpg" style="visibility:hidden;width:1px;height:1px;" />
 				     </div>
-				     <div class="clear-g cbox-block-w"> 
-				      <div class="block-head-w"> 
-				       <div class="head-img-w"> 
+				     <div class="clear-g cbox-block-w">
+				      <div class="block-head-w">
+				       <div class="head-img-w">
 				        <a node-type="user-avatar" href="javascript:void(0)" target="_self">
 				        {{if .User.IsLogin}}
 				        <img class="userPic" src="{{.User.Pic}}" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
 				        {{else}}
 				        <img class="userPic" src="http://assets.changyan.sohu.com/upload/asset/scs/images/pic/pic42_null.gif" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
 				        {{end}}
-				        </a> 
-				       </div> 
-				      </div> 
+				        </a>
+				       </div>
+				      </div>
 				      <div class="block-post-w">
 				       <div class="post-default-w post-default-b" style="border: 1px solid rgb(204, 212, 217);">
 				        <div class="clear-g default-wrap-w">
@@ -116,25 +116,25 @@
 				    </div>
 				   </div>
 				   <div id="list_sort_sohu"></div>
-				   <div id="list_sohu" topicid="1011815160"> 
-				    <div class="reset-g section-list-w"> 
-				     <div class="list-block-gw list-newest-w list-newest-b"> 
-				      <div class="block-title-gw"> 
-				       <ul class="clear-g"> 
-				        <li><strong class="title-name-gw title-name-bg">最新评论</strong></li> 
-				       </ul> 
-				      </div>  
+				   <div id="list_sohu" topicid="1011815160">
+				    <div class="reset-g section-list-w">
+				     <div class="list-block-gw list-newest-w list-newest-b">
+				      <div class="block-title-gw">
+				       <ul class="clear-g">
+				        <li><strong class="title-name-gw title-name-bg">最新评论</strong></li>
+				       </ul>
+				      </div>
 				      {{.CommentContent}}
-				     </div> 
+				     </div>
 				    </div>
 				   </div>
 				   <div id="list_hot"></div>
 				   <div id="page_sohu"></div>
 				   <div id="more_list_sohu"></div>
-				   <div id="powerby_sohu"> 
-				    <div class="reset-g section-service-w"> 
+				   <div id="powerby_sohu">
+				    <div class="reset-g section-service-w">
 				     <div class="service-wrap-w service-wrap-b">
-				     </div> 
+				     </div>
 				    </div>
 				   </div>
 				  </div>
@@ -143,7 +143,7 @@
 			</div>
 		</div>
 		<div class="side">
-			<div class="widget widget_archive"><div class="small_title"><h2>文章归档</h2></div>		
+			<div class="widget widget_archive"><div class="small_title"><h2>文章归档</h2></div>
 				<ul>
 					{{range .Side.BlogTimeList}}
 					<li><a href="{{$.Host.Host}}/date?time={{.Year}}.{{.Month}}">{{.Date}}</a></li>
