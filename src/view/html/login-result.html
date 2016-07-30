@@ -15,7 +15,14 @@
 	<p>登录成功</p>
 	<script type="text/javascript" charset="utf-8">
 		window.onload = function () {
-			window.parent.postMessage('login', '/');
+			var listener = function(event) {
+				if (event.data == "helo") {
+					var parent = event.source;
+					parent.postMessage('login', '/');
+					window.close();
+				}
+			};
+			window.addEventListener('message', listener, false);
 		};
 	</script>
 	{{else}}
