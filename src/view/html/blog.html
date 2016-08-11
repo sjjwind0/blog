@@ -28,11 +28,11 @@
 			<div class="breadcrumbs">
 				<a title="返回首页" href=".">
 					<i class="fa fa-home"></i>
-					</a> <small>&gt;</small><a href="{{.Host.Host}}/category/technique">Blog</a> <small>&gt;</small> <a href="{{.Host.Host}}/category/technique/other">{{.BlogSortType}}</a> <small>&gt;</small>
+					</a> <small>&gt;</small><a href="{{.Host.Host}}/index">Blog</a> <small>&gt;</small> <a href="{{.Host.Host}}/sort?type={{.BlogSortType}}">{{.BlogSortType}}</a> <small>&gt;</small>
 					<span class="muted">{{.BlogTitle}}</span>
 			</div>
 			<header class="article-header">
-					<h1 class="article-title"><a href="{{.Host.Host}}/blog?id={{.BlogID}}#comments">{{.BlogTitle}}</a></h1>
+					<h1 class="article-title"><a href="{{.Host.Host}}/blog?id={{.BlogID}}#comment">{{.BlogTitle}}</a></h1>
 					<div class="meta">
 						<span id="mute-category" class="muted">
 							<i class="fa fa-list-alt"></i>
@@ -41,7 +41,7 @@
 						<span class="muted"><i class="fa fa-user"></i> <a href="{{.Host.Host}}/about">{{.Author}}</a></span>
 						<time class="muted"><i class="fa fa-clock-o"></i>{{.BlogTime}}</time>
 						<span class="muted"><i class="fa fa-eye"></i> {{.BlogVisitCount}}</span>
-						<span class="muted"><i class="fa fa-comments-o"></i> <a href="{{.Host.Host}}/blog?id={{.BlogID}}#comments">{{.BlogCommentCount}}条评论</a></span>
+						<span class="muted"><i class="fa fa-comments-o"></i> <a href="{{.Host.Host}}/blog?id={{.BlogID}}#comment">{{.BlogCommentCount}}条评论</a></span>
 					</div>
 			</header>
 			<div class="blog" bid="{{.BlogID}}">
@@ -65,7 +65,7 @@
 				 <div id="SOHU_MAIN">
 				  <div id="SOHU-comment-main" class="sohu-comment-wrapper">
 				   <div id="article_info_sohu">
-				    <div class="reset-g clear-g section-title-w  section-title-logoutStyle">
+				    <div id="comment" class="reset-g clear-g section-title-w  section-title-logoutStyle">
 				     <div class="title-join-w">
 				      <div class="join-wrap-w join-wrap-b">
 				       <strong class="wrap-name-w wrap-name-b">评论</strong>

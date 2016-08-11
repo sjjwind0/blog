@@ -3,7 +3,8 @@
 <head>
 	<meta charset="utf-8" />
 	<meta property="wb:webmaster" content="ec68cbf32bb1042d" />
-	<meta property="qc:admins" content="66062230477671641641656375" />
+	<meta property="qc:admins" content="66062235164106375" />
+	<!-- <meta property="qc:admins" content="66062230477671641641656375" /> -->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>小风的个人博客</title>
 	<link rel="stylesheet" href="/css/global.css" />
@@ -35,7 +36,7 @@
 						<span class="note"> {{.BlogDescription}}</span>
 					<p class="auth-span">
 							<span class="muted"><i class="fa fa-user"></i> <a href="{{$.Host.Host}}/about">{{.BlogAuthor}}</a></span>
-							<span class="muted"><i class="fa fa-clock-o"></i> {{.BlogTime}}</span>	<span class="muted"><i class="fa fa-eye"></i> {{.BlogVisitCount}}℃</span>	<span class="muted"><i class="fa fa-comments-o"></i> <a target="_blank" href="{{$.Host.Host}}/blog?id={{.BlogID}}#comments">{{.BlogCommentCount}}评论</a></span><span class="muted">
+							<span class="muted"><i class="fa fa-clock-o"></i> {{.BlogTime}}</span>	<span class="muted"><i class="fa fa-eye"></i> {{.BlogVisitCount}}℃</span>	<span class="muted"><i class="fa fa-comments-o"></i> <a target="_blank" href="{{$.Host.Host}}/blog?id={{.BlogID}}#comment">{{.BlogCommentCount}}评论</a></span><span class="muted">
 					<a href="javascript:;" data-action="ding" data-id="{{.BlogID}}" id="Addlike" class="action"><i class="fa fa-heart-o"></i><span class="count">{{.BlogPraiseCount}}</span>喜欢</a></span></p>
 				</article>
 				{{end}}

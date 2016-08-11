@@ -18,7 +18,16 @@ var sessionMgrInstance *session.SessoinMgr = nil
 
 type Controller interface {
 	HandlerRequest(w http.ResponseWriter, r *http.Request)
+}
+
+type NormalController interface {
+	Controller
 	Path() interface{}
+}
+
+type ChildHandlerController interface {
+	Controller
+	Path() (interface{}, bool)
 }
 
 type SessionControllerInterface interface {

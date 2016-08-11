@@ -63,7 +63,7 @@ func NewIndexController() *IndexController {
 }
 
 func (i *IndexController) Path() interface{} {
-	return []string{"/index", "/sort", "/tag", "/date"}
+	return []string{"/", "/index", "/sort", "/tag", "/date"}
 }
 
 func (i *IndexController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +75,7 @@ func (i *IndexController) HandlerRequest(w http.ResponseWriter, r *http.Request)
 	var blogList *list.List = nil
 	allBlogList, err := model.ShareBlogModel().FetchAllBlog()
 	switch r.URL.Path {
-	case "/index":
+	case "/index", "/":
 		blogList = allBlogList
 	case "/sort":
 		sortType := r.Form.Get("type")

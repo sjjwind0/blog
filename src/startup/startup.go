@@ -21,6 +21,9 @@ func StartServer() {
 	server.ShareServerMgrInstance().RegisterController(controller.NewLoginController())
 	server.ShareServerMgrInstance().RegisterController(controller.NewNotImplController())
 	server.ShareServerMgrInstance().RegisterController(personal.NewSyncController())
+	server.ShareServerMgrInstance().RegisterController(personal.NewPersonalAuthController())
+	server.ShareServerMgrInstance().RegisterController(personal.NewPersonalFetchController())
+	server.ShareServerMgrInstance().RegisterController(personal.NewPersonalFileController())
 
 	server.ShareServerMgrInstance().RegisterStaticFile("/js/", localWebResourcePath)
 	server.ShareServerMgrInstance().RegisterStaticFile("/css/", localWebResourcePath)

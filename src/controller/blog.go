@@ -207,7 +207,7 @@ func (b *BlogController) HandlerRequest(w http.ResponseWriter, r *http.Request) 
 		b.readBlog(w, id)
 	} else if r.URL.Path == "/img" {
 		b.readImg(w, r.Form["id"][0])
-	} else {
+	} else if r.URL.Path == "/blog" {
 		b.SessionController.HandlerRequest(b, w, r)
 		id, err := strconv.Atoi(r.Form.Get("id"))
 		if err != nil {

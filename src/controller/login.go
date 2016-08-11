@@ -2,7 +2,6 @@ package controller
 
 import (
 	"controller/login"
-	"fmt"
 	"framework"
 	"framework/response"
 	"framework/server"
@@ -44,7 +43,6 @@ func (l *LoginController) SessionPath() string {
 }
 
 func (l *LoginController) writeLoginInfo(from string, userInfo *info.UserInfo) {
-	fmt.Println("writeLoginInfo: ", userInfo.UserID)
 	l.WebSession.Set("from", from)
 	l.WebSession.Set("id", strconv.Itoa(int(userInfo.UserID)))
 	l.WebSession.Set("status", "login")

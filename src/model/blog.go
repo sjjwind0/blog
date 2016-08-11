@@ -74,6 +74,15 @@ func (b *blogModel) InsertBlog(uuid string, title string, sortType string, tagLi
 	return err
 }
 
+func (b *blogModel) UpdateBlog(uuid string, title string, sortType string, tagList []string) error {
+	currentTime := time.Now().Unix()
+	tag := strings.Join(tagList, "||")
+	sql := fmt.Sprintf("update %s set %s = ?, %s = ?, %s = ?, %s = ? where %s = ?",
+		kBlogTableName, kBlogTitle, kBlogSortType, kBlogTag, kBlogTime, kBlogUUID)
+	_, err := database.DatabaseInstance().DB.Exec(sql, title, sortType, tag, currentTime, uuid)
+	return err
+}
+
 func (b *blogModel) BlogIsExist(uuid string) (bool, error) {
 	sql := fmt.Sprintf("select * from %s where %s = ?", kBlogTableName, kBlogUUID)
 	rows, err := database.DatabaseInstance().DB.Query(sql, uuid)
