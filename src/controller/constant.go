@@ -36,7 +36,7 @@ const (
 			    <div class="post-wrap-w">
 			        <div class="wrap-area-w">
 			            <div class="area-textarea-w">
-			                <textarea node-type="textarea" name="" class="textarea-fw textarea-bf">有事没事说两句...</textarea>
+			                <textarea node-type="textarea" name="" placeholder="来说两句吧..." class="textarea-fw textarea-bf"></textarea>
 			            </div>
 			        </div>
 			        <div class="clear-g wrap-action-w">
@@ -89,7 +89,7 @@ const (
 			    <div class="post-wrap-w">
 			        <div class="wrap-area-w">
 			            <div class="area-textarea-w">
-			                <textarea node-type="textarea" name="" class="textarea-fw textarea-bf">有事没事说两句...</textarea>
+			                <textarea node-type="textarea" name="" placeholder="来说两句吧..." class="textarea-fw textarea-bf"></textarea>
 			            </div>
 			        </div>
 			        <div class="clear-g wrap-action-w">
