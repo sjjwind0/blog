@@ -3,16 +3,16 @@ package startup
 import (
 	"controller"
 	"controller/personal"
-	"framework/config"
+	"framework/base/config"
 	"framework/database"
 	"framework/server"
 	"model"
 )
 
 func StartServer() {
-	config := config.GetDefaultConfigFileManager()
-	localWebResourcePath := config.ReadConfig("resource.localpath").(string)
-	port := int(config.ReadConfig("net.port").(int64))
+	config := config.GetDefaultConfigJsonReader()
+	localWebResourcePath := config.Get("resource.localpath").(string)
+	port := int(config.Get("net.port").(int64))
 
 	server.ShareServerMgrInstance().SetServerPort(port)
 

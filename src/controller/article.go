@@ -1,9 +1,8 @@
 package controller
 
 import (
-	"fmt"
 	"framework"
-	"framework/config"
+	"framework/base/config"
 	"framework/response"
 	"framework/server"
 	"model"
@@ -52,7 +51,7 @@ func (b *ArticleController) readBlog(w http.ResponseWriter, blogId int) {
 		response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
 		return
 	}
-	blogPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
+	blogPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
 	blogPath = filepath.Join(blogPath, uuid, uuid+".html")
 	blogContent := b.readFileContent(blogPath)
 	w.Header().Set("Accept", "*/*")
@@ -84,19 +83,17 @@ func (b *ArticleController) HandlerRequest(w http.ResponseWriter, r *http.Reques
 		b.readBlog(w, id)
 	} else if r.URL.Path == "/cover" {
 		uuid := r.Form.Get("id")
-		blogPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
+		blogPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
 		imgPath := filepath.Join(blogPath, uuid, "cover.jpg")
 		b.readRes(w, imgPath)
 	} else if strings.HasPrefix(r.URL.Path, "/article/") {
 		// 首先解析uuid
 		url := r.URL.Path[1:]
 		part := strings.Split(url, "/")
-		fmt.Println("part: ", part)
 		if len(part) == 4 {
 			uuid := part[1]
-			blogPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
+			blogPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
 			resPath := filepath.Join(blogPath, uuid, "res", part[2], part[3])
-			fmt.Println("resPath: ", resPath)
 			b.readRes(w, resPath)
 		} else {
 			response.JsonResponseWithMsg(w, framework.ErrorParamError, "param error")

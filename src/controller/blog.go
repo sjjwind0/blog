@@ -3,7 +3,7 @@ package controller
 import (
 	"fmt"
 	"framework"
-	"framework/config"
+	"framework/base/config"
 	"framework/response"
 	"framework/server"
 	"html/template"
@@ -96,7 +96,7 @@ func (b *BlogController) readBlogContent(blogId int) string {
 	if err != nil {
 		return ""
 	}
-	blogPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
+	blogPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
 	blogPath = filepath.Join(blogPath, uuid, uuid+".html")
 	fileInfo, err := os.Stat(blogPath)
 	if err == nil {
@@ -143,7 +143,7 @@ func (b *BlogController) readBlogHtml(w http.ResponseWriter, blogId int) {
 	render.BlogVisitCount = strconv.Itoa(blogInfo.BlogVisitCount)
 	render.CommentContent = template.HTML(content)
 	render.BlogContent = template.HTML(b.readBlogContent(blogId))
-	render.Author = config.GetDefaultConfigFileManager().ReadConfig("blog.owner.name").(string)
+	render.Author = config.GetDefaultConfigJsonReader().Get("blog.owner.name").(string)
 	v, err := b.SessionController.WebSession.Get("status")
 	if err == nil {
 		if v.(string) == "login" {

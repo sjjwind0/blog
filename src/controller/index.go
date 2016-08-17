@@ -3,7 +3,8 @@ package controller
 import (
 	"container/list"
 	"framework"
-	"framework/config"
+	"framework/base/config"
+	"framework/base/json"
 	"framework/response"
 	"html/template"
 	"info"
@@ -37,11 +38,11 @@ type indexRender struct {
 
 func buildBlogElementRender(info *info.BlogInfo) *blogElementRender {
 	var uuid string = info.BlogUUID
-	storageName := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
+	storageName := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
 	descriptionPath := filepath.Join(storageName, uuid, "blog.info")
-	description := config.GetConfigFileManager(descriptionPath).ReadConfig("descript").(string)
+	description := json.NewJsonReaderFromFile(descriptionPath).Get("descript").(string)
 	var render blogElementRender
-	render.BlogAuthor = config.GetDefaultConfigFileManager().ReadConfig("blog.owner.name").(string)
+	render.BlogAuthor = config.GetDefaultConfigJsonReader().Get("blog.owner.name").(string)
 	render.BlogTitle = info.BlogTitle
 	render.BlogDescription = description
 	render.BlogID = info.BlogID

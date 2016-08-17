@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"framework"
-	"framework/config"
+	"framework/base/config"
 	"framework/response"
 	"framework/server"
 	"io/ioutil"
@@ -82,7 +82,7 @@ func (p *PersonalDeleteController) deleteBlog(blogId int) error {
 			return err
 		}
 		// 2. 删除本地文件, raw文件暂时不删
-		blogPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
+		blogPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
 		blogPath = filepath.Join(blogPath, blogInfo.BlogUUID)
 		return os.RemoveAll(blogPath)
 	}

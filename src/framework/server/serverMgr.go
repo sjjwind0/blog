@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"framework"
 	"framework/response"
-	"html/template"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -163,11 +162,7 @@ func (s *serverMgr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	// 4. 404
 	fmt.Println("404: ", r.URL.Path)
-	t, err := template.ParseFiles("./src/view/html/404.html")
-	if err != nil {
-		fmt.Println("err: ", err.Error())
-	}
-	t.Execute(w, nil)
+	w.WriteHeader(http.StatusNotFound)
 }
 
 func (s *serverMgr) StartServer() {

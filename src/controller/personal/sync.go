@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"framework"
-	"framework/config"
+	"framework/base/archive"
+	"framework/base/config"
 	"framework/response"
-	"framework/util/archive"
 	"info"
 	"io/ioutil"
 	"model"
@@ -67,8 +67,8 @@ func (s *SyncController) uploadBlog(w http.ResponseWriter, r *http.Request) {
 	tagList := strings.Split(tag, "||")
 	imgContent := r.MultipartForm.Value["img"][0]
 
-	blogStorageFilePath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
-	imgStorageFilePath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.img").(string)
+	blogStorageFilePath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
+	imgStorageFilePath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.img").(string)
 
 	blogStorageFilePath = filepath.Join(blogStorageFilePath, uuid)
 	fmt.Println("blogStorageFilePath: ", blogStorageFilePath)

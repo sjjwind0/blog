@@ -1,7 +1,10 @@
 package json
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/bitly/go-simplejson"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -415,4 +418,106 @@ func stringMapToString(data map[string]string) string {
 	}
 	ret += "}"
 	return ret
+}
+
+type JsonReader struct {
+	config string
+	js     *simplejson.Json
+	jsMap  map[string]interface{}
+}
+
+func NewJsonReader(content string) *JsonReader {
+	return &JsonReader{config: content}
+}
+
+func NewJsonReaderFromFile(filePath string) *JsonReader {
+	return &JsonReader{config: loadFileContent(filePath)}
+}
+
+func isFileExixt(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil || os.IsExist(err)
+}
+
+func loadFileContent(configPath string) string {
+	if isFileExixt(configPath) == false {
+		file, _ := os.Create(configPath)
+		defer file.Close()
+		return ""
+	} else {
+		fileInfo, err := os.Stat(configPath)
+		if err != nil {
+			return ""
+		}
+		file, err := os.Open(configPath)
+		defer file.Close()
+		if err != nil {
+			return ""
+		}
+		content := make([]byte, fileInfo.Size())
+		file.Read(content)
+		return string(content)
+	}
+}
+
+func transfer(value interface{}) interface{} {
+	switch value.(type) {
+	case int, int32, string, int64, float32, float64, []string, []int, []int64, []float32:
+		return value
+	case json.Number:
+		realValue := value.(json.Number)
+		if v, o := realValue.Int64(); o == nil {
+			return v
+		}
+		if v, o := realValue.Float64(); o == nil {
+			return v
+		}
+		return realValue.String()
+	case map[string]interface{}:
+		var retMap map[string]interface{} = make(map[string]interface{})
+		realMap := value.(map[string]interface{})
+		for k, v := range realMap {
+			retMap[k] = transfer(v)
+		}
+		return retMap
+	case []interface{}:
+		realList := value.([]interface{})
+		var retList []interface{}
+		for _, v := range realList {
+			retList = append(retList, transfer(v))
+		}
+		return retList
+	}
+	return nil
+}
+
+func (c *JsonReader) Get(key string) interface{} {
+	content := c.config
+	if content != "" {
+		var err error = nil
+		if c.js == nil {
+			c.js, err = simplejson.NewJson([]byte(content))
+			if err != nil {
+				return nil
+			}
+			c.jsMap, err = c.js.Map()
+			if err != nil {
+				return nil
+			}
+		}
+		if err == nil {
+			keyList := strings.Split(key, ".")
+			value := c.jsMap
+			for i := range keyList {
+				if i == len(keyList)-1 {
+					return transfer(value[keyList[i]])
+				}
+				var ok bool = true
+				if value, ok = value[keyList[i]].(map[string]interface{}); !ok {
+					break
+				}
+			}
+		}
+	}
+	return nil
 }

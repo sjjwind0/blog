@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"framework"
-	"framework/config"
+	"framework/base/config"
 	"framework/response"
 	"framework/server"
 	"io/ioutil"
@@ -58,9 +58,9 @@ func (p *PersonalAuthController) HandlerRequest(w http.ResponseWriter, r *http.R
 			response.JsonResponseWithMsg(w, framework.ErrorParamError, "no password")
 			return
 		}
-		defaultConfig := config.GetDefaultConfigFileManager()
-		defaultUserName := defaultConfig.ReadConfig("blog.owner.authUserName").(string)
-		defaultPassword := defaultConfig.ReadConfig("blog.owner.authPassword").(string)
+		defaultConfig := config.GetDefaultConfigJsonReader()
+		defaultUserName := defaultConfig.Get("blog.owner.authUserName").(string)
+		defaultPassword := defaultConfig.Get("blog.owner.authPassword").(string)
 
 		sign := func(password string) string {
 			md5Ctx := md5.New()

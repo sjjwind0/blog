@@ -3,10 +3,11 @@ package personal
 import (
 	"fmt"
 	"framework"
-	"framework/config"
+	"framework/base/archive"
+	"framework/base/config"
+	"framework/base/json"
 	"framework/response"
 	"framework/server"
-	"framework/util/archive"
 	"io"
 	"model"
 	"net/http"
@@ -42,7 +43,7 @@ func (f *FileController) handlerDownloadRequest(w http.ResponseWriter, r *http.R
 		return
 	}
 	// read raw zip file path
-	rawPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.raw").(string)
+	rawPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.raw").(string)
 	blogInfo, err := model.ShareBlogModel().FetchBlogByBlogID(blogId)
 	if err != nil {
 		response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
@@ -132,12 +133,12 @@ func (f *FileController) handlerUploadRequest(w http.ResponseWriter, r *http.Req
 	resZipName := f.savePostFile(r, "res", saveTmpPath)
 	coverImgName := f.savePostFile(r, "img", saveTmpPath)
 
-	blogMetaInfo := config.GetConfigFileManager(filepath.Join(saveTmpPath, blogInfoName))
-	uuid := blogMetaInfo.ReadConfig("uuid").(string)
-	title := blogMetaInfo.ReadConfig("title").(string)
-	tag := blogMetaInfo.ReadConfig("tag").(string)
+	blogMetaInfoReader := json.NewJsonReader(filepath.Join(saveTmpPath, blogInfoName))
+	uuid := blogMetaInfoReader.Get("uuid").(string)
+	title := blogMetaInfoReader.Get("title").(string)
+	tag := blogMetaInfoReader.Get("tag").(string)
 	tagList := strings.Split(tag, "||")
-	sort := blogMetaInfo.ReadConfig("sort").(string)
+	sort := blogMetaInfoReader.Get("sort").(string)
 	isExist, err := model.ShareBlogModel().BlogIsExistByUUID(uuid)
 	if err != nil {
 		response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
@@ -145,9 +146,9 @@ func (f *FileController) handlerUploadRequest(w http.ResponseWriter, r *http.Req
 		return
 	}
 	// 7. archive to path
-	rawRootPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.raw").(string)
+	rawRootPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.raw").(string)
 	f.checkFolder(rawRootPath)
-	blogRootPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
+	blogRootPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
 	blogRootPath = filepath.Join(blogRootPath, uuid)
 	f.checkFolder(blogRootPath)
 

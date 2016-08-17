@@ -2,7 +2,7 @@ package controller
 
 import (
 	"container/list"
-	"framework/config"
+	"framework/base/config"
 	"info"
 	"sort"
 	"strings"
@@ -36,7 +36,7 @@ var hostRenderOnce sync.Once
 func buildHostRender() *hostRender {
 	hostRenderOnce.Do(func() {
 		staticHostRender = &hostRender{}
-		staticHostRender.Host = config.GetDefaultConfigFileManager().ReadConfig("net.host").(string)
+		staticHostRender.Host = config.GetDefaultConfigJsonReader().Get("net.host").(string)
 		if !strings.HasPrefix(staticHostRender.Host, "http://") {
 			staticHostRender.Host = "http://" + staticHostRender.Host
 		}

@@ -2,7 +2,7 @@ package response
 
 import (
 	"fmt"
-	"framework/util/json"
+	"framework/base/json"
 	"net/http"
 )
 

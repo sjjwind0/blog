@@ -3,7 +3,8 @@ package login
 import (
 	// "errors"
 	"fmt"
-	"framework/config"
+	"framework/base/config"
+	"framework/base/json"
 	"info"
 	"io/ioutil"
 	"net/http"
@@ -35,8 +36,8 @@ func GetWebLoginInstance() *loginByWeb {
 }
 
 func (l *loginByWeb) init() {
-	l.appKey = config.GetDefaultConfigFileManager().ReadConfig("blog.account.weibo.key").(string)
-	l.appSecret = config.GetDefaultConfigFileManager().ReadConfig("blog.account.weibo.secret").(string)
+	l.appKey = config.GetDefaultConfigJsonReader().Get("blog.account.weibo.key").(string)
+	l.appSecret = config.GetDefaultConfigJsonReader().Get("blog.account.weibo.secret").(string)
 }
 
 func (l *loginByWeb) getTokenByCode(code string) (string, string, error) {
@@ -55,9 +56,9 @@ func (l *loginByWeb) getTokenByCode(code string) (string, string, error) {
 	}
 	var accessToken string
 	var uid string
-	parse := config.NewConfigContentManager(string(data))
-	accessToken = parse.ReadConfig("access_token").(string)
-	uid = parse.ReadConfig("uid").(string)
+	parse := json.NewJsonReader(string(data))
+	accessToken = parse.Get("access_token").(string)
+	uid = parse.Get("uid").(string)
 	return accessToken, uid, err
 }
 
@@ -72,12 +73,12 @@ func (l *loginByWeb) getUserInfo(accessToken string, openid string) (*info.UserI
 	if err != nil {
 		return nil, err
 	}
-	parse := config.NewConfigContentManager(string(body))
+	parse := json.NewJsonReader(string(body))
 	var info info.UserInfo
-	info.UserName = parse.ReadConfig("name").(string)
-	info.Sex = parse.ReadConfig("gender").(string)
+	info.UserName = parse.Get("name").(string)
+	info.Sex = parse.Get("gender").(string)
 	info.UserOpenID = openid
-	info.SmallFigureurl = parse.ReadConfig("profile_image_url").(string)
+	info.SmallFigureurl = parse.Get("profile_image_url").(string)
 	return &info, nil
 }
 

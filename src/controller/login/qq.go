@@ -3,7 +3,8 @@ package login
 import (
 	"errors"
 	"fmt"
-	"framework/config"
+	"framework/base/config"
+	"framework/base/json"
 	"info"
 	"io/ioutil"
 	"net/http"
@@ -33,8 +34,8 @@ type loginByQQ struct {
 }
 
 func (l *loginByQQ) init() {
-	l.appKey = config.GetDefaultConfigFileManager().ReadConfig("blog.account.qq.key").(string)
-	l.appSecret = config.GetDefaultConfigFileManager().ReadConfig("blog.account.qq.secret").(string)
+	l.appKey = config.GetDefaultConfigJsonReader().Get("blog.account.qq.key").(string)
+	l.appSecret = config.GetDefaultConfigJsonReader().Get("blog.account.qq.secret").(string)
 }
 
 func (l *loginByQQ) getTokenByCode(code string) (string, string, error) {
@@ -92,8 +93,8 @@ func (l *loginByQQ) getOpenId(accessToken string) (string, error) {
 	end := strings.LastIndex(response, "}")
 	jsonBody := response[begin : end+1]
 	fmt.Println(jsonBody)
-	c := config.NewConfigContentManager(jsonBody)
-	openId := c.ReadConfig("openid").(string)
+	c := json.NewJsonReader(jsonBody)
+	openId := c.Get("openid").(string)
 	return openId, nil
 }
 
@@ -113,18 +114,18 @@ func (l *loginByQQ) getUserInfo(accessToken string, openId string) (*info.UserIn
 	fmt.Println(string(body))
 
 	// 2. 解析
-	c := config.NewConfigContentManager(response)
-	code := c.ReadConfig("ret").(int64)
+	c := json.NewJsonReader(response)
+	code := c.Get("ret").(int64)
 	if code != 0 {
 		fmt.Println("get user info error with error code: ", code)
 		return nil, errors.New("ret error")
 	}
 	var info info.UserInfo
-	info.UserName = c.ReadConfig("nickname").(string)
-	info.Sex = c.ReadConfig("gender").(string)
+	info.UserName = c.Get("nickname").(string)
+	info.Sex = c.Get("gender").(string)
 	info.UserOpenID = openId
-	info.SmallFigureurl = c.ReadConfig("figureurl_1").(string)
-	info.BigFigureurl = c.ReadConfig("figureurl_2").(string)
+	info.SmallFigureurl = c.Get("figureurl_1").(string)
+	info.BigFigureurl = c.Get("figureurl_2").(string)
 	fmt.Println("userName: ", info.UserName)
 	return &info, nil
 }

@@ -348,7 +348,9 @@ article {
     position: relative;
     height: 45px;
     border-bottom: 1px solid #90bba8;
-    margin: 5px 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 20px;
 }
 
 .small_title h2 {
