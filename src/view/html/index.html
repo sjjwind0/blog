@@ -12,13 +12,14 @@
 <body>
 	<div class="body">
 		<div id="nav">
-		<div class="nav-center">
-			<ul class="clear">
-				<li class="active"><a href="{{.Host.Host}}/index">博客</a></li>
-				<li><a href="{{.Host.Host}}/high">High玩</a></li>
-				<li><a href="{{.Host.Host}}/about">关于</a></li>
-			</ul>
-		</div>
+			<img class="icon" src="{{.Host.Host}}/img/icon.png"/>
+			<div class="nav-center">
+				<ul class="clear">
+					<li class="active"><a href="{{.Host.Host}}/index">博客</a></li>
+					<li><a href="{{.Host.Host}}/high">High玩</a></li>
+					<li><a href="{{.Host.Host}}/about">关于自己</a></li>
+				</ul>
+			</div>
 		</div>
 		<div class="container">
 			<div class="header">
@@ -32,7 +33,7 @@
 						</a>
 						<h2><a target="_blank" href="{{$.Host.Host}}/blog?id={{.BlogID}}" title="{{.BlogTitle}}">{{.BlogTitle}}</a></h2>
 					</header>
-					<div class="focus"><a target="_blank" href="{{$.Host.Host}}/blog?id={{.BlogID}}"><img class="thumb" src="{{$.Host.Host}}/img?id={{.BlogUUID}}" height="123" width="200" alt="{{.BlogTitle}}"></a></div>
+					<div class="focus"><a target="_blank" href="{{$.Host.Host}}/blog?id={{.BlogID}}"><img class="thumb" src="{{$.Host.Host}}/cover?id={{.BlogUUID}}" height="123" width="200" alt="{{.BlogTitle}}"></a></div>
 						<span class="note"> {{.BlogDescription}}</span>
 					<p class="auth-span">
 							<span class="muted"><i class="fa fa-user"></i> <a href="{{$.Host.Host}}/about">{{.BlogAuthor}}</a></span>

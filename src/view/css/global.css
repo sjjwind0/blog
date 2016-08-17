@@ -42,6 +42,11 @@ input,textarea,.uneditable-input{width:206px}textarea{height:auto}textarea,input
 	vertical-align: top;
 }
 
+#nav .nav-center {
+	float: left;
+    margin-left: 80px;
+}
+
 #nav .nav-center a {
 	text-decoration: none;
 	color: #666;
@@ -49,7 +54,7 @@ input,textarea,.uneditable-input{width:206px}textarea{height:auto}textarea,input
 
 #nav .nav-center a:hover {
 	text-decoration: underline;
-	color: #518900;
+	color: #555;
 }
 
 .clear:after {
@@ -86,8 +91,8 @@ body {
 
 #nav {
 	width: 100%;
-	height: 44px;
-	background-color: rgba(213, 100, 100, 1);
+	height: 54px;
+	background-color: #22262a;
 }
 
 #searchbotton {
@@ -110,7 +115,6 @@ body {
 }
 
 #nav ul {
-	width: 70%;
 	margin: 0 auto;
 	padding-top: 0px;
 }
@@ -126,17 +130,16 @@ body {
 #nav .nav-center a {
 	display: block;
 	padding: 0 22px;
-	font: 16px/44px 'microsoft yahei',STXihei;
+	font: 16px/54px 'microsoft yahei',STXihei;
 	color: #fff;
 }
 
 #nav .nav-center a:hover {
-	background-color: #09a709;
 	text-decoration: none;
 }
 
 #nav .nav-center .active {
-	background-color: #09ae09;
+	background-color: #363d41;
 }
 
 .container {
@@ -149,7 +152,7 @@ body {
 .content {
 	float: left;
 	margin-right: 370px;
-	width: 850px;
+	width: 73%;
 	margin: 0 auto;
 	padding: 20px 0;
 }
@@ -289,7 +292,7 @@ article {
 .side {
     float: left;
     width: 300px;
-    margin-left: 30px;
+    margin-left: 20px;
     position: relative;
 }
 
@@ -395,6 +398,13 @@ article {
 .breadcrumbs a {
     color: #00a67c;
     text-decoration: none;
+}
+
+.icon {
+	float: left;
+    width: 54px;
+    height: 54px;
+    margin-left: 120px;
 }
 
 .blog {

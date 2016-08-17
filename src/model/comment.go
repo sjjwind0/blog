@@ -75,6 +75,12 @@ func (c *commentModel) AddComment(userId int, blogId int, commentId int, comment
 	return 0, err
 }
 
+func (c *commentModel) DeleteAllBlogComment(blogId int) error {
+	sql := fmt.Sprintf("delete from %s where %s = ?", kCommentTableName, kCommentId)
+	_, err := database.DatabaseInstance().DB.Exec(sql, blogId)
+	return err
+}
+
 func (c *commentModel) FetchCommentByCommentId(commentId int) (*info.CommentInfo, error) {
 	sql := fmt.Sprintf("select * from %s where %s = ?", kCommentTableName, kCommentId)
 	rows, err := database.DatabaseInstance().DB.Query(sql, commentId)

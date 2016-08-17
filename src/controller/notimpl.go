@@ -12,7 +12,7 @@ func NewNotImplController() *NotImplController {
 }
 
 func (i *NotImplController) Path() interface{} {
-	return []string{"/about", "/high"}
+	return []string{"/high"}
 }
 
 func (i *NotImplController) HandlerRequest(w http.ResponseWriter, r *http.Request) {

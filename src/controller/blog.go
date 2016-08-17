@@ -44,6 +44,7 @@ type blogRender struct {
 	BlogTime               string
 	Author                 string
 	BlogVisitCount         string
+	BlogContent            template.HTML
 	BlogCommentCount       string
 	BlogCommentPeopleCount string
 	User                   userRender
@@ -63,7 +64,7 @@ func NewBlogController() *BlogController {
 }
 
 func (b *BlogController) Path() interface{} {
-	return []string{"/blog", "/article", "/img"}
+	return "/blog"
 }
 
 func (b *BlogController) SessionPath() string {
@@ -89,46 +90,23 @@ func (b *BlogController) fetchCommentContent(blogId int) (string, error) {
 	return rawComment, nil
 }
 
-func (b *BlogController) readFileContent(path string) *[]byte {
-	if v, ok := b.blogContentMap[path]; ok {
-		return v
-	}
-	fileInfo, err := os.Stat(path)
-	if err == nil {
-		content := make([]byte, fileInfo.Size())
-		file, _ := os.Open(path)
-		defer file.Close()
-		file.Read(content)
-		b.blogContentMap[path] = &content
-		return &content
-	}
-	return nil
-}
-
-func (b *BlogController) readBlog(w http.ResponseWriter, blogId int) {
+func (b *BlogController) readBlogContent(blogId int) string {
 	uuid, err := model.ShareBlogModel().GetBlogUUIDByBlogID(blogId)
 	// generate blog path
 	if err != nil {
-		response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
-		return
+		return ""
 	}
 	blogPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
 	blogPath = filepath.Join(blogPath, uuid, uuid+".html")
-	blogContent := b.readFileContent(blogPath)
-	w.Header().Set("Accept", "*/*")
-	w.Header().Set("Content-Length", strconv.Itoa(len(*blogContent)))
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Write(*blogContent)
-}
-
-func (b *BlogController) readImg(w http.ResponseWriter, imgId string) {
-	imgPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.img").(string)
-	imgPath = filepath.Join(imgPath, imgId)
-	imgContent := b.readFileContent(imgPath)
-	w.Header().Set("Accept", "*/*")
-	w.Header().Set("Content-Length", strconv.Itoa(len(*imgContent)))
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Write(*imgContent)
+	fileInfo, err := os.Stat(blogPath)
+	if err == nil {
+		content := make([]byte, fileInfo.Size())
+		file, _ := os.Open(blogPath)
+		defer file.Close()
+		file.Read(content)
+		return string(content)
+	}
+	return ""
 }
 
 func (b *BlogController) readBlogHtml(w http.ResponseWriter, blogId int) {
@@ -164,6 +142,7 @@ func (b *BlogController) readBlogHtml(w http.ResponseWriter, blogId int) {
 	render.BlogCommentPeopleCount = strconv.Itoa(peopleCount)
 	render.BlogVisitCount = strconv.Itoa(blogInfo.BlogVisitCount)
 	render.CommentContent = template.HTML(content)
+	render.BlogContent = template.HTML(b.readBlogContent(blogId))
 	render.Author = config.GetDefaultConfigFileManager().ReadConfig("blog.owner.name").(string)
 	v, err := b.SessionController.WebSession.Get("status")
 	if err == nil {
@@ -198,16 +177,7 @@ func (b *BlogController) readBlogHtml(w http.ResponseWriter, blogId int) {
 
 func (b *BlogController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	if r.URL.Path == "/article" {
-		id, err := strconv.Atoi(r.Form["id"][0])
-		if err != nil {
-			response.JsonResponseWithMsg(w, framework.ErrorParamError, "param error")
-			return
-		}
-		b.readBlog(w, id)
-	} else if r.URL.Path == "/img" {
-		b.readImg(w, r.Form["id"][0])
-	} else if r.URL.Path == "/blog" {
+	if r.URL.Path == "/blog" {
 		b.SessionController.HandlerRequest(b, w, r)
 		id, err := strconv.Atoi(r.Form.Get("id"))
 		if err != nil {
@@ -215,5 +185,7 @@ func (b *BlogController) HandlerRequest(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 		b.readBlogHtml(w, id)
+	} else {
+		response.JsonResponseWithMsg(w, framework.ErrorParamError, "param error")
 	}
 }

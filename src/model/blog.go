@@ -83,9 +83,21 @@ func (b *blogModel) UpdateBlog(uuid string, title string, sortType string, tagLi
 	return err
 }
 
-func (b *blogModel) BlogIsExist(uuid string) (bool, error) {
+func (b *blogModel) BlogIsExistByUUID(uuid string) (bool, error) {
 	sql := fmt.Sprintf("select * from %s where %s = ?", kBlogTableName, kBlogUUID)
 	rows, err := database.DatabaseInstance().DB.Query(sql, uuid)
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			return true, nil
+		}
+	}
+	return false, err
+}
+
+func (b *blogModel) BlogIsExistByBlogID(blogId int) (bool, error) {
+	sql := fmt.Sprintf("select * from %s where %s = ?", kBlogTableName, kBlogId)
+	rows, err := database.DatabaseInstance().DB.Query(sql, blogId)
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {
@@ -241,6 +253,12 @@ func (b *blogModel) FetchAllBlogByTime(beginTime int64, endTime int64) (*list.Li
 
 func (b *blogModel) AddVisitCount(blogId int) error {
 	sql := fmt.Sprintf("update %s set visit = visit + 1 where %s = ?", kBlogTableName, kBlogId)
+	_, err := database.DatabaseInstance().DB.Exec(sql, blogId)
+	return err
+}
+
+func (b *blogModel) DeleteBlog(blogId int) error {
+	sql := fmt.Sprintf("delete from %s where %s = ?", kBlogTableName, kBlogId)
 	_, err := database.DatabaseInstance().DB.Exec(sql, blogId)
 	return err
 }

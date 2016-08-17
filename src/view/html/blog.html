@@ -6,19 +6,22 @@
 	<title>Test Title</title>
 	<link rel="stylesheet" href="/css/talk.css">
 	<link rel="stylesheet" href="/css/global.css">
+	<link rel="stylesheet" href="/css/atom-article.css"> 
+	<link rel="stylesheet" href="/css/katex.min.css"> 
 	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/jquery-cookie.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/blog.js?1003" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 	<div id="nav">
+		<img class="icon" src="{{.Host.Host}}/img/icon.png"/>
 		<div class="nav-center">
 			<ul class="clear">
 				<li class="active"><a href="{{.Host.Host}}/index">博客</a></li>
 				<li><a href="{{.Host.Host}}/high">High玩</a></li>
-				<li><a href="{{.Host.Host}}/about">关于</a></li>
+				<li><a href="{{.Host.Host}}/about">关于自己</a></li>
 			</ul>
-	</div>
+		</div>
 	</div>
 	<div class="container">
 		<div class="header">
@@ -45,7 +48,8 @@
 					</div>
 			</header>
 			<div class="blog" bid="{{.BlogID}}">
-				<iframe class="blog-frame" name="blog" scrolling="no" frameborder="0" width="100%" onload="this.height=this.contentWindow.document.documentElement.scrollHeight;" src="{{.Host.Host}}/article?id={{.BlogID}}"></iframe>
+				{{.BlogContent}}
+				<!-- <iframe class="blog-frame" name="blog" scrolling="no" frameborder="0" width="100%" onload="this.height=this.contentWindow.document.documentElement.scrollHeight;" src="{{.Host.Host}}/article?id={{.BlogID}}"></iframe> -->
 			</div>
 			<div class="talk">
 				{{if .User.IsLogin}}

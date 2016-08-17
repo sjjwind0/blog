@@ -16,6 +16,8 @@ import (
 	"strings"
 )
 
+const k24K = (1 << 20) * 24
+
 type FileController struct {
 	server.SessionController
 }
@@ -25,7 +27,7 @@ func NewPersonalFileController() *FileController {
 }
 
 func (f *FileController) Path() interface{} {
-	return []string{"/personal/file-download", "/personal/file-upload"}
+	return "/personal/file"
 }
 
 func (f *FileController) SessionPath() string {
@@ -46,7 +48,7 @@ func (f *FileController) handlerDownloadRequest(w http.ResponseWriter, r *http.R
 		response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
 		return
 	}
-	blogPath := filepath.Join(rawPath, blogInfo.BlogUUID)
+	blogPath := filepath.Join(rawPath, blogInfo.BlogUUID+".zip")
 	file, err := os.Open(blogPath)
 	if err != nil {
 		response.JsonResponseWithMsg(w, framework.ErrorFileNotExist, err.Error())
@@ -62,8 +64,36 @@ func (f *FileController) handlerDownloadRequest(w http.ResponseWriter, r *http.R
 	file.Close()
 	w.Header().Set("Accept", "*/*")
 	w.Header().Set("Content-Length", strconv.Itoa(len(content)))
-	w.Header().Set("Content-Disposition", "attachment; filename="+blogInfo.BlogTitle)
+	w.Header().Set("Content-Disposition", "attachment; filename="+blogInfo.BlogUUID+".zip")
 	w.Write(content)
+}
+
+func (f *FileController) savePostFile(r *http.Request, name string, path string) string {
+	file, handler, err := r.FormFile(name)
+	if err != nil {
+		fmt.Println("r.FormFile: ", err)
+		return ""
+	}
+	defer file.Close()
+	saveFile, err := os.OpenFile(filepath.Join(path, handler.Filename), os.O_WRONLY|os.O_CREATE, 0755)
+	if err != nil {
+		fmt.Println("os.OpenFile: ", err)
+		return ""
+	}
+	defer saveFile.Close()
+	io.Copy(saveFile, file)
+	return handler.Filename
+}
+
+func (f *FileController) checkFolder(path string) {
+	_, err := os.Stat(path)
+	if !os.IsExist(err) {
+		fmt.Println("create folder: ", path)
+		err := os.MkdirAll(path, 0775)
+		if err != nil {
+			fmt.Println("create folder error: ", err.Error())
+		}
+	}
 }
 
 /* 接受multi-part form格式，格式如下：
@@ -86,71 +116,44 @@ func (f *FileController) handlerDownloadRequest(w http.ResponseWriter, r *http.R
 **	 			- js
 **				- img
 **	 			- font
+**	 			- other
 ** raw文件放在raw目录不对外开放，html文件以及res文件放在blog目录，meta信息放数据库。
  */
 func (f *FileController) handlerUploadRequest(w http.ResponseWriter, r *http.Request) {
-	const _24K = (1 << 20) * 24
-	if err := r.ParseMultipartForm(_24K); nil != err {
+	if err := r.ParseMultipartForm(k24K); nil != err {
 		fmt.Println("r.ParseMultipartForm: ", err)
 		return
 	}
-	checkFolder := func(path string) {
-		_, err := os.Stat(path)
-		if !(err == nil || os.IsExist(err)) {
-			os.MkdirAll(path, 0755)
-		}
-	}
-	saveFile := func(name string, path string) string {
-		file, handler, err := r.FormFile(name)
-		if err != nil {
-			fmt.Println("r.FormFile: ", err)
-			return ""
-		}
-		defer file.Close()
-		fmt.Fprintf(w, "%v", handler.Header)
-		f, err := os.OpenFile(filepath.Join(path, handler.Filename), os.O_WRONLY|os.O_CREATE, 0666)
-		if err != nil {
-			fmt.Println(err)
-			return ""
-		}
-		defer f.Close()
-		io.Copy(f, file)
-		return handler.Filename
-	}
 
 	saveTmpPath := "/tmp"
+	rawZipName := f.savePostFile(r, "raw", saveTmpPath)
+	webHtmlName := f.savePostFile(r, "web", saveTmpPath)
+	blogInfoName := f.savePostFile(r, "info", saveTmpPath)
+	resZipName := f.savePostFile(r, "res", saveTmpPath)
+	coverImgName := f.savePostFile(r, "img", saveTmpPath)
 
-	// 1. save raw.zip
-	rawZipName := saveFile("raw", saveTmpPath)
-	// 2. save web html
-	webHtmlName := saveFile("web", saveTmpPath)
-	// 3. save blog.info
-	blogInfoName := saveFile("info", saveTmpPath)
-	// 4. save res.zip
-	resZipName := saveFile("res", saveTmpPath)
-	// 5. save cover.jpg
-	coverImgName := saveFile("img", saveTmpPath)
-	// 6. read blog.info
 	blogMetaInfo := config.GetConfigFileManager(filepath.Join(saveTmpPath, blogInfoName))
 	uuid := blogMetaInfo.ReadConfig("uuid").(string)
 	title := blogMetaInfo.ReadConfig("title").(string)
 	tag := blogMetaInfo.ReadConfig("tag").(string)
 	tagList := strings.Split(tag, "||")
 	sort := blogMetaInfo.ReadConfig("sort").(string)
-	isExist, err := model.ShareBlogModel().BlogIsExist(uuid)
-	fmt.Println("uuid: ", uuid)
+	isExist, err := model.ShareBlogModel().BlogIsExistByUUID(uuid)
 	if err != nil {
 		response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
+		fmt.Println("insert uuid error: ", err.Error())
 		return
 	}
 	// 7. archive to path
 	rawRootPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.raw").(string)
-	checkFolder(rawRootPath)
+	f.checkFolder(rawRootPath)
 	blogRootPath := config.GetDefaultConfigFileManager().ReadConfig("blog.storage.file.blog").(string)
 	blogRootPath = filepath.Join(blogRootPath, uuid)
-	checkFolder(rawRootPath)
+	f.checkFolder(blogRootPath)
 
 	rawZipPath := filepath.Join(rawRootPath, uuid+".zip")
+	fmt.Println("1 = ", filepath.Join(saveTmpPath, rawZipName))
+	fmt.Println("2 = ", rawZipPath)
 	os.Rename(filepath.Join(saveTmpPath, rawZipName), rawZipPath)
 
 	infoPath := filepath.Join(blogRootPath, blogInfoName)
@@ -169,6 +172,7 @@ func (f *FileController) handlerUploadRequest(w http.ResponseWriter, r *http.Req
 	err = archive.UnZip(resZipPath)
 	if err != nil {
 		response.JsonResponseWithMsg(w, framework.ErrorParamError, err.Error())
+		fmt.Println("unzip error: ", err.Error())
 		return
 	}
 	// write db
@@ -185,11 +189,6 @@ func (f *FileController) handlerUploadRequest(w http.ResponseWriter, r *http.Req
 }
 
 func (f *FileController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		response.JsonResponse(w, framework.ErrorMethodError)
-		return
-	}
-
 	f.SessionController.HandlerRequest(f, w, r)
 	// if status, err := f.WebSession.Get("status"); err != nil || status != "auth" {
 	// 	fmt.Println("err: ", err.Error(), "\tstatus: ", status)
@@ -199,11 +198,12 @@ func (f *FileController) HandlerRequest(w http.ResponseWriter, r *http.Request) 
 	// if r.Header.Get("Content-Type") == "multipart/form-data" {
 	// 	fmt.Println("right")
 	// }
-	switch r.URL.Path {
-	case "/personal/file-download":
-		f.handlerDownloadRequest(w, r)
-	case "/personal/file-upload":
+	fmt.Println("FileController.HandlerRequest")
+	switch r.Method {
+	case "POST":
 		f.handlerUploadRequest(w, r)
+	case "GET":
+		f.handlerDownloadRequest(w, r)
 	default:
 		response.JsonResponseWithMsg(w, framework.ErrorParamError, "param error")
 	}

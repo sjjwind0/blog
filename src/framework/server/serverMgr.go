@@ -1,9 +1,10 @@
 package server
 
 import (
-	"container/list"
 	"fmt"
-	"io"
+	"framework"
+	"framework/response"
+	"html/template"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -44,33 +45,39 @@ func ShareServerMgrInstance() *serverMgr {
 }
 
 func (s *serverMgr) RegisterController(controller Controller) {
-	if s.controllerMap == nil {
-		s.controllerMap = make(map[string]Controller)
-	}
-	const registerController = func(controllerMap *map[string]Controller, path interface{},
+	registerController := func(controllerMap *map[string]Controller, path interface{},
 		controller Controller) {
 		switch path.(type) {
 		case string:
-			if _, ok := controllerMap[path.(string)]; ok {
+			if _, ok := (*controllerMap)[path.(string)]; ok {
 				fmt.Println("controller has been registered!")
 				return
 			}
-			controllerMap[path.(string)] = controller
+			(*controllerMap)[path.(string)] = controller
 		case []string:
 			for _, p := range path.([]string) {
-				if _, ok := controllerMap[p]; ok {
+				if _, ok := (*controllerMap)[p]; ok {
 					fmt.Println("controller has been registered!")
 					return
 				}
-				controllerMap[p] = controller
+				(*controllerMap)[p] = controller
 			}
 		}
 	}
 	if normalController, ok := controller.(NormalController); ok {
+		if s.controllerMap == nil {
+			s.controllerMap = make(map[string]Controller)
+		}
 		registerController(&s.controllerMap, normalController.Path(), normalController)
 	} else if childHandlerController, ok := controller.(ChildHandlerController); ok {
-		registerController(&s.controllerMap, childHandlerController.Path(), childHandlerController)
-		registerController(&s.childHandlerControllerMap, childHandlerController.Path(), childHandlerController)
+		if s.childHandlerControllerMap == nil {
+			s.childHandlerControllerMap = make(map[string]Controller)
+		}
+		path, enableChildPath := childHandlerController.Path()
+		registerController(&s.controllerMap, path, childHandlerController)
+		if enableChildPath {
+			registerController(&s.childHandlerControllerMap, path, childHandlerController)
+		}
 	}
 }
 
@@ -96,10 +103,12 @@ func (s *serverMgr) SetServerPort(port int) {
 	s.port = port
 }
 
-func (s *serverMgr) handlerStatisFile() bool {
+func (s *serverMgr) handlerStatisFile(w http.ResponseWriter, currentPath string) bool {
+	if currentPath[0] == '/' {
+		currentPath = currentPath[1:]
+	}
 	if local, ok := s.staticFileMap[currentPath]; ok {
 		ext := filepath.Ext(local)
-		fmt.Println("ext: ", ext)
 		contentType := ""
 		if v, ok := extContentTypeMap[strings.ToLower(ext)]; ok {
 			contentType = v
@@ -112,18 +121,20 @@ func (s *serverMgr) handlerStatisFile() bool {
 			return false
 		}
 		defer file.Close()
-		io.Cw.(io.Writer)
 		fileInfo, err := os.Stat(local)
 		if err != nil {
 			response.JsonResponseWithMsg(w, framework.ErrorNoSuchFileOrDirectory, err.Error())
 			return false
 		}
-		io.Copy(w, file)
+		content := make([]byte, fileInfo.Size())
+		file.Read(content)
 		w.Header().Set("Accept", "*/*")
-		w.Header().Set("Content-Length", strconv.Itoa(len(*imgContent)))
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
 		w.Header().Set("Content-Type", contentType)
+		w.Write(content)
 		return true
 	}
+	return false
 }
 
 func (s *serverMgr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -134,7 +145,7 @@ func (s *serverMgr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 2. 在static file 里面寻找
-	if s.handlerStatisFile() {
+	if s.handlerStatisFile(w, currentPath) {
 		return
 	}
 	// 3. 逐级分解，看是不是某个controller的子集
@@ -146,42 +157,20 @@ func (s *serverMgr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				controller.HandlerRequest(w, r)
 				return
 			}
+		} else {
+			break
 		}
 	}
 	// 4. 404
+	fmt.Println("404: ", r.URL.Path)
 	t, err := template.ParseFiles("./src/view/html/404.html")
 	if err != nil {
-		log.Println(err)
+		fmt.Println("err: ", err.Error())
 	}
 	t.Execute(w, nil)
 }
 
 func (s *serverMgr) StartServer() {
-	// register controller
-	if s.controllerMap != nil {
-		for controller := s.controllerMap.Front(); controller != nil; controller = controller.Next() {
-			element := controller.Value.(Controller)
-			path := element.Path()
-			switch path.(type) {
-			case string:
-				http.HandleFunc(path.(string), element.HandlerRequest)
-			case []string:
-				pathList := path.([]string)
-				for _, p := range pathList {
-					http.HandleFunc(p, element.HandlerRequest)
-				}
-			}
-		}
-	}
-
-	// register static file
-	if s.staticFileMap != nil {
-		for file := s.staticFileMap.Front(); file != nil; file = file.Next() {
-			element := file.Value.(*staticFileElement)
-			http.Handle(element.webPath, http.FileServer(http.Dir(element.localPath)))
-		}
-	}
-
-	fmt.Println("server at port: ", s.port)
+	http.HandleFunc("/", s.ServeHTTP)
 	http.ListenAndServe(fmt.Sprintf(":%d", s.port), nil)
 }

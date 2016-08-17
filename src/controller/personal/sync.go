@@ -77,7 +77,7 @@ func (s *SyncController) uploadBlog(w http.ResponseWriter, r *http.Request) {
 
 	archive.ArchiveBufferToPath(imgContent, imgStorageFilePath)
 	// insert blog
-	isExist, err := model.ShareBlogModel().BlogIsExist(uuid)
+	isExist, err := model.ShareBlogModel().BlogIsExistByUUID(uuid)
 	if err == nil {
 		if !isExist {
 			if model.ShareBlogModel().InsertBlog(uuid, title, sort, tagList) == nil {
