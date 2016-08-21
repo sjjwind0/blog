@@ -1,9 +1,5 @@
 package impl
 
-import (
-	"fmt"
-)
-
 type Position struct {
 	X int
 	Y int
@@ -33,5 +29,5 @@ func (this *Position) IsValidPosition() bool {
 }
 
 func (this *Position) DescriptionPosition() {
-	fmt.Printf("Position: (%d, %d)\n", this.X, this.Y)
+	// fmt.Printf("Position: (%d, %d)\n", this.X, this.Y)
 }

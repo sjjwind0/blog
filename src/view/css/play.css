@@ -1,6 +1,7 @@
 .left-board {
 	float: left;
 	margin-right: 30px;
+    background-color: #fff;
 }
 
 .center-board {
@@ -23,9 +24,7 @@
 }
 
 .recommand {
-	padding: 30px;
-	background-color: #fff;
-    padding: 20px 15px 30px 20px;
+    padding: 20px 15px 0px 20px;
     margin-bottom: 10px;
     position: relative;
     clear: both;
@@ -99,6 +98,8 @@ entry-content a:visited, .comment-content a:visited {
 .list-cover {
 	width: 80%;
 	margin-bottom: 30px;
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 .list-time {

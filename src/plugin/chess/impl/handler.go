@@ -61,14 +61,10 @@ func (this *MessageManager) MessageProc(msgType string, message string) {
 							}
 							this.SendValidMove(NewChessMove(sourcePos, targetPos))
 							this.algorithm.GetBoardMap().MoveChess(sourcePos, targetPos)
-							fmt.Println("Web端下完后的棋盘")
-							this.algorithm.GetBoardMap().ShowBoardMap()
 							this.algorithm.GetBoardMap().SwapTurn()
 							move := this.CalcNextStep()
 							this.algorithm.GetBoardMap().MakeMove(move)
 							this.algorithm.GetBoardMap().SwapTurn()
-							fmt.Println("本机下完后的棋盘")
-							this.algorithm.GetBoardMap().ShowBoardMap()
 							this.SendCurrentMove(move)
 							this.SendBoardMap()
 							if this.algorithm.GetBoardMap().IsGameOver() {

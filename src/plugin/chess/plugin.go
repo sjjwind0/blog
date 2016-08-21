@@ -13,7 +13,7 @@ func NewChessPlugin() *chessPlugin {
 }
 
 func (c *chessPlugin) GetPluginName() string {
-	return "chess"
+	return "基于alpha-beta算法的中国象棋"
 }
 
 func (c *chessPlugin) GetPluginUUID() string {

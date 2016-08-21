@@ -2,7 +2,6 @@ package impl
 
 import (
 	"fmt"
-	"time"
 )
 
 type ChessMove struct {
@@ -407,49 +406,29 @@ func (this *BoardMap) ResetChessTime() {
 	chessTime7 = 0
 }
 
-func (this *BoardMap) ShowChessTime() {
-	fmt.Println("chessTime1: ", chessTime1)
-	fmt.Println("chessTime2: ", chessTime2)
-	fmt.Println("chessTime3: ", chessTime3)
-	fmt.Println("chessTime4: ", chessTime4)
-	fmt.Println("chessTime5: ", chessTime5)
-	fmt.Println("chessTime6: ", chessTime6)
-	fmt.Println("chessTime7: ", chessTime7)
-	fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-}
-
 func (this *BoardMap) GetNextStep(pos *Position) *[]Position {
 	if pos.IsValidPosition() == false {
 		return nil
 	}
-	var ret *[]Position = nil
-	begin := time.Now().UnixNano()
 	switch this.GetChessType(pos) {
 	case ChessTypeCar:
-		ret = this.nextCarStep(pos)
-		chessTime1 += time.Now().UnixNano() - begin
+		return this.nextCarStep(pos)
 	case ChessTypeHorse:
-		ret = this.nextHorseStep(pos)
-		chessTime2 += time.Now().UnixNano() - begin
+		return this.nextHorseStep(pos)
 	case ChessTypeElephant:
-		ret = this.nextElephantStep(pos)
-		chessTime3 += time.Now().UnixNano() - begin
+		return this.nextElephantStep(pos)
 	case ChessTypeSolider:
-		ret = this.nextSoliderStep(pos)
-		chessTime4 += time.Now().UnixNano() - begin
+		return this.nextSoliderStep(pos)
 	case ChessTypeGeneral:
-		ret = this.nextGeneralStep(pos)
-		chessTime5 += time.Now().UnixNano() - begin
+		return this.nextGeneralStep(pos)
 	case ChessTypeCannon:
-		ret = this.nextCannonStep(pos)
-		chessTime6 += time.Now().UnixNano() - begin
+		return this.nextCannonStep(pos)
 	case ChessTypePrivate:
-		ret = this.nextPrivateStep(pos)
-		chessTime7 += time.Now().UnixNano() - begin
+		return this.nextPrivateStep(pos)
 	default:
 		fmt.Println("Type Error!", pos.X, pos.Y)
 	}
-	return ret
+	return nil
 }
 
 func (this *BoardMap) nextCarStep(pos *Position) *[]Position {

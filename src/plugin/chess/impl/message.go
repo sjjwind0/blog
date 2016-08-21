@@ -35,7 +35,6 @@ func (m *MessageController) HandlerRequest(ws *websocket.Conn) {
 			msgManager.MessageProc("MessageCut", "")
 			return
 		}
-		fmt.Println("Recv Data:" + string(reply))
 		msgManager.MessageProc("RecvData", reply)
 		if err != nil {
 			fmt.Println("Can't send")

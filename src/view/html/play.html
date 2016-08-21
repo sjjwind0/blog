@@ -6,9 +6,10 @@
 	<meta property="qc:admins" content="66062235164106375" />
 	<!-- <meta property="qc:admins" content="66062230477671641641656375" /> -->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title>小风的个人博客</title>
+	<title>小风的个人博客 - High玩</title>
 	<link rel="stylesheet" href="/css/global.css" />
 	<link rel="stylesheet" href="/css/play.css" />
+	<link rel="shortcut icon "href="/img/facvicon.ico" />
 </head>
 <body>
 	<div class="body">
@@ -25,12 +26,14 @@
 		<div class="container">
 			<div class="header">
 			</div>
-			<p class="header-title">玩出自己</p>
 			<div class="main">
 				<div class="left-board">
+					<div style="border-bottom: 1px solid #90bba8; margin-left: 20px; margin-right: 20px;">
+						<p style="font-size: 16px; margin-top: 5px; padding-top: 10px; padding-bottom: 10px;">推荐</p>
+					</div>
 					<div class="recommand">
 						<img class="recommand-img" src="{{.Host.Host}}/img/recommand-chess-logo.jpg" alt="">
-						<h3 class="recommand-title">基于alpha-beta算法的中国象棋。</h3>
+						<h3 class="recommand-title">基于alpha-beta算法的中国象棋</h3>
 					</div>
 				</div>
 				<div class="center-board">
@@ -39,7 +42,9 @@
 						<h2 class="list-title">{{.PluginTitle}}</h2>
 						<p class="visit-and-comment">0 人浏览      暂无评论</p>
 						<p class="discription">{{.PluginDescription}}</p>
-						<img class="list-cover" align="middle" src="{{$.Host.Host}}/{{.PluginCoverURL}}">
+						<a href="{{$.Host.Host}}/{{.PluginURL}}">
+							<img class="list-cover" align="middle" src="{{$.Host.Host}}/{{.PluginCoverURL}}">
+						</a>
 						<p class="list-button">
 							<a class="demo" href="{{$.Host.Host}}/{{.PluginURL}}" target="_blank">在线演示</a>
 							<a class="download" href="{{$.Host.Host}}/{{.PluginDownloadURL}}" target="_blank">源码下载</a>
