@@ -6,6 +6,7 @@ import (
 	"framework/server/session"
 	"framework/server/session/memory"
 	"framework/server/session/redis"
+	"golang.org/x/net/websocket"
 	"net/http"
 )
 
@@ -18,6 +19,11 @@ var sessionMgrInstance *session.SessoinMgr = nil
 
 type Controller interface {
 	HandlerRequest(w http.ResponseWriter, r *http.Request)
+}
+
+type WebSocketController interface {
+	Path() interface{}
+	HandlerRequest(ws *websocket.Conn)
 }
 
 type NormalController interface {

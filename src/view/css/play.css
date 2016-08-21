@@ -1,0 +1,111 @@
+.left-board {
+	float: left;
+	margin-right: 30px;
+}
+
+.center-board {
+	background-color: #fff;
+	width: 68%;
+	float: left;
+}
+
+.play-list {
+	padding: 30px;
+}
+
+.main {
+	margin-top: 30px;
+}
+
+.header-title {
+	margin-top: 10px;
+	font-size: 28px;
+}
+
+.recommand {
+	padding: 30px;
+	background-color: #fff;
+    padding: 20px 15px 30px 20px;
+    margin-bottom: 10px;
+    position: relative;
+    clear: both;
+}
+
+.recommand-img {
+	border-radius: 3px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.recommand-title {
+	margin: 0 auto;
+	width: 100%;
+	text-align: center;
+}
+
+entry-content a:visited, .comment-content a:visited {
+    color: #9f9f9f;
+}
+
+.list-button {
+	margin: 0 auto;
+	width: 500px;
+}
+
+.list-button .demo {
+    font-size: 18px;
+    padding: 1.2em 2.5em 1em;
+    background-color: #a5d16d;
+    box-shadow: 0 0 5px #a4cf6c inset, 0 1px 1px #eee;
+}
+
+.list-button .download {
+	margin-left: 10px;
+    margin-right: 0;
+    font-size: 18px;
+    padding: 1.2em 2.5em 1em;
+    background-color: #93d0ea;
+    box-shadow: 0 0 5px #8fcde7 inset, 0 1px 1px #eee;
+}
+
+.list-button a, .read-more a {
+    margin-right: 16px;
+    margin-bottom: 10px;
+    display: inline-block;
+    text-transform: uppercase;
+    padding: 1em 1.5em 0.75em;
+    border-radius: 2px;
+    font-weight: bold;
+    border: none;
+    color: #fff !important;
+    text-decoration: none;
+    font-family: 'Open Sans Condensed',sans-serif;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.visit-and-comment {
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+
+.discription {
+	font-family:Arial,Verdana,Sans-serif;
+	margin-bottom: 30px;
+	line-height: 30px;
+	font-size: 16px;
+}
+
+.list-cover {
+	width: 80%;
+	margin-bottom: 30px;
+}
+
+.list-time {
+	margin-top: 30px;
+}
+
+a {
+    outline: none;
+    color: #21759b;
+}

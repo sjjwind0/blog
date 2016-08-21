@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+		<title>None</title>
+		<link type="text/css" rel="stylesheet" href="chess/res/css/layout.css"/>
+	</head>
+	<body>
+		<div class="control">
+			<div class="level">
+				<p class="controltype">游戏难度</p>
+				<select class="selecttype hardtype">
+					<option value ="1">简单难度</option>
+					<option value ="2">中等难度</option> 
+					<option value="3">困难难度</option>
+					<option value="4">DeepLearning难度</option>
+					<option value ="5">随机</option> 
+				</select>
+			</div>
+			<div class="level">
+				<p class="controltype">先手选择</p>
+				<select class="selecttype first">
+					<option value ="1">红方先手</option>
+					<option value ="2">黑方先手</option> 
+					<option value ="3">随机</option> 
+				</select>
+			</div>
+			<div class="level">
+				<p class="controltype">颜色选择</p>
+				<select class="selecttype select">
+					<option value ="1">红方</option>
+					<option value ="2">黑方</option> 
+					<option value ="4">随机</option> 
+				</select>
+			</div>
+			<div class="level">
+				<input class="startGame" type="button" name="start" value="游戏开始" />
+			</div>
+		</div>
+		<div class="frame">
+			<canvas id="board" width="600" height="600">
+				Your Browser Not Support Html5
+			</canvas>
+			<div class="recodeBoard">
+				<div class="recodeText"><p>操作记录</p></div>
+			</div>
+		</div>
+		<script src="chess/res/js/jquery-2.1.1.js"></script>
+		<script src="chess/res/js/control.js"></script>
+	</body>
+</html>

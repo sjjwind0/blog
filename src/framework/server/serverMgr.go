@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"framework"
 	"framework/response"
+	"golang.org/x/net/websocket"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -26,6 +27,7 @@ type staticFileElement struct {
 type serverMgr struct {
 	controllerMap             map[string]Controller
 	staticFileMap             map[string]string
+	webSocketControllerMap    map[string]WebSocketController
 	childHandlerControllerMap map[string]Controller
 	port                      int
 }
@@ -76,6 +78,20 @@ func (s *serverMgr) RegisterController(controller Controller) {
 		registerController(&s.controllerMap, path, childHandlerController)
 		if enableChildPath {
 			registerController(&s.childHandlerControllerMap, path, childHandlerController)
+		}
+	}
+}
+
+func (s *serverMgr) RegisterWebSocketController(controller WebSocketController) {
+	if s.webSocketControllerMap == nil {
+		s.webSocketControllerMap = make(map[string]WebSocketController)
+	}
+	if path, ok := controller.Path().(string); ok {
+		s.webSocketControllerMap[path] = controller
+	}
+	if pathList, ok := controller.Path().([]string); ok {
+		for _, path := range pathList {
+			s.webSocketControllerMap[path] = controller
 		}
 	}
 }
@@ -165,7 +181,16 @@ func (s *serverMgr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 }
 
+func (s *serverMgr) startWebSocketServer() {
+	for path, controller := range s.webSocketControllerMap {
+		http.Handle(path, websocket.Handler(controller.HandlerRequest))
+	}
+}
+
 func (s *serverMgr) StartServer() {
+	// normal controller and static file
 	http.HandleFunc("/", s.ServeHTTP)
+	// websocket
+	s.startWebSocketServer()
 	http.ListenAndServe(fmt.Sprintf(":%d", s.port), nil)
 }

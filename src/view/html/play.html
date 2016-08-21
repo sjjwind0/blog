@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:wb="http://open.weibo.com/wb">
+<head>
+	<meta charset="utf-8" />
+	<meta property="wb:webmaster" content="ec68cbf32bb1042d" />
+	<meta property="qc:admins" content="66062235164106375" />
+	<!-- <meta property="qc:admins" content="66062230477671641641656375" /> -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>小风的个人博客</title>
+	<link rel="stylesheet" href="/css/global.css" />
+	<link rel="stylesheet" href="/css/play.css" />
+</head>
+<body>
+	<div class="body">
+		<div id="nav">
+			<img class="icon" src="{{.Host.Host}}/img/icon.png"/>
+			<div class="nav-center">
+				<ul class="clear">
+					<li><a href="{{.Host.Host}}/index">博客</a></li>
+					<li class="active"><a href="{{.Host.Host}}/play">High玩</a></li>
+					<li><a href="{{.Host.Host}}/about">关于自己</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="container">
+			<div class="header">
+			</div>
+			<p class="header-title">玩出自己</p>
+			<div class="main">
+				<div class="left-board">
+					<div class="recommand">
+						<img class="recommand-img" src="{{.Host.Host}}/img/recommand-chess-logo.jpg" alt="">
+						<h3 class="recommand-title">基于alpha-beta算法的中国象棋。</h3>
+					</div>
+				</div>
+				<div class="center-board">
+					{{range .PluginList}}
+					<div class="play-list">
+						<h2 class="list-title">{{.PluginTitle}}</h2>
+						<p class="visit-and-comment">0 人浏览      暂无评论</p>
+						<p class="discription">{{.PluginDescription}}</p>
+						<img class="list-cover" align="middle" src="{{$.Host.Host}}/{{.PluginCoverURL}}">
+						<p class="list-button">
+							<a class="demo" href="{{$.Host.Host}}/{{.PluginURL}}" target="_blank">在线演示</a>
+							<a class="download" href="{{$.Host.Host}}/{{.PluginDownloadURL}}" target="_blank">源码下载</a>
+						</p>
+						<p class="list-time">本条目发布于一月 14, 2014。</p>
+					</div>
+					{{end}}
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

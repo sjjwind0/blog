@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"framework/base/config"
 	"info"
+	"model"
 	"sort"
 	"strings"
 	"sync"
@@ -21,9 +22,30 @@ type timeRender struct {
 	Month int
 }
 
+type rankRender struct {
+	ID    int
+	Title string
+	Index int
+	Hot   int
+}
+type rankList []*rankRender
+
+func (r rankList) Len() int {
+	return len(r)
+}
+
+func (r rankList) Swap(blog1, blog2 int) {
+	r[blog1], r[blog2] = r[blog2], r[blog1]
+}
+
+func (r rankList) Less(blog1, blog2 int) bool {
+	return r[blog1].Hot > r[blog2].Hot
+}
+
 type sideRender struct {
-	BlogTagList  []*tagRender
-	BlogTimeList []*timeRender
+	BlogTagList     []*tagRender
+	BlogTimeList    []*timeRender
+	BlogHotBlogList rankList
 }
 
 type hostRender struct {
@@ -50,6 +72,9 @@ func buildSideRender(blogList *list.List) *sideRender {
 	var timeMap map[string]int64 = make(map[string]int64)
 	for iter := blogList.Front(); iter != nil; iter = iter.Next() {
 		info := iter.Value.(info.BlogInfo)
+		commentCount, _ := model.ShareCommentModel().FetchCommentCount(info.BlogID)
+		rank := &rankRender{ID: info.BlogID, Title: info.BlogTitle, Hot: info.BlogVisitCount + commentCount*5}
+		topRender.BlogHotBlogList = append(topRender.BlogHotBlogList, rank)
 		for tag := range info.BlogTagList {
 			tagMap[info.BlogTagList[tag]]++
 		}
@@ -72,5 +97,12 @@ func buildSideRender(blogList *list.List) *sideRender {
 	}
 	topRender.BlogTagList = tagList
 	topRender.BlogTimeList = blogTimeStringList
+	if len(topRender.BlogHotBlogList) > 6 {
+		topRender.BlogHotBlogList = topRender.BlogHotBlogList[:6]
+	}
+	sort.Sort(topRender.BlogHotBlogList)
+	for i, rank := range topRender.BlogHotBlogList {
+		rank.Index = i + 1
+	}
 	return &topRender
 }

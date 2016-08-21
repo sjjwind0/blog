@@ -16,7 +16,7 @@
 			<div class="nav-center">
 				<ul class="clear">
 					<li class="active"><a href="{{.Host.Host}}/index">博客</a></li>
-					<li><a href="{{.Host.Host}}/high">High玩</a></li>
+					<li><a href="{{.Host.Host}}/play">High玩</a></li>
 					<li><a href="{{.Host.Host}}/about">关于自己</a></li>
 				</ul>
 			</div>
@@ -43,7 +43,10 @@
 				{{end}}
 			</div>
 			<div class="side">
-				<div class="widget widget_archive"><div class="small_title"><h2>文章归档</h2></div>		
+				<div class="widget widget_archive">
+					<div class="small_title">
+						<h2>文章归档</h2>
+					</div>		
 					<ul>
 						{{range .Side.BlogTimeList}}
 						<li><a href="{{$.Host.Host}}/date?time={{.Year}}.{{.Month}}">{{.Date}}</a></li>
@@ -59,6 +62,16 @@
 						<a title="" href="{{$.Host.Host}}/tag?type={{.Tag}}" data-original-title="{{.Count}}个话题">{{.Tag}} ({{.Count}})</a>
 						{{end}}
 					</div>
+				</div>
+				<div class="widget v_rank">
+					<div class="small_title">
+						<h2>热门博客</h2>
+					</div>
+					<ul>
+						{{range .Side.BlogHotBlogList}}
+						<li><a href="{{$.Host.Host}}/blog?id={{.ID}}">{{.Index}}. {{.Title}}</a></li>
+						{{end}}
+					</ul>
 				</div>
 			</div>
 		</div>
