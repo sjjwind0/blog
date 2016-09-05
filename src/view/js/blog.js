@@ -98,7 +98,7 @@ Account.waitingLogin = function () {
 		clearInterval(Account.timer);
 		if (event.data == "login") {
 			// 登录成功
-			var url = "http://blog.windy.live/api";
+			var url = "https://windyx.com/api";
 			$.ajax({
 				url: url,
 				type: "POST",
@@ -126,7 +126,7 @@ Account.waitingLogin = function () {
 
 Account.loginByQQ = function(clientId, redirectUri) {
 	Account.waitingLogin();
-	var url = "https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=101324961&redirect_uri=http%3A%2F%2Fblog.windy.live%2Flogin%3Ftype%3Dqq&scope=get_user_info";
+	var url = "https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=101351452&redirect_uri=https%3A%2F%2Fwindyx.com%2Flogin%3Ftype%3Dqq&scope=get_user_info";
 	var child = window.open(url);
 	Account.timer = setInterval(function() {
 		  var message = "helo";
@@ -142,7 +142,7 @@ Account.loginByWeixin = function() {
 Account.loginByWeibo = function() {
 	// not implement
 	Account.waitingLogin();
-	var url = "https://api.weibo.com/oauth2/authorize?client_id=1523189451&response_type=code&redirect_uri=http%3A%2F%2Fblog.windy.live%2Flogin%3Ftype%3Dweibo"
+	var url = "https://api.weibo.com/oauth2/authorize?client_id=3153747122&response_type=code&redirect_uri=https%3A%2F%2Fwindyx.com%2Flogin%3Ftype%3Dweibo"
 	var child = window.open(url);
 	Account.timer = setInterval(function() {
 		  var message = "helo";
@@ -151,7 +151,7 @@ Account.loginByWeibo = function() {
 }
 
 Account.logout = function() {
-	var url = "http://blog.windy.live/login?type=logout"
+	var url = "https://windyx.com/login?type=logout"
 	$.get(url, function(result) {
 		var data = JSON.parse(result);
 		if (data.code == 0) {

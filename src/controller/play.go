@@ -35,7 +35,6 @@ func (a *PlayController) HandlerRequest(w http.ResponseWriter, r *http.Request) 
 	pluginsInfo := plugin.GetDefaultPluginManager().GetAllPluginInfo()
 	pluginList := &pluginListRender{}
 	for _, plugin := range pluginsInfo {
-		fmt.Printf("1234")
 		pluginRender := &pluginRender{}
 		pluginRender.PluginTitle = plugin.GetPluginName()
 		pluginRender.PluginDescription = plugin.GetPluginDescription()

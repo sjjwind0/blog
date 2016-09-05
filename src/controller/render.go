@@ -59,8 +59,9 @@ func buildHostRender() *hostRender {
 	hostRenderOnce.Do(func() {
 		staticHostRender = &hostRender{}
 		staticHostRender.Host = config.GetDefaultConfigJsonReader().Get("net.host").(string)
-		if !strings.HasPrefix(staticHostRender.Host, "http://") {
-			staticHostRender.Host = "http://" + staticHostRender.Host
+		protocol := config.GetDefaultConfigJsonReader().Get("net.protocol").(string)
+		if !strings.HasPrefix(staticHostRender.Host, protocol+"://") {
+			staticHostRender.Host = protocol + "://" + staticHostRender.Host
 		}
 	})
 	return staticHostRender

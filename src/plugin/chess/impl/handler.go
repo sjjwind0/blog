@@ -2,7 +2,6 @@ package impl
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type DataPackage struct {
@@ -40,16 +39,15 @@ func NewMessageManager(ws *MessageController) *MessageManager {
 func (this *MessageManager) MessageProc(msgType string, message string) {
 	dataPackage := &DataPackage{}
 	json.Unmarshal([]byte(message), dataPackage)
-	fmt.Println(dataPackage)
 	switch msgType {
 	case "RecvData":
 		{
 			switch dataPackage.Type {
 			case "MoveChess":
 				{
-					fmt.Println("收到消息")
-					fmt.Printf("Web端移动: (%d, %d) --> (%d,%d)\n", dataPackage.Param.SourcePos[0], dataPackage.Param.SourcePos[1],
-						dataPackage.Param.TargetPos[0], dataPackage.Param.TargetPos[1])
+					// fmt.Println("收到消息")
+					// fmt.Printf("Web端移动: (%d, %d) --> (%d,%d)\n", dataPackage.Param.SourcePos[0], dataPackage.Param.SourcePos[1],
+					// 	dataPackage.Param.TargetPos[0], dataPackage.Param.TargetPos[1])
 					sourcePos := NewPositionWithXY(dataPackage.Param.SourcePos[0], dataPackage.Param.SourcePos[1])
 					targetPos := NewPositionWithXY(dataPackage.Param.TargetPos[0], dataPackage.Param.TargetPos[1])
 					turn := this.algorithm.GetBoardMap().GetTurn()
@@ -80,7 +78,6 @@ func (this *MessageManager) MessageProc(msgType string, message string) {
 				{
 					option := &Option{}
 					json.Unmarshal([]byte(dataPackage.Param.OptionalType), option)
-					fmt.Println(option)
 					switch option.HardType {
 					case "1":
 						{
@@ -157,12 +154,12 @@ func (this *MessageManager) CalcNextStep() *ChessMove {
 }
 
 func (this *MessageManager) sendPackage(dataPackage *DataPackage) {
-	jsonStr, err := json.Marshal(dataPackage)
-	if err == nil {
-		fmt.Println("发送消息: ", string(jsonStr))
-	} else {
-		fmt.Println("SendError!", err)
-	}
+	jsonStr, _ := json.Marshal(dataPackage)
+	// if err == nil {
+	// 	fmt.Println("发送消息: ", string(jsonStr))
+	// } else {
+	// 	fmt.Println("SendError!", err)
+	// }
 	this.ws.SendMessage(string(jsonStr))
 }
 

@@ -1,6 +1,7 @@
 .left-board {
 	float: left;
 	margin-right: 30px;
+	width: 28%;
     background-color: #fff;
 }
 

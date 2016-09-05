@@ -9,9 +9,8 @@
 	<link rel="stylesheet" href="/css/atom-article.css"> 
 	<link rel="stylesheet" href="/css/katex.min.css">
 	<link rel="shortcut icon" href="/img/facvicon.ico" />
-	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="js/jquery-cookie.js" type="text/javascript" charset="utf-8"></script>
-	<script src="js/blog.js?1003" type="text/javascript" charset="utf-8"></script>
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+	<script src="{{.Host.Host}}/js/blog.js?1003" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 	<div id="nav">
@@ -50,6 +49,9 @@
 			</header>
 			<div class="blog" bid="{{.BlogID}}">
 				{{.BlogContent}}
+				<!-- <div class="blog-foot">
+					<p>如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作！</p>
+				</div> -->
 			</div>
 			<div class="talk">
 				{{if .User.IsLogin}}
@@ -81,11 +83,6 @@
 					    <a style="display:none;" href="javascript:void(0);" rel="nofollow" id="logout" class="user-name-login user-logout wrap-name-logout">登出</a>
 						<strong style="display:none;" class="user-name-login wrap-name-nick"></strong>
 				       {{end}}
-				      </div>
-				     </div>
-				     <div class="title-user-w">
-				      <div node-type="sohu-pact" class="title-link-w" style="display: none;">
-				       <a href="http://zt.pinglun.sohu.com/s2014/sljyhgy/index.shtml" target="_blank">搜狐“我来说两句”用户公约</a>
 				      </div>
 				     </div>
 				    </div>
@@ -174,6 +171,9 @@
 					{{end}}
 				</ul>
 			</div>
+		</div>
+		<div class="bottom">
+			<p>Written by <a class="write" target="_blank" href="https://golang.org">Golang</a><a class="gov" target="_blank" href="http://www.miitbeian.gov.cn/">浙ICP备16031285号</a></p>
 		</div>
 	</div>
 </body>

@@ -18,7 +18,7 @@ type loginByWeb struct {
 
 const sWeiboOauth2AccessTokenUrl = "https://api.weibo.com/oauth2/access_token?client_id=%s&client_secret=%s&grant_type=authorization_code&redirect_uri=%s&code=%s"
 
-const sWeiboRedirectUrl = "http%3A%2F%2Fblog.windy.live%2Flogin%3Ftype%3Dweibo"
+const sWeiboRedirectUrl = "https%3A%2F%2Fwindyx.com%2Flogin%3Ftype%3Dweibo"
 
 const sWeiboUserShowUrl = "https://api.weibo.com/2/users/show.json?access_token=%s&uid=%s"
 

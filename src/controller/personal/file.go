@@ -133,7 +133,7 @@ func (f *FileController) handlerUploadRequest(w http.ResponseWriter, r *http.Req
 	resZipName := f.savePostFile(r, "res", saveTmpPath)
 	coverImgName := f.savePostFile(r, "img", saveTmpPath)
 
-	blogMetaInfoReader := json.NewJsonReader(filepath.Join(saveTmpPath, blogInfoName))
+	blogMetaInfoReader := json.NewJsonReaderFromFile(filepath.Join(saveTmpPath, blogInfoName))
 	uuid := blogMetaInfoReader.Get("uuid").(string)
 	title := blogMetaInfoReader.Get("title").(string)
 	tag := blogMetaInfoReader.Get("tag").(string)

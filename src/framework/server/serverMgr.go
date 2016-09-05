@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"framework"
 	"framework/response"
+	"golang.org/x/net/http2"
 	"golang.org/x/net/websocket"
 	"net/http"
 	"os"
@@ -118,7 +119,15 @@ func (s *serverMgr) SetServerPort(port int) {
 	s.port = port
 }
 
-func (s *serverMgr) handlerStatisFile(w http.ResponseWriter, currentPath string) bool {
+func (s *serverMgr) handlerWebsocketReq(w http.ResponseWriter, r *http.Request) bool {
+	if controller, ok := s.webSocketControllerMap[r.URL.Path]; ok {
+		websocket.Handler(controller.HandlerRequest).ServeHTTP(w, r)
+		return true
+	}
+	return false
+}
+
+func (s *serverMgr) handlerStatisFileReq(w http.ResponseWriter, currentPath string) bool {
 	if currentPath[0] == '/' {
 		currentPath = currentPath[1:]
 	}
@@ -160,7 +169,7 @@ func (s *serverMgr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 2. 在static file 里面寻找
-	if s.handlerStatisFile(w, currentPath) {
+	if s.handlerStatisFileReq(w, currentPath) {
 		return
 	}
 	// 3. 逐级分解，看是不是某个controller的子集
@@ -176,21 +185,29 @@ func (s *serverMgr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	// 4. 404
+	// 4. websocket
+	if s.handlerWebsocketReq(w, r) {
+		return
+	}
+	// 5. 404
 	fmt.Println("404: ", r.URL.Path)
 	w.WriteHeader(http.StatusNotFound)
 }
 
-func (s *serverMgr) startWebSocketServer() {
-	for path, controller := range s.webSocketControllerMap {
-		http.Handle(path, websocket.Handler(controller.HandlerRequest))
+func (s *serverMgr) startHTTPServer() {
+	http.HandleFunc("/", s.ServeHTTP)
+	http.ListenAndServe(fmt.Sprintf(":%d", s.port), nil)
+}
+
+func (s *serverMgr) startHTTPSServer() {
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", s.port),
+		Handler: s,
 	}
+	http2.ConfigureServer(srv, &http2.Server{})
+	fmt.Println(srv.ListenAndServeTLS("cert.pem", "key.pem"))
 }
 
 func (s *serverMgr) StartServer() {
-	// normal controller and static file
-	http.HandleFunc("/", s.ServeHTTP)
-	// websocket
-	s.startWebSocketServer()
-	http.ListenAndServe(fmt.Sprintf(":%d", s.port), nil)
+	s.startHTTPSServer()
 }

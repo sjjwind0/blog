@@ -15,7 +15,7 @@ import (
 const kQQOAuthMeURL = "https://graph.qq.com/oauth2.0/me?access_token=%s"
 const kQQOAuthTokenURL = "https://graph.qq.com/oauth2.0/token?grant_type=authorization_code&client_id=%s&client_secret=%s&code=%s&state=%s&redirect_uri=%s"
 const kQQAPIGetUserInfo = "https://graph.qq.com/user/get_user_info?access_token=%s&oauth_consumer_key=%s&openid=%s"
-const kQQRedirectURL = "http%3A%2F%2Fblog.windy.live%2Flogin%3Ftype%3Dqq"
+const kQQRedirectURL = "https%3A%2F%2Fwindyx.com%2Flogin%3Ftype%3Dqq"
 
 var qqLoginOnce sync.Once
 var qqLoginInstance *loginByQQ = nil

@@ -289,7 +289,7 @@ Control.UI = (function() {
 }());
 
 Control.Message = (function() {
-	var wsUri = "ws://blog.windy.live/message";
+	var wsUri = "wss://windyx.com/message";
 	var websocket;
 	return {
 		init: function() {

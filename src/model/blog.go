@@ -108,7 +108,7 @@ func (b *blogModel) BlogIsExistByBlogID(blogId int) (bool, error) {
 }
 
 func (b *blogModel) FetchAllBlog() (*list.List, error) {
-	sql := fmt.Sprintf("select * from %s", kBlogTableName)
+	sql := fmt.Sprintf("select * from %s order by %s desc", kBlogTableName, kBlogId)
 	rows, err := database.DatabaseInstance().DB.Query(sql)
 	if err == nil {
 		defer rows.Close()
@@ -208,7 +208,8 @@ func (b *blogModel) FetchAllSortType() ([]string, error) {
 }
 
 func (b *blogModel) FetchAllBlogBySortType(sortType string) (*list.List, error) {
-	sql := fmt.Sprintf("select * from %s where %s = ?", kBlogTableName, kBlogSortType)
+	sql := fmt.Sprintf("select * from %s where %s = ? order by %s desc",
+		kBlogTableName, kBlogSortType, kBlogId)
 	rows, err := database.DatabaseInstance().DB.Query(sql, sortType)
 	if err == nil {
 		defer rows.Close()
@@ -230,7 +231,7 @@ func (b *blogModel) FetchAllBlogBySortType(sortType string) (*list.List, error) 
 }
 
 func (b *blogModel) FetchAllBlogByTime(beginTime int64, endTime int64) (*list.List, error) {
-	sql := fmt.Sprintf("select * from %s where %s >= ? and %s <= ?", kBlogTableName, kBlogTime, kBlogTime)
+	sql := fmt.Sprintf("select * from %s where %s >= ? and %s <= ? order by %s desc", kBlogTableName, kBlogTime, kBlogTime, kBlogId)
 	rows, err := database.DatabaseInstance().DB.Query(sql, beginTime, endTime)
 	if err == nil {
 		defer rows.Close()
