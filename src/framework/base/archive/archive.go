@@ -20,21 +20,27 @@ func checkFolder(path string) {
 }
 
 func UnZip(zipPath string) error {
-	dest := filepath.Dir(zipPath)
+	dst := filepath.Dir(zipPath)
+	return UnZipToPath(zipPath, dst)
+}
+
+func UnZipToPath(zipPath string, dstPath string) error {
 	unZipFile, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return err
 	}
-	os.MkdirAll(dest, 0755)
+	defer unZipFile.Close()
+	os.MkdirAll(dstPath, 0755)
 	for _, f := range unZipFile.File {
 		rc, err := f.Open()
 		if err != nil {
 			return err
 		}
-		path := filepath.Join(dest, f.Name)
+		path := filepath.Join(dstPath, f.Name)
 		if f.FileInfo().IsDir() {
 			os.MkdirAll(path, f.Mode())
 		} else {
+			fmt.Println("path: ", path)
 			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 			if err != nil {
 				return err
@@ -48,7 +54,6 @@ func UnZip(zipPath string) error {
 			f.Close()
 		}
 	}
-	unZipFile.Close()
 	return nil
 }
 

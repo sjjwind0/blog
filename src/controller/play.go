@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"fmt"
-	"html/template"
+	//"fmt"
+	//"html/template"
 	"net/http"
-	"plugin"
+	//"plugin"
 )
 
 type pluginRender struct {
@@ -32,21 +32,21 @@ func (a *PlayController) Path() interface{} {
 }
 
 func (a *PlayController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
-	pluginsInfo := plugin.GetDefaultPluginManager().GetAllPluginInfo()
-	pluginList := &pluginListRender{}
-	for _, plugin := range pluginsInfo {
-		pluginRender := &pluginRender{}
-		pluginRender.PluginTitle = plugin.GetPluginName()
-		pluginRender.PluginDescription = plugin.GetPluginDescription()
-		pluginRender.PluginCoverURL = plugin.GetPluginCoverURL()
-		pluginRender.PluginURL = plugin.GetPluginDisplayPath()
-		pluginRender.PluginDownloadURL = plugin.GetPluginDownloadURL()
-		pluginList.PluginList = append(pluginList.PluginList, pluginRender)
-	}
-	pluginList.Host = buildHostRender()
-	t, err := template.ParseFiles("./src/view/html/play.html")
-	if err != nil {
-		fmt.Println("parse file error: ", err.Error())
-	}
-	t.Execute(w, &pluginList)
+	//pluginsInfo := plugin.GetDefaultPluginManager().GetAllPluginInfo()
+	//pluginList := &pluginListRender{}
+	//for _, plugin := range pluginsInfo {
+	//	pluginRender := &pluginRender{}
+	//	pluginRender.PluginTitle = plugin.GetPluginName()
+	//	pluginRender.PluginDescription = plugin.GetPluginDescription()
+	//	pluginRender.PluginCoverURL = plugin.GetPluginCoverURL()
+	//	pluginRender.PluginURL = plugin.GetPluginDisplayPath()
+	//	pluginRender.PluginDownloadURL = plugin.GetPluginDownloadURL()
+	//	pluginList.PluginList = append(pluginList.PluginList, pluginRender)
+	//}
+	//pluginList.Host = buildHostRender()
+	//t, err := template.ParseFiles("./src/view/html/play.html")
+	//if err != nil {
+	//	fmt.Println("parse file error: ", err.Error())
+	//}
+	//t.Execute(w, &pluginList)
 }

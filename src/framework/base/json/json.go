@@ -521,3 +521,19 @@ func (c *JsonReader) Get(key string) interface{} {
 	}
 	return nil
 }
+
+func (c *JsonReader) GetString(key string) string {
+	return c.Get(key).(string)
+}
+
+func (c *JsonReader) GetInteger(key string) int {
+	return int(c.Get(key).(int64))
+}
+
+func (c *JsonReader) GetInt64(key string) int64 {
+	return c.Get(key).(int64)
+}
+
+func (c *JsonReader) GetFloat64(key string) float64 {
+	return c.Get(key).(float64)
+}

@@ -11,8 +11,9 @@ import (
 
 const (
 	kCommentTableName = "comment"
-	kCommentBlogId    = "blog_id"
-	kCommentId        = "comment_id"
+	kCommentType      = "type"
+	kCommentTypeId    = "type_id"
+	kCommentId        = "id"
 	kCommentParentId  = "parent_id"
 	kCommentUserId    = "user_id"
 	kCommentContent   = "content"
@@ -44,6 +45,7 @@ func (c *commentModel) CreateTable() error {
 	CREATE TABLE %s (
 		%s int(32) unsigned NOT NULL AUTO_INCREMENT,
 		%s int(32) NOT NULL,
+		%s int(32) NOT NULL,
 		%s int(32) NOT NULL DEFAULT '-1',
 		%s int(32) NOT NULL,
 		%s varchar(1024) NOT NULL,
@@ -52,16 +54,16 @@ func (c *commentModel) CreateTable() error {
 		%s int(32) NULL DEFAULT '0',
 		%s varchar(1024) DEFAULT '',
 		PRIMARY KEY (%s)
-	) CHARSET=utf8;`, kCommentTableName, kCommentId,
-		kCommentBlogId, kCommentParentId, kCommentUserId, kCommentContent, kCommentTime,
+	) CHARSET=utf8;`, kCommentTableName, kCommentId, kCommentType,
+		kCommentTypeId, kCommentParentId, kCommentUserId, kCommentContent, kCommentTime,
 		kCommentPraise, kCommentDissent, kCommentAddress, kCommentId)
 	_, err := database.DatabaseInstance().DB.Exec(sql)
 	return err
 }
 
-func (c *commentModel) AddComment(userId int, blogId int, commentId int, commentContent string) (int, error) {
-	sql := fmt.Sprintf("insert into %s(%s, %s, %s, %s, %s) values(?, ?, ?, ?, ?)",
-		kCommentTableName, kCommentUserId, kCommentBlogId, kCommentParentId,
+func (c *commentModel) AddComment(commentType int, userId int, blogId int, commentId int, commentContent string) (int, error) {
+	sql := fmt.Sprintf("insert into %s(%s, %s, %s, %s, %s, %s) values(?, ?, ?, ?, ?, ?)",
+		kCommentTableName, kCommentType, kCommentUserId, kCommentTypeId, kCommentParentId,
 		kCommentContent, kCommentTime)
 	stat, err := database.DatabaseInstance().DB.Prepare(sql)
 	if err == nil {
@@ -75,20 +77,20 @@ func (c *commentModel) AddComment(userId int, blogId int, commentId int, comment
 	return 0, err
 }
 
-func (c *commentModel) DeleteAllBlogComment(blogId int) error {
-	sql := fmt.Sprintf("delete from %s where %s = ?", kCommentTableName, kCommentId)
-	_, err := database.DatabaseInstance().DB.Exec(sql, blogId)
+func (c *commentModel) DeleteAllBlogComment(commentType int, blogId int) error {
+	sql := fmt.Sprintf("delete from %s where %s = ? and %s = ?", kCommentTableName, kCommentType, kCommentId)
+	_, err := database.DatabaseInstance().DB.Exec(sql, commentType, blogId)
 	return err
 }
 
-func (c *commentModel) FetchCommentByCommentId(commentId int) (*info.CommentInfo, error) {
-	sql := fmt.Sprintf("select * from %s where %s = ?", kCommentTableName, kCommentId)
-	rows, err := database.DatabaseInstance().DB.Query(sql, commentId)
+func (c *commentModel) FetchCommentByCommentId(commentType int, commentId int) (*info.CommentInfo, error) {
+	sql := fmt.Sprintf("select * from %s where %s = ? and %s = ?", kCommentTableName, kCommentType, kCommentId)
+	rows, err := database.DatabaseInstance().DB.Query(sql, commentType, commentId)
 	if err == nil {
 		defer rows.Close()
 		if rows.Next() {
 			var commentInfo info.CommentInfo
-			err = rows.Scan(&commentInfo.CommentID, &commentInfo.BlogID, &commentInfo.ParentCommentID,
+			err = rows.Scan(&commentInfo.CommentID, &commentInfo.Type, &commentInfo.TypeID, &commentInfo.ParentCommentID,
 				&commentInfo.UserID, &commentInfo.Content, &commentInfo.Time,
 				&commentInfo.Praise, &commentInfo.Dissent, &commentInfo.Address)
 			return &commentInfo, nil
@@ -97,15 +99,16 @@ func (c *commentModel) FetchCommentByCommentId(commentId int) (*info.CommentInfo
 	return nil, err
 }
 
-func (c *commentModel) FetchAllCommentByBlogId(blogId int) (*list.List, error) {
-	sql := fmt.Sprintf("select * from %s where %s = ? order by %s desc", kCommentTableName, kCommentBlogId, kCommentId)
-	rows, err := database.DatabaseInstance().DB.Query(sql, blogId)
+func (c *commentModel) FetchAllCommentByBlogId(commentType int, blogId int) (*list.List, error) {
+	sql := fmt.Sprintf("select * from %s where %s = ? and %s = ? order by %s desc", kCommentTableName,
+		kCommentType, kCommentTypeId, kCommentId)
+	rows, err := database.DatabaseInstance().DB.Query(sql, commentType, blogId)
 	var blogList *list.List = list.New()
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {
 			var commentInfo info.CommentInfo
-			err = rows.Scan(&commentInfo.CommentID, &commentInfo.BlogID, &commentInfo.ParentCommentID,
+			err = rows.Scan(&commentInfo.CommentID, &commentInfo.Type, &commentInfo.TypeID, &commentInfo.ParentCommentID,
 				&commentInfo.UserID, &commentInfo.Content, &commentInfo.Time,
 				&commentInfo.Praise, &commentInfo.Dissent, &commentInfo.Address)
 			if err == nil {
@@ -118,9 +121,10 @@ func (c *commentModel) FetchAllCommentByBlogId(blogId int) (*list.List, error) {
 	return blogList, err
 }
 
-func (b *commentModel) FetchCommentCount(blogId int) (int, error) {
-	sql := fmt.Sprintf("select count(*) from %s where %s = ?", kCommentTableName, kCommentBlogId)
-	rows, err := database.DatabaseInstance().DB.Query(sql, blogId)
+func (b *commentModel) FetchCommentCount(commentType int, typeId int) (int, error) {
+	sql := fmt.Sprintf("select count(*) from %s where %s = ? and %s = ?",
+		kCommentTableName, kCommentType, kCommentTypeId)
+	rows, err := database.DatabaseInstance().DB.Query(sql, commentType, typeId)
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {
@@ -134,10 +138,10 @@ func (b *commentModel) FetchCommentCount(blogId int) (int, error) {
 	return 0, err
 }
 
-func (b *commentModel) FetchCommentPeopleCount(blogId int) (int, error) {
-	sql := fmt.Sprintf("select count(distinct(%s)) from %s where %s = ?",
-		kCommentUserId, kCommentTableName, kCommentBlogId)
-	rows, err := database.DatabaseInstance().DB.Query(sql, blogId)
+func (b *commentModel) FetchCommentPeopleCount(commentType int, typeId int) (int, error) {
+	sql := fmt.Sprintf("select count(distinct(%s)) from %s where %s = ? and %s = ?",
+		kCommentUserId, kCommentTableName, kCommentType, kCommentTypeId)
+	rows, err := database.DatabaseInstance().DB.Query(sql, commentType, typeId)
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {

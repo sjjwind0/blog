@@ -36,23 +36,23 @@ type indexRender struct {
 	Side     *sideRender
 }
 
-func buildBlogElementRender(info *info.BlogInfo) *blogElementRender {
-	var uuid string = info.BlogUUID
+func buildBlogElementRender(inf *info.BlogInfo) *blogElementRender {
+	var uuid string = inf.BlogUUID
 	storageName := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
 	descriptionPath := filepath.Join(storageName, uuid, "blog.info")
 	description := json.NewJsonReaderFromFile(descriptionPath).Get("descript").(string)
 	var render blogElementRender
 	render.BlogAuthor = config.GetDefaultConfigJsonReader().Get("blog.owner.name").(string)
-	render.BlogTitle = info.BlogTitle
+	render.BlogTitle = inf.BlogTitle
 	render.BlogDescription = description
-	render.BlogID = info.BlogID
-	render.BlogUUID = info.BlogUUID
-	render.BlogPraiseCount = info.BlogPraiseCount
-	render.BlogTime = FormatTime(info.BlogTime)
-	render.BlogSortType = info.BlogSortType
-	commentCount, _ := model.ShareCommentModel().FetchCommentCount(info.BlogID)
+	render.BlogID = inf.BlogID
+	render.BlogUUID = inf.BlogUUID
+	render.BlogPraiseCount = inf.BlogPraiseCount
+	render.BlogTime = FormatTime(inf.BlogTime)
+	render.BlogSortType = inf.BlogSortType
+	commentCount, _ := model.ShareCommentModel().FetchCommentCount(info.CommentType_Blog, inf.BlogID)
 	render.BlogCommentCount = commentCount
-	render.BlogVisitCount = info.BlogVisitCount
+	render.BlogVisitCount = inf.BlogVisitCount
 	return &render
 }
 

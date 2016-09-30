@@ -7,14 +7,17 @@ import (
 	"framework/database"
 	"framework/server"
 	"model"
+	"fmt"
 	"plugin"
+	"path/filepath"
 )
 
 func StartServer() {
 	config := config.GetDefaultConfigJsonReader()
-	localWebResourcePath := config.Get("resource.localpath").(string)
-	pluginResourcePath := config.Get("resource.pluginpath").(string)
-	port := int(config.Get("net.port").(int64))
+	localWebResourcePath := config.GetString("storage.file.res")
+	fmt.Println("localWebResourcePath: ", localWebResourcePath)
+	//pluginResourcePath := config.GetString("resource.pluginpath")
+	port := config.GetInteger("net.port")
 
 	server.ShareServerMgrInstance().SetServerPort(port)
 
@@ -35,11 +38,12 @@ func StartServer() {
 	server.ShareServerMgrInstance().RegisterController(personal.NewPersonalDeleteController())
 
 	// staitc file
-	server.ShareServerMgrInstance().RegisterStaticFile("/js/", localWebResourcePath)
-	server.ShareServerMgrInstance().RegisterStaticFile("/css/", localWebResourcePath)
-	server.ShareServerMgrInstance().RegisterStaticFile("/img/", localWebResourcePath)
-	server.ShareServerMgrInstance().RegisterStaticFile("/font/", localWebResourcePath)
+	server.ShareServerMgrInstance().RegisterStaticFile("js", filepath.Join(localWebResourcePath, "js"))
+	server.ShareServerMgrInstance().RegisterStaticFile("css", filepath.Join(localWebResourcePath, "css"))
+	server.ShareServerMgrInstance().RegisterStaticFile("img", filepath.Join(localWebResourcePath, "img"))
+	server.ShareServerMgrInstance().RegisterStaticFile("font", filepath.Join(localWebResourcePath, "font"))
 
+	/*
 	// plugin
 	pluginsRunner := plugin.GetDefaultPluginManager().GetAllPluginRunner()
 	for _, runner := range pluginsRunner {
@@ -57,14 +61,20 @@ func StartServer() {
 				controller.(server.WebSocketController))
 		}
 	}
-
+*/
 	// 评论表
 	database.ShareDatabaseRunner().RegisterModel(model.ShareCommentModel())
 	// 博客表
 	database.ShareDatabaseRunner().RegisterModel(model.ShareBlogModel())
 	// 用户表
 	database.ShareDatabaseRunner().RegisterModel(model.ShareUserModel())
+	// 插件表
+	database.ShareDatabaseRunner().RegisterModel(model.SharePluginModel())
+
 	database.ShareDatabaseRunner().Start()
+
+	// plugin
+	plugin.SharePluginMgrInstance().LoadPlugin(1)
 
 	server.ShareServerMgrInstance().StartServer()
 }

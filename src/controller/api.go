@@ -50,7 +50,7 @@ func (a *APIController) SessionPath() string {
 func (a *APIController) buildComment(commentId int) (string, error) {
 	var commentList []*info.CommentInfo = nil
 	for commentId != -1 {
-		comment, err := model.ShareCommentModel().FetchCommentByCommentId(commentId)
+		comment, err := model.ShareCommentModel().FetchCommentByCommentId(info.CommentType_Blog, commentId)
 		if err != nil {
 			return "", err
 		}
@@ -68,7 +68,7 @@ func (a *APIController) buildComment(commentId int) (string, error) {
 	return comment, nil
 }
 
-func (a *APIController) handlePublicCommentAction(w http.ResponseWriter, info map[string]interface{}) {
+func (a *APIController) handlePublicCommentAction(w http.ResponseWriter, inf map[string]interface{}) {
 	status, err := a.WebSession.Get("status")
 	if err != nil {
 		response.JsonResponseWithMsg(w, framework.ErrorAccountNotLogin, err.Error())
@@ -86,14 +86,14 @@ func (a *APIController) handlePublicCommentAction(w http.ResponseWriter, info ma
 	}
 	parseInt := func(name string, retValue *int) bool {
 		var ok bool
-		if _, ok = info[name]; ok {
-			switch info[name].(type) {
+		if _, ok = inf[name]; ok {
+			switch inf[name].(type) {
 			case int, int32, int64:
-				*retValue = info[name].(int)
+				*retValue = inf[name].(int)
 			case float32:
-				*retValue = int(info[name].(float32))
+				*retValue = int(inf[name].(float32))
 			case float64:
-				*retValue = int(info[name].(float64))
+				*retValue = int(inf[name].(float64))
 			default:
 				return false
 			}
@@ -104,11 +104,11 @@ func (a *APIController) handlePublicCommentAction(w http.ResponseWriter, info ma
 	var blogId, commentId int
 	var content string
 	if parseInt("blogId", &blogId) && parseInt("commentId", &commentId) {
-		if _, ok := info["content"]; ok {
-			switch info["content"].(type) {
+		if _, ok := inf["content"]; ok {
+			switch inf["content"].(type) {
 			case string:
-				content = info["content"].(string)
-				commentId, err := model.ShareCommentModel().AddComment(userId, blogId, commentId, content)
+				content = inf["content"].(string)
+				commentId, err := model.ShareCommentModel().AddComment(info.CommentType_Blog, userId, blogId, commentId, content)
 				if err == nil {
 					comment, err := a.buildComment(commentId)
 					if err == nil {

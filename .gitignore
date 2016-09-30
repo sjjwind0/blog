@@ -1,3 +1,7 @@
 .DS_Store
 main
 dump.rdb
+.idea/*.*
+*.o
+build/*.*
+output/*.*

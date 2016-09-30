@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"fmt"
 )
 
 type tagRender struct {
@@ -58,10 +59,16 @@ var hostRenderOnce sync.Once
 func buildHostRender() *hostRender {
 	hostRenderOnce.Do(func() {
 		staticHostRender = &hostRender{}
-		staticHostRender.Host = config.GetDefaultConfigJsonReader().Get("net.host").(string)
+		staticHostRender.Host = config.GetDefaultConfigJsonReader().GetString("net.host")
+		port := config.GetDefaultConfigJsonReader().GetInteger("net.port")
 		protocol := config.GetDefaultConfigJsonReader().Get("net.protocol").(string)
 		if !strings.HasPrefix(staticHostRender.Host, protocol+"://") {
 			staticHostRender.Host = protocol + "://" + staticHostRender.Host
+			if protocol == "http" &&  port != 80 {
+				staticHostRender.Host += fmt.Sprintf(":%d", port)
+			} else if protocol == "https" && port != 443 {
+				staticHostRender.Host += fmt.Sprintf(":%d", port)
+			}
 		}
 	})
 	return staticHostRender
@@ -72,14 +79,14 @@ func buildSideRender(blogList *list.List) *sideRender {
 	var tagMap map[string]int = make(map[string]int)
 	var timeMap map[string]int64 = make(map[string]int64)
 	for iter := blogList.Front(); iter != nil; iter = iter.Next() {
-		info := iter.Value.(info.BlogInfo)
-		commentCount, _ := model.ShareCommentModel().FetchCommentCount(info.BlogID)
-		rank := &rankRender{ID: info.BlogID, Title: info.BlogTitle, Hot: info.BlogVisitCount + commentCount*5}
+		inf := iter.Value.(info.BlogInfo)
+		commentCount, _ := model.ShareCommentModel().FetchCommentCount(info.CommentType_Blog, inf.BlogID)
+		rank := &rankRender{ID: inf.BlogID, Title: inf.BlogTitle, Hot: inf.BlogVisitCount + commentCount*5}
 		topRender.BlogHotBlogList = append(topRender.BlogHotBlogList, rank)
-		for tag := range info.BlogTagList {
-			tagMap[info.BlogTagList[tag]]++
+		for tag := range inf.BlogTagList {
+			tagMap[inf.BlogTagList[tag]]++
 		}
-		timeMap[time.Unix(info.BlogTime, 0).Format("2006年01月")] = info.BlogTime
+		timeMap[time.Unix(inf.BlogTime, 0).Format("2006年01月")] = inf.BlogTime
 	}
 	var tagList []*tagRender = nil
 	for k, v := range tagMap {

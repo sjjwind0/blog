@@ -8,7 +8,7 @@ import (
 
 const (
 	kDatabaseName  = "blog"
-	kConnectString = "root:123456@tcp(localhost:3306)/blog?charset=utf8"
+	kConnectString = "root:12256@tcp(localhost:3306)/blog?charset=utf8"
 )
 
 type Database struct {

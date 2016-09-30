@@ -1,17 +1,5 @@
 package info
 
-type CommentInfo struct {
-	CommentID       int
-	BlogID          int
-	UserID          int64
-	ParentCommentID int
-	Content         string
-	Time            int64
-	Praise          int
-	Dissent         int
-	Address         string
-}
-
 type BlogInfo struct {
 	BlogID           int
 	BlogUUID         string

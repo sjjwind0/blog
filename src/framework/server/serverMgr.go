@@ -31,6 +31,7 @@ type serverMgr struct {
 	webSocketControllerMap    map[string]WebSocketController
 	childHandlerControllerMap map[string]Controller
 	port                      int
+	staticFileMapLock sync.Mutex
 }
 
 var serverMgrInstance *serverMgr = nil
@@ -98,6 +99,8 @@ func (s *serverMgr) RegisterWebSocketController(controller WebSocketController) 
 }
 
 func (s *serverMgr) RegisterStaticFile(webPath string, localPath string) {
+	s.staticFileMapLock.Lock()
+	defer s.staticFileMapLock.Unlock()
 	if s.staticFileMap == nil {
 		s.staticFileMap = make(map[string]string)
 	}
@@ -105,14 +108,27 @@ func (s *serverMgr) RegisterStaticFile(webPath string, localPath string) {
 		fmt.Println("static file has beed registered!")
 		return
 	}
-	walkPath := filepath.Join(localPath, webPath)
+	//walkPath := filepath.Join(localPath, webPath)
+	walkPath := localPath
+	fmt.Println("walkPath: ", walkPath)
 	filepath.Walk(walkPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
-			webFilePath := path[len(localPath)+1:]
-			s.staticFileMap[webFilePath] = path
+			fmt.Println("path: ", path)
+			rel, _ := filepath.Rel(localPath, path)
+			fmt.Println(rel)
+			webFilePath := filepath.Join(webPath, rel)
+			//webFilePath := path[len(localPath)+1:]
+			s.staticFileMap[webFilePath], err = filepath.Abs(path)
+			fmt.Println(webFilePath)
+			fmt.Println(s.staticFileMap[webFilePath])
 		}
 		return nil
 	})
+}
+
+func (s *serverMgr) UnRegisterStaticFile(webPath string, localPath string) {
+	s.staticFileMapLock.Lock()
+	defer s.staticFileMapLock.Unlock()
 }
 
 func (s *serverMgr) SetServerPort(port int) {
@@ -128,9 +144,12 @@ func (s *serverMgr) handlerWebsocketReq(w http.ResponseWriter, r *http.Request) 
 }
 
 func (s *serverMgr) handlerStatisFileReq(w http.ResponseWriter, currentPath string) bool {
+	s.staticFileMapLock.Lock()
+	defer s.staticFileMapLock.Unlock()
 	if currentPath[0] == '/' {
 		currentPath = currentPath[1:]
 	}
+	fmt.Println(currentPath)
 	if local, ok := s.staticFileMap[currentPath]; ok {
 		ext := filepath.Ext(local)
 		contentType := ""
@@ -209,5 +228,5 @@ func (s *serverMgr) startHTTPSServer() {
 }
 
 func (s *serverMgr) StartServer() {
-	s.startHTTPSServer()
+	s.startHTTPServer()
 }

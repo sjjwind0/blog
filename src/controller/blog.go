@@ -72,7 +72,7 @@ func (b *BlogController) SessionPath() string {
 }
 
 func (b *BlogController) fetchCommentContent(blogId int) (string, error) {
-	commentList, err := model.ShareCommentModel().FetchAllCommentByBlogId(blogId)
+	commentList, err := model.ShareCommentModel().FetchAllCommentByBlogId(info.CommentType_Blog, blogId)
 	if err != nil {
 		return "", err
 	}
@@ -136,9 +136,9 @@ func (b *BlogController) readBlogHtml(w http.ResponseWriter, blogId int) {
 	render.BlogTitle = blogInfo.BlogTitle
 	render.BlogTime = FormatRealTime(blogInfo.BlogTime)
 	render.BlogTag = strings.Join(blogInfo.BlogTagList, "||")
-	commentCount, err := model.ShareCommentModel().FetchCommentCount(blogInfo.BlogID)
+	commentCount, err := model.ShareCommentModel().FetchCommentCount(info.CommentType_Blog, blogInfo.BlogID)
 	render.BlogCommentCount = strconv.Itoa(commentCount)
-	peopleCount, err := model.ShareCommentModel().FetchCommentPeopleCount(blogInfo.BlogID)
+	peopleCount, err := model.ShareCommentModel().FetchCommentPeopleCount(info.CommentType_Blog, blogInfo.BlogID)
 	render.BlogCommentPeopleCount = strconv.Itoa(peopleCount)
 	render.BlogVisitCount = strconv.Itoa(blogInfo.BlogVisitCount)
 	render.CommentContent = template.HTML(content)

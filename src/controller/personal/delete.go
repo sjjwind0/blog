@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"info"
 )
 
 type PersonalDeleteController struct {
@@ -77,7 +78,7 @@ func (p *PersonalDeleteController) deleteBlog(blogId int) error {
 		if err != nil {
 			return err
 		}
-		err = model.ShareCommentModel().DeleteAllBlogComment(blogId)
+		err = model.ShareCommentModel().DeleteAllBlogComment(info.CommentType_Blog, blogId)
 		if err != nil {
 			return err
 		}
