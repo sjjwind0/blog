@@ -8,8 +8,8 @@ public:
     TwoWayFifo(const std::string& name);
     ~TwoWayFifo();
 
-    bool CreatServerFile();
-    bool CreatClientFile();
+    bool CreateServerFile();
+    bool CreateClientFile();
     bool OpenServerFile();
     bool OpenClientFile();
 
@@ -19,14 +19,16 @@ public:
 
     void Close();
 
-    int GetFD() { return show_fd_; }
+    int GetID() const { return id_; }
 
-    int GetReadFD() { return read_fd_; }
+    int GetReadFD() const { return read_fd_; }
 
-    int GetWriteFD() { return write_fd_; }
+    int GetWriteFD() const { return write_fd_; }
+
+    std::string GetName() const { return name_; }
 
 private:
-    int show_fd_;
+    int id_;
     int read_fd_;
     int write_fd_;
     std::string name_;

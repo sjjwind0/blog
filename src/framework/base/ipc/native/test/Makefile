@@ -1,6 +1,6 @@
-CC = gcc-4.9
-C++ = g++-4.9
-LINK = g++-4.9
+CC = gcc
+C++ = g++
+LINK = g++
 
 LIBS=-lpthread
 CCFLAGS=$(COMPILER_FLAGS) -c -g
@@ -12,6 +12,7 @@ INCLUDES=-I. -I..
 
 C++FILES=../src/fifo.cpp \
 		 ../src/ipc_mgr.cpp \
+		 ../third_party/json/json.cpp \
 		 test.cpp
 
 OBJFILE=$(C++FILES:.cc=.o)

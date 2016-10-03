@@ -1,83 +1,165 @@
 #include "include/ipc_mgr.h"
 
+#include <iostream>
+#include <unistd.h>
 #include <sys/epoll.h>
 #include "third_party/json/json.h"
 
 #define FDSIZE      10
 #define EPOLLEVENTS 10
 
+using namespace json11;
+
+int IPCManager::call_index = 0;
+
 IPCManager::IPCManager() {
+    epfd_ = epoll_create(FDSIZE);
 }
 
 IPCManager::~IPCManager() {
 }
 
 void IPCManager::StartListener() {
-    epfd_ = epoll_create(FDSIZE);
     epoll_event events[EPOLLEVENTS];
     while (true) {
-        int ev_size = epoll_wait(epollfd, events, EPOLLEVENTS,-1);
+        int ev_size = epoll_wait(epfd_, events, EPOLLEVENTS,-1);
         for (int i = 0; i < ev_size; i++) {
             int ev_read_fd = events[i].data.fd;
             int ev_show_id = GetShowIDByReadFD(ev_read_fd);
             std::string recv_data = "";
-            int ret = ipc_info_map_[ev_show_id].pipe->Read(recv_data);
+            int ret = ipc_info_map_[ev_show_id].fifo->Read(recv_data);
             if (ret == 0) {
-                HandleMessage(recv_data);
+                HandleMessage(ev_show_id, recv_data);
             }
         }
     }
 }
 
-int IPCManager::CreateServer(const std::string& ipc_name) {
-    shared_ptr<TwoWayFifo> fifo = new TwoWayFifo(ipc_name);
+int IPCManager::CreateServer(const std::string& ipc_name, std::shared_ptr<IPCServerDelegate> delegate) {
+    std::shared_ptr<TwoWayFifo> fifo(new TwoWayFifo(ipc_name));
     fifo->CreateServerFile();
-    ipc_info_map_[fifo->GetShowID()].fifo.reset(fifo);
-    return fifo_->GetShowID();
+    ipc_info_map_[fifo->GetID()].fifo = fifo;
+    ipc_info_map_[fifo->GetID()].server_delegate = delegate;
+    read_fd_map_[fifo->GetReadFD()] = fifo->GetID();
+    struct epoll_event ev;
+    ev.events = EPOLLIN;
+    ev.data.fd = fifo->GetReadFD();
+    epoll_ctl(epfd_, EPOLL_CTL_ADD, fifo->GetReadFD(), &ev);
+    return fifo->GetID();
 }
 
-int IPCManager::OpenClient(int show_id) {
-    shared_ptr<TwoWayFifo> fifo = new TwoWayFifo(ipc_name);
+int IPCManager::OpenClient(const std::string& ipc_name, std::shared_ptr<IPCClientDelegate> delegate) {
+    std::shared_ptr<TwoWayFifo> fifo(new TwoWayFifo(ipc_name));
     fifo->CreateClientFile();
     fifo->OpenServerFile();
-    fifo->Write("{\"param\": \"init\"}");
-    ipc_info_map_[fifo->GetShowID()].fifo.reset(fifo);
+    ipc_info_map_[fifo->GetID()].fifo = fifo;
+    ipc_info_map_[fifo->GetID()].client_delegate = delegate;
+    read_fd_map_[fifo->GetReadFD()] = fifo->GetID();
+    struct epoll_event ev;
+    ev.events = EPOLLIN;
+    ev.data.fd = fifo->GetReadFD();
+    epoll_ctl(epfd_, EPOLL_CTL_ADD, fifo->GetReadFD(), &ev);
+    if (fifo->Write("{\"action\": \"init\"}") == 0) {
+        delegate->OnConnect(this, fifo->GetID());
+    }
+    return fifo->GetID();
 }
 
 void IPCManager::RegisterMethod(int ipc_id, const std::string& method_name, const Method& method) {
-    ipc_info_map_[ipc_id].method_map_[method_name] = method;
+    ipc_info_map_[ipc_id].method_map[method_name] = method;
 }
 
-void IPCManager::CallMethod(int ipc_id, const std::string& method_name, const std::string& request, const MethodCallback& callback) {
+void IPCManager::CallMethod(int ipc_id, const std::string& method_name, 
+        const std::string& request, const MethodCallback& callback) {
+    int current_call = call_index++;
+    ipc_info_map_[ipc_id].method_callback_map[method_name][current_call] = callback;
+    Json obj = Json::object({
+        { "action", "request" },
+        { "id", current_call }, 
+        { "method", method_name },
+        { "request", request },
+    });
+    ipc_info_map_[ipc_id].fifo->Write(obj.dump());
 }
 
-int IPCManager::CreateIPCChannel(const std::string& channel_name, IPCDelegate* delegate) {
+std::string IPCManager::GetNameByIPCID(int ipc_id) {
+    if (ipc_info_map_.find(ipc_id) != ipc_info_map_.end()) {
+        return ipc_info_map_[ipc_id].fifo->GetName();
+    }
+    return "";
 }
 
-int IPCManager::OpenIPCChannel(const std::string& channel_name, IPCDelegate* delegate) {
-}
-
-void IPCManager::HandleMessage(const std::string& data) {
+void IPCManager::HandleMessage(int show_id, const std::string& data) {
     ParseData(data);
     while (true) {
         std::string next_message = "";
         if (GetNextMessage(next_message)) {
-            string err;
+            std::string err;
             auto json = Json::parse(next_message, err);
+            if (!err.empty()) {
+                std::cout << "error: " << err << std::endl;
+                continue;
+            }
+            // std::cout << "message: " << next_message << std::endl;
             std::string action = json["action"].string_value();
             if (action == "request") {
                 // 请求
+                int req_id = json["id"].int_value();
+                std::string method = json["method"].string_value();
+                std::string req = json["request"].string_value();
+                if (ipc_info_map_[show_id].method_map.find(method) != 
+                    ipc_info_map_[show_id].method_map.end()) {
+                    std::string response = "";
+                    (ipc_info_map_[show_id].method_map[method])(req, response);
+                    Json obj = Json::object({
+                        { "action", "response" },
+                        { "id", req_id }, 
+                        { "method", method },
+                        { "response", response },
+                        { "code", ErrorOK },
+                    });
+                    ipc_info_map_[show_id].fifo->Write(obj.dump());
+                } else {
+                    Json obj = Json::object({
+                        { "action", "response" },
+                        { "id", req_id }, 
+                        { "method", method },
+                        { "error", "no such api." },
+                        { "code", ErrorNoSuchAPI },
+                    });
+                    ipc_info_map_[show_id].fifo->Write(obj.dump());
+                }
             } else if (action == "init") {
                 // 收到客户端发过来的初始化完成的消息
-                int show_id = json["param"]["id"];
-                std::cout << "init: " << show_id;
-                ipc_info_map_[show_id].fifo->OpenClientFile();
+                if (ipc_info_map_[show_id].fifo->OpenClientFile()) {
+                    if (ipc_info_map_[show_id].server_delegate != nullptr) {
+                        ipc_info_map_[show_id].server_delegate->OnAcceptNewClient(this, show_id);
+                    }
+                } else {
+                    std::cout << "open client failed: " << errno;
+                }
+
             } else  if (action == "response") {
                 // 请求的回应
-                int show_id = json["param"]["id"];
+                std::string method = json["method"].string_value();
+                if (ipc_info_map_[show_id].method_callback_map.find(method) != ipc_info_map_[show_id].method_callback_map.end()) {
+                    int req_id = json["id"].int_value();
+                    if (ipc_info_map_[show_id].method_callback_map[method].find(req_id) != ipc_info_map_[show_id].method_callback_map[method].end()) {
+                        ErrorCode code = ErrorCode((json["code"].int_value()));
+                        if (code == ErrorOK) {
+                            std::string req = json["response"].string_value();
+                            (ipc_info_map_[show_id].method_callback_map[method][req_id])(code, req);
+                        } else {
+                            std::string error = json["error"].string_value();
+                            (ipc_info_map_[show_id].method_callback_map[method][req_id])(code, error);
+                        }
+                    }
+                }
             } else if (action == "close") {
                 // 关闭
             }
+        } else {
+            break;
         }
     }
 }
@@ -88,15 +170,23 @@ void IPCManager::ParseData(const std::string& data) {
 }
 
 bool IPCManager::GetNextMessage(std::string& data) {
-    unsigned int data_size = buffer_.size();
-    unsigned char* buf_ptr = reinterpret_cast<unsigned char*>(buffer_.c_str());
-    int next_message_size = int(reinterpret_cast<int*>(buf_ptr));
-    std::cout << "next message size: " << next_message_size;
+    long unsigned int data_size = buffer_.size();
+    if (data_size == 0) {
+        return false;
+    }
+    const char* buf_ptr = reinterpret_cast<const char*>(buffer_.c_str());
+    long unsigned int next_message_size = *(reinterpret_cast<int*>(const_cast<char*>(buf_ptr)));
     if (next_message_size > data_size) {
-        std::cout << "not enough size";
+        std::cout << "not enough size" << std::endl;
+        return false;
     } else {
         data.assign(buf_ptr + 4, next_message_size);
-        buffer_ = buffer_.substr(4);
+        if (sizeof(int) + next_message_size == buffer_.size()) {
+            buffer_.clear();
+        } else {
+            buffer_ = buffer_.substr(4 + next_message_size);
+        }
+        return true;
     }
 }
 

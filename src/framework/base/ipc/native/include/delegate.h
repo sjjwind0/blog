@@ -1,9 +1,17 @@
 #ifndef _DELEGATE_H_
 #define _DELEGATE_H_
 
-class IPCDelegate {
+class IPCManager;
+class IPCServerDelegate {
 public:
-    virtual void OnReceiveData(int fd, int code, const std::string& data);
+	virtual void OnAcceptNewClient(IPCManager* manager, int ipc_id) = 0;
+	virtual void OnClientClose() = 0;
+};
+
+class IPCClientDelegate {
+public:
+	virtual void OnConnect(IPCManager* manager, int ipc_id) = 0;
+	virtual void OnServerClose() = 0;
 };
 
 #endif

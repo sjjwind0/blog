@@ -1,5 +1,6 @@
 #include "include/fifo.h"
 
+#include <iostream>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -11,15 +12,15 @@
 int TwoWayFifo::index = 0;
 
 TwoWayFifo::TwoWayFifo(const std::string& name)
-    : name_(name), show_fd_(-1), read_fd_(-1), write_fd_(-1) {
-    show_fd_ = index++;
+    : name_(name), id_(-1), read_fd_(-1), write_fd_(-1) {
+    id_ = index++;
 }
 
 TwoWayFifo::~TwoWayFifo() {
     Close();
 }
 
-bool TwoWayFifo::CreatServerFile() {
+bool TwoWayFifo::CreateServerFile() {
     std::string file_path = "/tmp/com.ipc." + name_ + ".server";
     if (access(file_path.c_str(), F_OK) != 0) {
         if (0 != mkfifo(file_path.c_str(), 0664)) {
@@ -27,10 +28,14 @@ bool TwoWayFifo::CreatServerFile() {
         }
     }
     read_fd_ = open(file_path.c_str(), O_RDONLY | O_NONBLOCK);
-    return read_fd_ != 0;
+    if (read_fd_ == -1) {
+        perror("CreateServerFile");
+        return false;
+    }
+    return true;
 }
 
-bool TwoWayFifo::CreatClientFile() {
+bool TwoWayFifo::CreateClientFile() {
     std::string file_path = "/tmp/com.ipc." + name_ + ".client";
     if (access(file_path.c_str(), F_OK) != 0) {
         if (0 != mkfifo(file_path.c_str(), 0664)) {
@@ -38,7 +43,11 @@ bool TwoWayFifo::CreatClientFile() {
         }
     }
     read_fd_ = open(file_path.c_str(), O_RDONLY | O_NONBLOCK);
-    return read_fd_ != 0;
+    if (read_fd_ == -1) {
+        perror("CreateClientFile");
+        return false;
+    }
+    return true;
 }
 
 bool TwoWayFifo::OpenServerFile() {
@@ -47,7 +56,11 @@ bool TwoWayFifo::OpenServerFile() {
         return false;
     }
     write_fd_ = open(file_path.c_str(), O_WRONLY | O_NONBLOCK);
-    return write_fd_ != 0;
+    if (write_fd_ == -1) {
+        perror("OpenServerFile");
+        return false;
+    }
+    return true;
 }
 
 bool TwoWayFifo::OpenClientFile() {
@@ -56,20 +69,34 @@ bool TwoWayFifo::OpenClientFile() {
         return false;
     }
     write_fd_ = open(file_path.c_str(), O_WRONLY | O_NONBLOCK);
-    return write_fd_ != 0;
+    if (write_fd_ == -1) {
+        perror("OpenClientFile");
+        return false;
+    }
+    return true;
 }
 
 int TwoWayFifo::Write(const std::string& data) {
-    const unsigned char* write_buf = reinterpret_cast<const unsigned char*>(data.c_str());
+    // std::cout << "Write: " << data << std::endl;
+    int data_size = data.size();
+    std::string real_data = "";
+    real_data.append(reinterpret_cast<char*>(&data_size), sizeof(int));
+    real_data = real_data + data;
+    data_size += sizeof(int);
+    const unsigned char* write_buf = reinterpret_cast<const unsigned char*>(real_data.c_str());
     int writed_size = 0;
     while (true) {
-        int receive_size = write(write_fd_, write_buf + writed_size, BUFFER);
-        if ((receive_size == -1 && errno == EOF) || receive_size == 0) {
+        int current_write_size = write(write_fd_, write_buf + writed_size, data_size);
+        if ((current_write_size == -1 && errno == EAGAIN) || current_write_size == 0) {
             return 0;
-        } else if (receive_size == -1) {
+        } else if (current_write_size == -1) {
             perror("write failed");
+            return -1;
         }
-        writed_size += receive_size;
+        writed_size += current_write_size;
+        if (writed_size == data_size) {
+            return 0;
+        }
     }
 }
 
@@ -77,10 +104,11 @@ int TwoWayFifo::Read(std::string& data) {
     unsigned char buf[BUFFER];
     while (true) {
         int read_size = read(read_fd_, buf, BUFFER);
-        if (read_size == -1 && errno == EOF) {
+        if (read_size == -1 && errno == EAGAIN) {
             return 0;
         } else if (read_size == -1) {
-            perror("write failed");
+            perror("read failed");
+            return -1;
         }
         data.append((const char*)buf, read_size);
     }
