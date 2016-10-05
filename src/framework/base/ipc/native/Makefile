@@ -2,19 +2,17 @@ CC = gcc
 C++ = g++
 LINK = g++
 
-LIBS = -lpthread
-#must add -fPIC option
-CCFLAGS = $(COMPILER_FLAGS) -c -g -fPIC
-C++FLAGS = $(COMPILER_FLAGS) -c -g -fPIC
+CCFLAGS = $(COMPILER_FLAGS) -c -g
+C++FLAGS = $(COMPILER_FLAGS) -c -g -fPIC -std=c++11
 
 TARGET=libipc.so
 
 INCLUDES = -I.
 
-C++FILES = fifo.cc \
-           ipc_mgr.cc
-
-# CFILES = ipc.c
+C++FILES = src/fifo.cpp \
+		   src/ipc_mgr.cpp \
+		   src/ipc.cpp \
+		   third_party/json/json.cpp
 
 # OBJFILE = $(CFILES:.c=.o) $(C++FILES:.cpp=.o)
 OBJFILE = $(C++FILES:.cpp=.o)
@@ -22,17 +20,17 @@ OBJFILE = $(C++FILES:.cpp=.o)
 all:$(TARGET)
 
 $(TARGET): $(OBJFILE)
-    $(LINK) $^ $(LIBS) -Wall -fPIC -shared -o $@
+	$(LINK) $^ $(INCLUDES) -fPIC -std=c++11 -shared -o $@
 
 %.o:%.c
-    $(CC) -o $@ $(CCFLAGS) $< $(INCLUDES)
+	$(CC) -o $@ $(CCFLAGS) $< $(INCLUDES)
 
 %.o:%.cpp
-    $(C++) -o $@ $(C++FLAGS) $< $(INCLUDES)
+	$(C++) -o $@ $(C++FLAGS) $< $(INCLUDES)
 
 install:
-    tsxs -i -o $(TARGET)
+	tsxs -i -o $(TARGET)
 
 clean:
-    rm -rf $(TARGET)
-    rm -rf $(OBJFILE)
+	rm -rf $(TARGET)
+	rm -rf $(OBJFILE)

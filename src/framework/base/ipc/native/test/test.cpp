@@ -23,7 +23,7 @@ public:
 	    	}
     	});
 	}
-	void OnClientClose() {
+	void OnClientClose(IPCManager* manager, int ipc_id) {
 	}
 	void OnConnect(IPCManager* manager, int ipc_id) {
 		std::cout << "connect ipc name: " << manager->GetNameByIPCID(ipc_id) << std::endl;
@@ -42,7 +42,7 @@ public:
 	    	}
         });
 	}
-	void OnServerClose() {
+	void OnServerClose(IPCManager* manager) {
 	}
 };
 
