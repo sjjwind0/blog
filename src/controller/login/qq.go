@@ -34,8 +34,8 @@ type loginByQQ struct {
 }
 
 func (l *loginByQQ) init() {
-	l.appKey = config.GetDefaultConfigJsonReader().Get("blog.account.qq.key").(string)
-	l.appSecret = config.GetDefaultConfigJsonReader().Get("blog.account.qq.secret").(string)
+	l.appKey = config.GetDefaultConfigJsonReader().Get("account.open.qq.key").(string)
+	l.appSecret = config.GetDefaultConfigJsonReader().Get("account.open.qq.secret").(string)
 }
 
 func (l *loginByQQ) getTokenByCode(code string) (string, string, error) {

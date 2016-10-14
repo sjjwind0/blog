@@ -51,7 +51,7 @@ func (b *ArticleController) readBlog(w http.ResponseWriter, blogId int) {
 		response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
 		return
 	}
-	blogPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
+	blogPath := config.GetDefaultConfigJsonReader().Get("storage.file.blog").(string)
 	blogPath = filepath.Join(blogPath, uuid, uuid+".html")
 	blogContent := b.readFileContent(blogPath)
 	w.Header().Set("Accept", "*/*")
@@ -83,7 +83,7 @@ func (b *ArticleController) HandlerRequest(w http.ResponseWriter, r *http.Reques
 		b.readBlog(w, id)
 	} else if r.URL.Path == "/cover" {
 		uuid := r.Form.Get("id")
-		blogPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
+		blogPath := config.GetDefaultConfigJsonReader().Get("storage.file.blog").(string)
 		imgPath := filepath.Join(blogPath, uuid, "cover.jpg")
 		b.readRes(w, imgPath)
 	} else if strings.HasPrefix(r.URL.Path, "/article/") {
@@ -92,7 +92,7 @@ func (b *ArticleController) HandlerRequest(w http.ResponseWriter, r *http.Reques
 		part := strings.Split(url, "/")
 		if len(part) == 4 {
 			uuid := part[1]
-			blogPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
+			blogPath := config.GetDefaultConfigJsonReader().Get("storage.file.blog").(string)
 			resPath := filepath.Join(blogPath, uuid, "res", part[2], part[3])
 			b.readRes(w, resPath)
 		} else {

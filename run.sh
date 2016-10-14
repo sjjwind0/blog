@@ -9,5 +9,5 @@ res=$?
 GOPATH=$current_go_path
 if [ $res -eq 0 ]; then
 	echo 'run project ...'
-	./main
+	sudo ./main
 fi

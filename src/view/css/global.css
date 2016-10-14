@@ -14,7 +14,7 @@
 	font-family: "lucida grande", "lucida sans unicode", lucida, helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
 }
 
-.bottom {
+.body-bottom {
 	margin: 0 auto;
 	width: 300px;
 	padding-top: 10px;
@@ -25,11 +25,11 @@
 	text-align: center;
 }
 
-.bottom a {
+.body-bottom a {
 	color: #555;
 }
 
-.bottom .gov {
+.body-bottom .gov {
 	font-size: 14px;
 	text-align: center;
 	color: #333;

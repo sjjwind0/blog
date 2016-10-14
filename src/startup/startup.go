@@ -3,13 +3,13 @@ package startup
 import (
 	"controller"
 	"controller/personal"
+	"fmt"
 	"framework/base/config"
 	"framework/database"
 	"framework/server"
 	"model"
-	"fmt"
-	"plugin"
 	"path/filepath"
+	// "plugin"
 )
 
 func StartServer() {
@@ -44,24 +44,24 @@ func StartServer() {
 	server.ShareServerMgrInstance().RegisterStaticFile("font", filepath.Join(localWebResourcePath, "font"))
 
 	/*
-	// plugin
-	pluginsRunner := plugin.GetDefaultPluginManager().GetAllPluginRunner()
-	for _, runner := range pluginsRunner {
-		staticFiles := runner.ResourceHandler()
-		for _, web := range staticFiles {
-			server.ShareServerMgrInstance().RegisterStaticFile(web, pluginResourcePath)
+		// plugin
+		pluginsRunner := plugin.GetDefaultPluginManager().GetAllPluginRunner()
+		for _, runner := range pluginsRunner {
+			staticFiles := runner.ResourceHandler()
+			for _, web := range staticFiles {
+				server.ShareServerMgrInstance().RegisterStaticFile(web, pluginResourcePath)
+			}
+			normalControllers := runner.NormalHanlder()
+			for _, controller := range normalControllers {
+				server.ShareServerMgrInstance().RegisterController(controller.(server.NormalController))
+			}
+			websocketsControllers := runner.WebSocketHandler()
+			for _, controller := range websocketsControllers {
+				server.ShareServerMgrInstance().RegisterWebSocketController(
+					controller.(server.WebSocketController))
+			}
 		}
-		normalControllers := runner.NormalHanlder()
-		for _, controller := range normalControllers {
-			server.ShareServerMgrInstance().RegisterController(controller.(server.NormalController))
-		}
-		websocketsControllers := runner.WebSocketHandler()
-		for _, controller := range websocketsControllers {
-			server.ShareServerMgrInstance().RegisterWebSocketController(
-				controller.(server.WebSocketController))
-		}
-	}
-*/
+	*/
 	// 评论表
 	database.ShareDatabaseRunner().RegisterModel(model.ShareCommentModel())
 	// 博客表
@@ -73,8 +73,8 @@ func StartServer() {
 
 	database.ShareDatabaseRunner().Start()
 
-	// plugin
-	plugin.SharePluginMgrInstance().LoadPlugin(1)
+	// // plugin
+	// plugin.SharePluginMgrInstance().LoadPlugin(1)
 
 	server.ShareServerMgrInstance().StartServer()
 }

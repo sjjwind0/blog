@@ -39,23 +39,23 @@
 				<div class="center-board">
 					{{range .PluginList}}
 					<div class="play-list">
-						<h2 class="list-title">{{.PluginTitle}}</h2>
+						<h2 class="list-title">{{.PluginName}}</h2>
 						<p class="visit-and-comment">0 人浏览      暂无评论</p>
 						<p class="discription">{{.PluginDescription}}</p>
 						<a href="{{$.Host.Host}}/{{.PluginURL}}">
-							<img class="list-cover" align="middle" src="{{$.Host.Host}}/{{.PluginCoverURL}}">
+							<img class="list-cover" align="middle" src="{{$.Host.Host}}/big_cover?id={{.PluginID}}">
 						</a>
 						<p class="list-button">
-							<a class="demo" href="{{$.Host.Host}}/{{.PluginURL}}" target="_blank">在线演示</a>
-							<a class="download" href="{{$.Host.Host}}/{{.PluginDownloadURL}}" target="_blank">源码下载</a>
+							<a class="demo" href="{{$.Host.Host}}/plugin?id={{.PluginID}}" target="_blank">在线演示</a>
+							<a class="download" href="{{$.Host.Host}}/plugin_download?id={{.PluginID}}" target="_blank">源码下载</a>
 						</p>
-						<p class="list-time">本条目发布于一月 14, 2014。</p>
+						<p class="list-time">{{.PluginTime}}</p>
 					</div>
 					{{end}}
 				</div>
 			</div>
 		</div>
-		<div class="bottom">
+		<div class="body-bottom">
 			<p>Written by <a class="write" target="_blank" href="https://golang.org">Golang</a><a class="gov" target="_blank" href="http://www.miitbeian.gov.cn/">浙ICP备16031285号</a></p>
 		</div>
 	</div>

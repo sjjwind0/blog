@@ -1,18 +1,17 @@
 package controller
 
 import (
-	//"fmt"
-	//"html/template"
+	"fmt"
+	"html/template"
+	"info"
+	"model"
 	"net/http"
-	//"plugin"
 )
 
 type pluginRender struct {
-	PluginTitle       string
+	PluginID          int
+	PluginName        string
 	PluginDescription string
-	PluginCoverURL    string
-	PluginURL         string
-	PluginDownloadURL string
 }
 
 type pluginListRender struct {
@@ -32,21 +31,24 @@ func (a *PlayController) Path() interface{} {
 }
 
 func (a *PlayController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
-	//pluginsInfo := plugin.GetDefaultPluginManager().GetAllPluginInfo()
-	//pluginList := &pluginListRender{}
-	//for _, plugin := range pluginsInfo {
-	//	pluginRender := &pluginRender{}
-	//	pluginRender.PluginTitle = plugin.GetPluginName()
-	//	pluginRender.PluginDescription = plugin.GetPluginDescription()
-	//	pluginRender.PluginCoverURL = plugin.GetPluginCoverURL()
-	//	pluginRender.PluginURL = plugin.GetPluginDisplayPath()
-	//	pluginRender.PluginDownloadURL = plugin.GetPluginDownloadURL()
-	//	pluginList.PluginList = append(pluginList.PluginList, pluginRender)
-	//}
-	//pluginList.Host = buildHostRender()
-	//t, err := template.ParseFiles("./src/view/html/play.html")
-	//if err != nil {
-	//	fmt.Println("parse file error: ", err.Error())
-	//}
-	//t.Execute(w, &pluginList)
+	pluginRenderList := &pluginListRender{}
+	allPlugins, err := model.SharePluginModel().FetchAllPlugin()
+	if err != nil {
+		fmt.Println("get plugin failed")
+	} else {
+		for iter := allPlugins.Front(); iter != nil; iter = iter.Next() {
+			info := iter.Value.(info.PluginInfo)
+			pluginRender := &pluginRender{}
+			pluginRender.PluginName = info.PluginName
+			pluginRender.PluginID = info.PluginID
+			pluginRender.PluginDescription = "test description"
+			pluginRenderList.PluginList = append(pluginRenderList.PluginList, pluginRender)
+		}
+	}
+	pluginRenderList.Host = buildHostRender()
+	t, err := template.ParseFiles("./src/view/html/play.html")
+	if err != nil {
+		fmt.Println("parse file error: ", err.Error())
+	}
+	t.Execute(w, &pluginRenderList)
 }

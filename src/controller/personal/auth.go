@@ -59,8 +59,8 @@ func (p *PersonalAuthController) HandlerRequest(w http.ResponseWriter, r *http.R
 			return
 		}
 		defaultConfig := config.GetDefaultConfigJsonReader()
-		defaultUserName := defaultConfig.Get("blog.owner.authUserName").(string)
-		defaultPassword := defaultConfig.Get("blog.owner.authPassword").(string)
+		defaultUserName := defaultConfig.Get("account.owner.authUserName").(string)
+		defaultPassword := defaultConfig.Get("account.owner.authPassword").(string)
 
 		sign := func(password string) string {
 			md5Ctx := md5.New()

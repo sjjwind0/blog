@@ -31,7 +31,7 @@ type serverMgr struct {
 	webSocketControllerMap    map[string]WebSocketController
 	childHandlerControllerMap map[string]Controller
 	port                      int
-	staticFileMapLock sync.Mutex
+	staticFileMapLock         sync.Mutex
 }
 
 var serverMgrInstance *serverMgr = nil
@@ -108,7 +108,7 @@ func (s *serverMgr) RegisterStaticFile(webPath string, localPath string) {
 		fmt.Println("static file has beed registered!")
 		return
 	}
-	//walkPath := filepath.Join(localPath, webPath)
+	// walkPath := filepath.Join(localPath, webPath)
 	walkPath := localPath
 	fmt.Println("walkPath: ", walkPath)
 	filepath.Walk(walkPath, func(path string, info os.FileInfo, err error) error {
@@ -149,7 +149,6 @@ func (s *serverMgr) handlerStatisFileReq(w http.ResponseWriter, currentPath stri
 	if currentPath[0] == '/' {
 		currentPath = currentPath[1:]
 	}
-	fmt.Println(currentPath)
 	if local, ok := s.staticFileMap[currentPath]; ok {
 		ext := filepath.Ext(local)
 		contentType := ""

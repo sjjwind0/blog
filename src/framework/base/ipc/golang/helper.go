@@ -38,13 +38,13 @@ func GoOnServerClose(delegate unsafe.Pointer, manager unsafe.Pointer) {
 }
 
 //export GoMethodFunc
-func GoMethodFunc(f unsafe.Pointer, request *C.char) *C.char {
+func GoMethodFunc(f int, request *C.char) *C.char {
 	rsp := ""
-	(*((*Method)(f)))(C.GoString(request), &rsp)
+	methodMap[f](C.GoString(request), &rsp)
 	return C.CString(rsp)
 }
 
 //export GoMethodCallback
-func GoMethodCallback(f unsafe.Pointer, code C.int, response *C.char) {
-	(*((*MethodCallback)(f)))(int(code), C.GoString(response))
+func GoMethodCallback(f int, code C.int, response *C.char) {
+	callbackMap[f](int(code), C.GoString(response))
 }

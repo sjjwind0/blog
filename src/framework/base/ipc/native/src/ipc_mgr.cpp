@@ -19,19 +19,30 @@ IPCManager::IPCManager() {
 IPCManager::~IPCManager() {
 }
 
-void IPCManager::StartListener() {
-    epoll_event events[EPOLLEVENTS];
-    while (true) {
-        int ev_size = epoll_wait(epfd_, events, EPOLLEVENTS,-1);
-        for (int i = 0; i < ev_size; i++) {
-            int ev_read_fd = events[i].data.fd;
-            int ev_show_id = GetShowIDByReadFD(ev_read_fd);
-            std::string recv_data = "";
-            int ret = ipc_info_map_[ev_show_id].fifo->Read(recv_data);
-            if (ret == 0) {
-                HandleMessage(ev_show_id, recv_data);
+void* IPCManager::ThreadFunc(void* args) {
+    IPCManager* self = reinterpret_cast<IPCManager*>(args);
+    if (self != nullptr) {
+        epoll_event events[EPOLLEVENTS];
+        while (true) {
+            int ev_size = epoll_wait(self->epfd_, events, EPOLLEVENTS,-1);
+            for (int i = 0; i < ev_size; i++) {
+                int ev_read_fd = events[i].data.fd;
+                int ev_show_id = self->GetShowIDByReadFD(ev_read_fd);
+                std::string recv_data = "";
+                int ret = self->ipc_info_map_[ev_show_id].fifo->Read(recv_data);
+                if (ret == 0) {
+                    self->HandleMessage(ev_show_id, recv_data);
+                }
             }
         }
+    }
+}
+
+void IPCManager::StartListener() {
+    pthread_t id;
+    int ret = pthread_create(&id, NULL, IPCManager::ThreadFunc, this);
+    if (ret) {
+        std::cout << "StartListener error: " << errno << std::endl;
     }
 }
 

@@ -13,29 +13,22 @@ func (t *TestIPCDelegate) OnAcceptNewClient(manager *IPCManager, ipcID int) {
 	manager.CallMethod(ipcID, "TestClientFunc1", "我有一头小毛驴我从来也不骑", func(code int, response string) {
 		if code == 0 {
 			fmt.Println("TestClientFunc1 response: ", response)
-		} else {
-			fmt.Println("callback failed")
 		}
 	})
 }
 
 func (t *TestIPCDelegate) OnClientClose(manager *IPCManager, ipcID int) {
-	fmt.Println("OnClientClose: ", ipcID)
 }
 
 func (t *TestIPCDelegate) OnConnect(manager *IPCManager, ipcID int) {
 	manager.CallMethod(ipcID, "TestServerFunc", "我有一头小毛驴我从来也不骑", func(code int, response string) {
 		if code == 0 {
 			fmt.Println("TestServerFunc response: ", response)
-		} else {
-			fmt.Println("callback failed")
 		}
 	})
 	manager.CallMethod(ipcID, "TestServerFunc1", "我有一头小毛驴我从来也不骑", func(code int, response string) {
 		if code == 0 {
 			fmt.Println("TestServerFunc1 response: ", response)
-		} else {
-			fmt.Println("callback failed")
 		}
 	})
 }

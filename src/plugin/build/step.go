@@ -1,21 +1,18 @@
 package build
 
 import (
-	"io"
+	"fmt"
+	"io/ioutil"
 	"os/exec"
+	"strings"
 )
 
-type BuildStep struct {
-	Outer io.ReadCloser
-	Error io.ReadCloser
-}
-
-func (b *BuildStep) Run() error {
-	return nil
+type BuildStep interface {
+	Description() string
+	Run() (string, string, error)
 }
 
 type ShellCommandStep struct {
-	BuildStep
 	env       []string
 	workDir   string
 	command   string
@@ -33,29 +30,44 @@ func NewShellCommandStep(env []string, workDir string, command string, arguments
 	return &ShellCommandStep{env: env, workDir: workDir, command: command, arguments: arguments}
 }
 
-func (s *ShellCommandStep) Run() error {
-	s.BuildStep.Run()
+func (s *ShellCommandStep) Description() string {
+	return s.command + " " + strings.Join(s.arguments, " ")
+}
+
+func (s *ShellCommandStep) Run() (string, string, error) {
 	cmd := exec.Command(s.command, s.arguments...)
 	cmd.Dir = s.workDir
 	cmd.Env = s.env
 
 	var err error = nil
-	s.Outer, err = cmd.StdoutPipe()
+	outReaderCloser, err := cmd.StdoutPipe()
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
-	s.Error, err = cmd.StderrPipe()
+	errReaderCloser, err := cmd.StderrPipe()
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
 	if err := cmd.Start(); err != nil {
-		return err
+		fmt.Println("start err: ", err)
+		return "", "", err
+	}
+
+	outBytes, err := ioutil.ReadAll(outReaderCloser)
+	if err != nil {
+		return "", "", err
+	}
+
+	errBytes, err := ioutil.ReadAll(errReaderCloser)
+	if err != nil {
+		return "", "", err
 	}
 
 	if err := cmd.Wait(); err != nil {
-		return err
+		return "", "", err
 	}
-	return nil
+
+	return string(outBytes), string(errBytes), err
 }

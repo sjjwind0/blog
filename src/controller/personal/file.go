@@ -43,7 +43,7 @@ func (f *FileController) handlerDownloadRequest(w http.ResponseWriter, r *http.R
 		return
 	}
 	// read raw zip file path
-	rawPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.raw").(string)
+	rawPath := config.GetDefaultConfigJsonReader().Get("storage.file.raw").(string)
 	blogInfo, err := model.ShareBlogModel().FetchBlogByBlogID(blogId)
 	if err != nil {
 		response.JsonResponseWithMsg(w, framework.ErrorSQLError, err.Error())
@@ -146,9 +146,9 @@ func (f *FileController) handlerUploadRequest(w http.ResponseWriter, r *http.Req
 		return
 	}
 	// 7. archive to path
-	rawRootPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.raw").(string)
+	rawRootPath := config.GetDefaultConfigJsonReader().Get("storage.file.raw").(string)
 	f.checkFolder(rawRootPath)
-	blogRootPath := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
+	blogRootPath := config.GetDefaultConfigJsonReader().Get("storage.file.blog").(string)
 	blogRootPath = filepath.Join(blogRootPath, uuid)
 	f.checkFolder(blogRootPath)
 

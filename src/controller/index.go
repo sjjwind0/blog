@@ -38,11 +38,11 @@ type indexRender struct {
 
 func buildBlogElementRender(inf *info.BlogInfo) *blogElementRender {
 	var uuid string = inf.BlogUUID
-	storageName := config.GetDefaultConfigJsonReader().Get("blog.storage.file.blog").(string)
+	storageName := config.GetDefaultConfigJsonReader().Get("storage.file.blog").(string)
 	descriptionPath := filepath.Join(storageName, uuid, "blog.info")
 	description := json.NewJsonReaderFromFile(descriptionPath).Get("descript").(string)
 	var render blogElementRender
-	render.BlogAuthor = config.GetDefaultConfigJsonReader().Get("blog.owner.name").(string)
+	render.BlogAuthor = config.GetDefaultConfigJsonReader().Get("account.owner.name").(string)
 	render.BlogTitle = inf.BlogTitle
 	render.BlogDescription = description
 	render.BlogID = inf.BlogID

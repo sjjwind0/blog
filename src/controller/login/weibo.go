@@ -36,8 +36,8 @@ func GetWebLoginInstance() *loginByWeb {
 }
 
 func (l *loginByWeb) init() {
-	l.appKey = config.GetDefaultConfigJsonReader().Get("blog.account.weibo.key").(string)
-	l.appSecret = config.GetDefaultConfigJsonReader().Get("blog.account.weibo.secret").(string)
+	l.appKey = config.GetDefaultConfigJsonReader().Get("account.open.weibo.key").(string)
+	l.appSecret = config.GetDefaultConfigJsonReader().Get("account.open.weibo.secret").(string)
 }
 
 func (l *loginByWeb) getTokenByCode(code string) (string, string, error) {

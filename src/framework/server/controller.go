@@ -95,7 +95,7 @@ func (s *SessionController) ResetSessionDuration() {
 }
 
 func (s *SessionController) newSession() session.Session {
-	sessionType := config.GetDefaultConfigJsonReader().Get("blog.storage.session.type").(string)
+	sessionType := config.GetDefaultConfigJsonReader().Get("storage.session.type").(string)
 	switch sessionType {
 	case "redis":
 		ss := redis.NewRedisSession()
@@ -113,13 +113,13 @@ func (s *SessionController) newSession() session.Session {
 
 func (s *SessionController) newSessionStorage() session.SessionStorage {
 	defaultConfig := config.GetDefaultConfigJsonReader()
-	sessionType := defaultConfig.Get("blog.storage.session.type").(string)
+	sessionType := defaultConfig.Get("storage.session.type").(string)
 	switch sessionType {
 	case "redis":
-		host := defaultConfig.Get("blog.storage.session.host").(string)
-		port := defaultConfig.Get("blog.storage.session.port").(string)
-		password := defaultConfig.Get("blog.storage.session.password").(string)
-		db := int(defaultConfig.Get("blog.storage.session.db").(int64))
+		host := defaultConfig.Get("storage.session.host").(string)
+		port := defaultConfig.Get("storage.session.port").(string)
+		password := defaultConfig.Get("storage.session.password").(string)
+		db := int(defaultConfig.Get("storage.session.db").(int64))
 		storage := redis.NewRedisStorage(host, port, password, db)
 		storage.SetSessionName("WebSession")
 		return storage

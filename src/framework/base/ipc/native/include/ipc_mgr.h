@@ -27,6 +27,8 @@ public:
 
     std::string GetNameByIPCID(int ipc_id);
 private:
+    static void* ThreadFunc(void* args);
+
     void HandleMessage(int show_id, const std::string& data);
     void ParseData(const std::string& data);
     bool GetNextMessage(std::string& data);
