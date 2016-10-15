@@ -39,6 +39,7 @@ void* IPCManager::ThreadFunc(void* args) {
 }
 
 void IPCManager::StartListener() {
+    // std::cout << "StartListener" << std::endl;
     pthread_t id;
     int ret = pthread_create(&id, NULL, IPCManager::ThreadFunc, this);
     if (ret) {
@@ -113,6 +114,7 @@ void IPCManager::HandleMessage(int show_id, const std::string& data) {
             }
             // std::cout << "message: " << next_message << std::endl;
             std::string action = json["action"].string_value();
+            // std::cout << "action: " << action << std::endl;
             if (action == "request") {
                 // 请求
                 int req_id = json["id"].int_value();

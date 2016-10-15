@@ -2,6 +2,7 @@ package storage
 
 import (
 	"errors"
+	"fmt"
 	"framework/base/archive"
 	"framework/base/config"
 	"framework/base/json"
@@ -9,7 +10,6 @@ import (
 	"model"
 	"os"
 	"path/filepath"
-	"fmt"
 )
 
 type pluginStorage struct {
@@ -145,7 +145,7 @@ func (p *pluginStorage) Run() error {
 	}
 
 	// 2.7 copy raw.zip
-	saveRawPath := filepath.Join(rawPath, uuid + ".zip")
+	saveRawPath := filepath.Join(rawPath, uuid+".zip")
 	fmt.Println("raw: ", saveRawPath)
 	err = os.Rename(p.rawPluginPath, saveRawPath)
 	if err != nil {
@@ -158,7 +158,7 @@ func (p *pluginStorage) Run() error {
 func (p *pluginStorage) languageToPluginType(language string) int {
 	switch language {
 	case "golang":
-		return info.PluginType_GOLANG
+		return info.PluginType_Golang
 	case "cpp":
 		return info.PluginType_CPP
 	case "html":
@@ -166,9 +166,9 @@ func (p *pluginStorage) languageToPluginType(language string) int {
 	case "python":
 		return info.PluginType_Python
 	case "java":
-		return info.PluginType_JAVA
+		return info.PluginType_Java
 	case "node":
-		return info.PluginType_NODE
+		return info.PluginType_Node
 	default:
 		return info.PluginType_None
 	}

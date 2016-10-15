@@ -9,7 +9,7 @@ import (
 	"framework/server"
 	"model"
 	"path/filepath"
-	// "plugin"
+	"plugin"
 )
 
 func StartServer() {
@@ -29,6 +29,7 @@ func StartServer() {
 	server.ShareServerMgrInstance().RegisterController(controller.NewLoginController())
 	server.ShareServerMgrInstance().RegisterController(controller.NewAboutController())
 	server.ShareServerMgrInstance().RegisterController(controller.NewPlayController())
+	server.ShareServerMgrInstance().RegisterController(controller.NewPluginController())
 
 	// personal api
 	server.ShareServerMgrInstance().RegisterController(personal.NewSyncController())
@@ -74,7 +75,7 @@ func StartServer() {
 	database.ShareDatabaseRunner().Start()
 
 	// // plugin
-	// plugin.SharePluginMgrInstance().LoadPlugin(1)
+	plugin.SharePluginMgrInstance().Initialize()
 
 	server.ShareServerMgrInstance().StartServer()
 }

@@ -9,11 +9,11 @@ const (
 
 	// native code
 	PluginType_CPP    = iota
-	PluginType_JAVA   = iota
-	PluginType_GOLANG = iota
+	PluginType_Java   = iota
+	PluginType_Golang = iota
 
 	// script
-	PluginType_NODE   = iota
+	PluginType_Node   = iota
 	PluginType_Python = iota
 )
 

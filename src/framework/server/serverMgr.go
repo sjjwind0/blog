@@ -110,17 +110,11 @@ func (s *serverMgr) RegisterStaticFile(webPath string, localPath string) {
 	}
 	// walkPath := filepath.Join(localPath, webPath)
 	walkPath := localPath
-	fmt.Println("walkPath: ", walkPath)
 	filepath.Walk(walkPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
-			fmt.Println("path: ", path)
 			rel, _ := filepath.Rel(localPath, path)
-			fmt.Println(rel)
 			webFilePath := filepath.Join(webPath, rel)
-			//webFilePath := path[len(localPath)+1:]
 			s.staticFileMap[webFilePath], err = filepath.Abs(path)
-			fmt.Println(webFilePath)
-			fmt.Println(s.staticFileMap[webFilePath])
 		}
 		return nil
 	})
@@ -208,7 +202,9 @@ func (s *serverMgr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 5. 404
-	fmt.Println("404: ", r.URL.Path)
+	fmt.Println("404: ", r.URL.String())
+	fmt.Println("header: ", r.Header)
+	fmt.Println("addr: ", r.RemoteAddr)
 	w.WriteHeader(http.StatusNotFound)
 }
 

@@ -22,6 +22,7 @@ TwoWayFifo::~TwoWayFifo() {
 
 bool TwoWayFifo::CreateServerFile() {
     std::string file_path = "/tmp/com.ipc." + name_ + ".server";
+    // std::cout << "CreateServerFile: " << file_path << std::endl;
     if (access(file_path.c_str(), F_OK) != 0) {
         if (0 != mkfifo(file_path.c_str(), 0664)) {
             perror("mkfifo error");
@@ -37,6 +38,7 @@ bool TwoWayFifo::CreateServerFile() {
 
 bool TwoWayFifo::CreateClientFile() {
     std::string file_path = "/tmp/com.ipc." + name_ + ".client";
+    // std::cout << "CreateClientFile: " << file_path << std::endl;
     if (access(file_path.c_str(), F_OK) != 0) {
         if (0 != mkfifo(file_path.c_str(), 0664)) {
             perror("mkfifo error");
@@ -52,6 +54,7 @@ bool TwoWayFifo::CreateClientFile() {
 
 bool TwoWayFifo::OpenServerFile() {
     std::string file_path = "/tmp/com.ipc." + name_ + ".server";
+    // std::cout << "OpenServerFile: " << file_path << std::endl;
     if (access(file_path.c_str(), F_OK) != 0) {
         return false;
     }
@@ -65,6 +68,7 @@ bool TwoWayFifo::OpenServerFile() {
 
 bool TwoWayFifo::OpenClientFile() {
     std::string file_path = "/tmp/com.ipc." + name_ + ".client";
+    // std::cout << "OpenClientFile: " << file_path << std::endl;
     if (access(file_path.c_str(), F_OK) != 0) {
         return false;
     }
@@ -77,7 +81,7 @@ bool TwoWayFifo::OpenClientFile() {
 }
 
 int TwoWayFifo::Write(const std::string& data) {
-    // std::cout << "Write: " << data << std::endl;
+    // std::cout << "Write: " << data.size() << std::endl;
     int data_size = data.size();
     std::string real_data = "";
     real_data.append(reinterpret_cast<char*>(&data_size), sizeof(int));
