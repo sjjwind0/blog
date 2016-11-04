@@ -13,13 +13,19 @@ const (
 	ErrorBlogExist = 1000
 	ErrorEmptyBlog = 1001
 
+	// plugin
+	ErrorPluginNotExist   = 2000
+	ErrorPluginParseError = 2001
+	ErrorPluginBuildError = 2002
+	ErrorPluginLoadError  = 2002
+
 	// runtime
-	ErrorRunTimeError = 2000
+	ErrorRunTimeError = 3000
 
 	// account
-	ErrorAccountNotLogin  = 3000
-	ErrorAccountAuthError = 3005
+	ErrorAccountNotLogin  = 4000
+	ErrorAccountAuthError = 5005
 
 	// file
-	ErrorFileNotExist = 4000
+	ErrorFileNotExist = 5000
 )

@@ -19,6 +19,7 @@ import (
 type playRender struct {
 	PluginID          int
 	PluginName        string
+	PluginTime        string
 	PluginDescription string
 }
 
@@ -35,7 +36,7 @@ func NewPlayController() *PlayController {
 }
 
 func (a *PlayController) Path() interface{} {
-	return []string{"/play", "/big_cover", "/small_cover"}
+	return []string{"/play", "/big_cover", "/small_cover", "/plugin_download"}
 }
 
 func (a *PlayController) readFileContent(path string) *[]byte {
@@ -59,6 +60,7 @@ func (a *PlayController) readRes(w http.ResponseWriter, path string) {
 	w.Header().Set("Accept", "*/*")
 	w.Header().Set("Content-Length", strconv.Itoa(len(*imgContent)))
 	w.Header().Set("Content-Type", server.QueryContentTypeByExt(ext))
+	w.Header().Set("Content-Disposition", "attachment; filename=plugin_run.zip")
 	w.Write(*imgContent)
 }
 
@@ -99,13 +101,28 @@ func (a *PlayController) HandlerRequest(w http.ResponseWriter, r *http.Request) 
 			response.JsonResponseWithMsg(w, framework.ErrorParamError, err.Error())
 			return
 		}
-		blogPath := config.GetDefaultConfigJsonReader().GetString("storage.file.plugin")
+		pluginPath := config.GetDefaultConfigJsonReader().GetString("storage.file.plugin")
 		var imgPath string = ""
 		if r.URL.Path == "/big_cover" {
-			imgPath = filepath.Join(blogPath, uuid, "big_cover.jpg")
+			imgPath = filepath.Join(pluginPath, uuid, "big_cover.jpg")
 		} else {
-			imgPath = filepath.Join(blogPath, uuid, "small_cover.jpg")
+			imgPath = filepath.Join(pluginPath, uuid, "small_cover.jpg")
 		}
 		a.readRes(w, imgPath)
+	} else if r.URL.Path == "/plugin_download" {
+		r.ParseForm()
+		id, err := strconv.Atoi(r.Form.Get("id"))
+		if err != nil {
+			response.JsonResponseWithMsg(w, framework.ErrorParamError, err.Error())
+			return
+		}
+		uuid, err := model.SharePluginModel().GetPluginUUIDByPluginID(id)
+		if err != nil || uuid == "" {
+			response.JsonResponseWithMsg(w, framework.ErrorParamError, err.Error())
+			return
+		}
+		pluginPath := config.GetDefaultConfigJsonReader().GetString("storage.file.plugin")
+		pluginDownloadPath := filepath.Join(pluginPath, uuid, "code.zip")
+		a.readRes(w, pluginDownloadPath)
 	}
 }

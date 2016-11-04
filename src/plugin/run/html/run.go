@@ -7,14 +7,19 @@ import (
 	"path/filepath"
 )
 
-type HtmlPluginRun struct {
+type htmlPluginRun struct {
 	webPath   string
 	localPath string
+	pluginId  int
 }
 
-func (h *HtmlPluginRun) Run(pluginId int) error {
+func NewHtmlPluginRunner(pluginId int) *htmlPluginRun {
+	return &htmlPluginRun{pluginId: pluginId}
+}
+
+func (h *htmlPluginRun) Run() error {
 	pluginPath := config.GetDefaultConfigJsonReader().GetString("storage.file.plugin")
-	pluginInfo, err := model.SharePluginModel().FetchPluginByPluginID(pluginId)
+	pluginInfo, err := model.SharePluginModel().FetchPluginByPluginID(h.pluginId)
 	if err != nil {
 		return err
 	}
@@ -25,7 +30,7 @@ func (h *HtmlPluginRun) Run(pluginId int) error {
 	return nil
 }
 
-func (h *HtmlPluginRun) Stop() error {
+func (h *htmlPluginRun) Stop() error {
 	server.ShareServerMgrInstance().UnRegisterStaticFile(h.webPath, h.localPath)
 	return nil
 }

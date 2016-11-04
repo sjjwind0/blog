@@ -60,7 +60,8 @@ func (c *pluginModel) CreateTable() error {
 	return err
 }
 
-func (b *pluginModel) InsertPlugin(uuid string, title string, pluginType int, pluginVersion string) error {
+func (b *pluginModel) InsertPlugin(uuid string, title string, pluginType int,
+	pluginVersion string) (int, error) {
 	currentTime := time.Now().Unix()
 	sql := fmt.Sprintf("insert into %s(%s, %s, %s, %s, %s) values(?, ?, ?, ?, ?)",
 		kPluginTableName, kPluginUUID, kPluginName, kPluginType, kPluginVersion, kPluginTime)
@@ -68,18 +69,21 @@ func (b *pluginModel) InsertPlugin(uuid string, title string, pluginType int, pl
 	stat, err := database.DatabaseInstance().DB.Prepare(sql)
 	if err == nil {
 		defer stat.Close()
-		_, err := stat.Exec(uuid, title, pluginType, pluginVersion, currentTime)
-		return err
+		result, err := stat.Exec(uuid, title, pluginType, pluginVersion, currentTime)
+		insertId, _ := result.LastInsertId()
+		return int(insertId), err
 	}
-	return err
+	return -1, err
 }
 
-func (b *pluginModel) UpdatePlugin(uuid string, title string, pluginType int, pluginVersion string) error {
+func (b *pluginModel) UpdatePlugin(uuid string, title string, pluginType int,
+	pluginVersion string) (int, error) {
 	currentTime := time.Now().Unix()
 	sql := fmt.Sprintf("update %s set %s = ?, %s = ?, %s = ?, %s = ? where %s = ?",
 		kPluginTableName, kPluginName, kPluginType, kPluginVersion, kPluginTime, kPluginUUID)
-	_, err := database.DatabaseInstance().DB.Exec(sql, title, pluginType, pluginVersion, currentTime, uuid)
-	return err
+	result, err := database.DatabaseInstance().DB.Exec(sql, title, pluginType, pluginVersion, currentTime, uuid)
+	updateId, _ := result.RowsAffected()
+	return int(updateId), err
 }
 
 func (b *pluginModel) PluginIsExistByUUID(uuid string) (bool, error) {

@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"plugin"
 	"strconv"
 	"strings"
 )
@@ -28,7 +29,7 @@ func NewPersonalFileController() *FileController {
 }
 
 func (f *FileController) Path() interface{} {
-	return "/personal/file"
+	return []string{"/personal/blog", "/personal/plugin"}
 }
 
 func (f *FileController) SessionPath() string {
@@ -105,12 +106,12 @@ func (f *FileController) checkFolder(path string) {
 ** 4. res, html中所需要的所有资源文件。
 ** 文件目录格式如下
 **	raw:
-**		- uuid_1.raw
-**		- uuid_2.raw
+**		- uuid.raw
 **	blog:
 **		- uuid
-**			- uuid_1.html
+**			- uuid.html
 **			- cover.jpg
+** 			- blog.info
 **			- res
 **				- html
 **	 			- css
@@ -118,9 +119,17 @@ func (f *FileController) checkFolder(path string) {
 **				- img
 **	 			- font
 **	 			- other
+**  plugin:
+		- uuid
+			- plugin.info
+			- big_cover.jpg
+			- small_cover.jpg
+			- code.zip
+			- run
 ** raw文件放在raw目录不对外开放，html文件以及res文件放在blog目录，meta信息放数据库。
- */
-func (f *FileController) handlerUploadRequest(w http.ResponseWriter, r *http.Request) {
+*/
+func (f *FileController) handlerBlogUploadRequest(w http.ResponseWriter, r *http.Request) {
+	// TODO: move to src/blog/storage
 	if err := r.ParseMultipartForm(k24K); nil != err {
 		fmt.Println("r.ParseMultipartForm: ", err)
 		return
@@ -153,8 +162,6 @@ func (f *FileController) handlerUploadRequest(w http.ResponseWriter, r *http.Req
 	f.checkFolder(blogRootPath)
 
 	rawZipPath := filepath.Join(rawRootPath, uuid+".zip")
-	fmt.Println("1 = ", filepath.Join(saveTmpPath, rawZipName))
-	fmt.Println("2 = ", rawZipPath)
 	os.Rename(filepath.Join(saveTmpPath, rawZipName), rawZipPath)
 
 	infoPath := filepath.Join(blogRootPath, blogInfoName)
@@ -189,20 +196,50 @@ func (f *FileController) handlerUploadRequest(w http.ResponseWriter, r *http.Req
 	response.JsonResponse(w, framework.ErrorOK)
 }
 
+func (f *FileController) handlerPluginUploadRequest(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("handlerPluginUploadRequest")
+	if err := r.ParseMultipartForm(k24K); nil != err {
+		fmt.Println("r.ParseMultipartForm: ", err)
+		return
+	}
+
+	saveTmpPath := "/tmp"
+	rawZipName := f.savePostFile(r, "raw", saveTmpPath)
+	rawZipFilePath := filepath.Join(saveTmpPath, rawZipName)
+
+	completeChan := make(chan bool)
+	err := plugin.SharePluginMgrInstance().AddNewPlugin(rawZipFilePath,
+		func(info string, err string, isComplete bool) {
+			if isComplete {
+				completeChan <- true
+			}
+			if info != "" {
+				fmt.Println("info: ", info)
+				w.Write([]byte(info))
+			}
+			if err != "" {
+				fmt.Println("err: ", err)
+				w.Write([]byte(err))
+			}
+		})
+	if err != nil {
+		fmt.Println("add plugin error: ", err)
+		response.JsonResponseWithMsg(w, framework.ErrorParamError, err.Error())
+		return
+	}
+	<-completeChan
+}
+
 func (f *FileController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
 	f.SessionController.HandlerRequest(f, w, r)
-	// if status, err := f.WebSession.Get("status"); err != nil || status != "auth" {
-	// 	fmt.Println("err: ", err.Error(), "\tstatus: ", status)
-	// 	response.JsonResponseWithMsg(w, framework.ErrorAccountAuthError, "not auth")
-	// 	return
-	// }
-	// if r.Header.Get("Content-Type") == "multipart/form-data" {
-	// 	fmt.Println("right")
-	// }
 	fmt.Println("FileController.HandlerRequest")
 	switch r.Method {
 	case "POST":
-		f.handlerUploadRequest(w, r)
+		if r.URL.Path == "/personal/blog" {
+			f.handlerBlogUploadRequest(w, r)
+		} else if r.URL.Path == "/personal/plugin" {
+			f.handlerPluginUploadRequest(w, r)
+		}
 	case "GET":
 		f.handlerDownloadRequest(w, r)
 	default:

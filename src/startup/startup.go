@@ -17,7 +17,7 @@ func StartServer() {
 	localWebResourcePath := config.GetString("storage.file.res")
 	fmt.Println("localWebResourcePath: ", localWebResourcePath)
 	//pluginResourcePath := config.GetString("resource.pluginpath")
-	port := config.GetInteger("net.port")
+	port := config.GetInteger("net.listen_port")
 
 	server.ShareServerMgrInstance().SetServerPort(port)
 

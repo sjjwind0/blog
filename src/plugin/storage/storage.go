@@ -14,6 +14,7 @@ import (
 
 type pluginStorage struct {
 	rawPluginPath string
+	pluginId      int
 }
 
 func NewPluginStorage(path string) *pluginStorage {
@@ -53,11 +54,13 @@ plugin 文件结构
 		- code.zip
 */
 func (p *pluginStorage) Run() error {
+	fmt.Println("pluginStorage Run")
 	c := config.GetDefaultConfigJsonReader()
 	tmpRawPath := c.GetString("storage.file.tmp")
 
-	err := archive.UnZipToPath(p.rawPluginPath, tmpRawPath)
+	extraPath, err := archive.UnZipToPathWithFileName(p.rawPluginPath, tmpRawPath)
 	if err != nil {
+		fmt.Println("pluginStorage: archive.UnZipToFolder error: ", err)
 		return err
 	}
 
@@ -67,12 +70,13 @@ func (p *pluginStorage) Run() error {
 
 	// 2. save plugin
 	// 2.1 read config
-	tmpConfigPath := filepath.Join(tmpRawPath, "raw", "plugin.info")
+	tmpConfigPath := filepath.Join(tmpRawPath, extraPath, "plugin.info")
 	fmt.Println("tmpConfigPath: ", tmpConfigPath)
 	jsonReader := json.NewJsonReaderFromFile(tmpConfigPath)
 	uuid := jsonReader.GetString("uuid")
 	pluginIsExist, err := model.SharePluginModel().PluginIsExistByUUID(uuid)
 	if err != nil {
+		fmt.Println("pluginStorage: PluginIsExistByUUID error: ", err)
 		return err
 	}
 	pluginName := jsonReader.GetString("name")
@@ -90,9 +94,9 @@ func (p *pluginStorage) Run() error {
 	fmt.Println(version)
 	if pluginIsExist {
 		// update plugin
-		err = model.SharePluginModel().UpdatePlugin(uuid, pluginName, pluginType, version)
+		p.pluginId, err = model.SharePluginModel().UpdatePlugin(uuid, pluginName, pluginType, version)
 	} else {
-		err = model.SharePluginModel().InsertPlugin(uuid, pluginName, pluginType, version)
+		p.pluginId, err = model.SharePluginModel().InsertPlugin(uuid, pluginName, pluginType, version)
 	}
 	if err != nil {
 		return err
@@ -103,7 +107,7 @@ func (p *pluginStorage) Run() error {
 	os.MkdirAll(pluginRootPath, os.ModePerm)
 
 	// 2.4 save code.zip
-	tmpCodePath := filepath.Join(tmpRawPath, "raw", "code.zip")
+	tmpCodePath := filepath.Join(tmpRawPath, extraPath, "code.zip")
 	saveCodePath := filepath.Join(pluginRootPath, "code.zip")
 	err = os.Rename(tmpCodePath, saveCodePath)
 	if err != nil {
@@ -111,7 +115,7 @@ func (p *pluginStorage) Run() error {
 	}
 
 	// 2.5 Extract code.zip to current path
-	extractPath := filepath.Join(pluginRootPath, "run")
+	extractPath := filepath.Join(pluginRootPath, "code")
 	fmt.Println("extractPath: ", extractPath)
 	err = archive.UnZipToPath(saveCodePath, tmpRawPath)
 	if err != nil {
@@ -123,11 +127,11 @@ func (p *pluginStorage) Run() error {
 	}
 
 	// 2.6 copy cover img, config and so on to here
-	tmpBigCoverImgPath := filepath.Join(tmpRawPath, "raw", "big_cover.jpg")
-	tmpSmallCoverImgPath := filepath.Join(tmpRawPath, "raw", "small_cover.jpg")
+	tmpBigCoverImgPath := filepath.Join(tmpRawPath, extraPath, "big_cover.jpg")
+	tmpSmallCoverImgPath := filepath.Join(tmpRawPath, extraPath, "small_cover.jpg")
 	saveBigCoverImgPath := filepath.Join(pluginRootPath, "big_cover.jpg")
 	saveSmallCoverImgPath := filepath.Join(pluginRootPath, "small_cover.jpg")
-	saveConfigPath := filepath.Join(pluginRootPath, "plugin.conf")
+	saveConfigPath := filepath.Join(pluginRootPath, "plugin.info")
 
 	err = os.Rename(tmpBigCoverImgPath, saveBigCoverImgPath)
 	if err != nil {
@@ -153,6 +157,10 @@ func (p *pluginStorage) Run() error {
 	}
 
 	return nil
+}
+
+func (p *pluginStorage) GetPluginID() int {
+	return p.pluginId
 }
 
 func (p *pluginStorage) languageToPluginType(language string) int {

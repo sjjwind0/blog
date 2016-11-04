@@ -202,7 +202,7 @@ func (s *serverMgr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 5. 404
-	fmt.Println("404: ", r.URL.String())
+	fmt.Println("404: ", r.URL.Path)
 	fmt.Println("header: ", r.Header)
 	fmt.Println("addr: ", r.RemoteAddr)
 	w.WriteHeader(http.StatusNotFound)
@@ -210,7 +210,10 @@ func (s *serverMgr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *serverMgr) startHTTPServer() {
 	http.HandleFunc("/", s.ServeHTTP)
-	http.ListenAndServe(fmt.Sprintf(":%d", s.port), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", s.port), nil)
+	if err != nil {
+		fmt.Println("StartHTTPServer error: ", err)
+	}
 }
 
 func (s *serverMgr) startHTTPSServer() {

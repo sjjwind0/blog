@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 func checkFolder(path string) {
@@ -55,6 +56,43 @@ func UnZipToPath(zipPath string, dstPath string) error {
 		}
 	}
 	return nil
+}
+
+func UnZipToPathWithFileName(zipPath string, dstPath string) (string, error) {
+	unZipFile, err := zip.OpenReader(zipPath)
+	if err != nil {
+		return "", err
+	}
+	defer unZipFile.Close()
+	fileName := ""
+	os.MkdirAll(dstPath, 0755)
+	for _, f := range unZipFile.File {
+		rc, err := f.Open()
+		if err != nil {
+			return fileName, err
+		}
+		if fileName == "" {
+			fileName = strings.Split(f.Name, "/")[0]
+		}
+		path := filepath.Join(dstPath, f.Name)
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(path, f.Mode())
+		} else {
+			fmt.Println("path: ", path)
+			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if err != nil {
+				return fileName, err
+			}
+			_, err = io.Copy(f, rc)
+			if err != nil {
+				if err != io.EOF {
+					return fileName, err
+				}
+			}
+			f.Close()
+		}
+	}
+	return fileName, nil
 }
 
 // 将文件夹解压到filePath下面

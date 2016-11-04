@@ -118,25 +118,16 @@ func (i *ipcMainRunner) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (i *ipcMainRunner) StartServer() {
-	go func() {
-		server := NewIPCManager()
-		ipcID := server.CreateServer(i.pluginName, i)
-		i.serverIPCID = ipcID
-		i.serverManager = server
-		server.StartListener()
-	}()
-	time.Sleep(time.Second * 1)
-	fmt.Println("start client...")
-	go func() {
-		client := NewIPCManager()
-		ipcID := client.OpenClient(i.pluginName, i)
-		i.clientManager = client
-		i.clientIPCID = ipcID
-		client.RegisterMethod(ipcID, "HttpRequest", func(request string, response *string) {
-			i.HandleIPCRequest(request, response)
-		})
-		client.StartListener()
-	}()
-	http.HandleFunc("/", i.ServeHTTP)
-	http.ListenAndServe(":80", nil)
+	client := NewIPCManager()
+	ipcID := client.OpenClient(i.pluginName, i)
+	i.clientManager = client
+	i.clientIPCID = ipcID
+	client.RegisterMethod(ipcID, "HttpRequest", func(request string, response *string) {
+		i.HandleIPCRequest(request, response)
+	})
+	client.StartListener()
+	fmt.Println("client over")
+	for {
+		time.Sleep(time.Second * 1)
+	}
 }

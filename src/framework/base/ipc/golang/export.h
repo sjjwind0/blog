@@ -25,8 +25,8 @@ extern void GoOnAcceptNewClient(void* delegate, void* ipc_ptr, int ipc_id);
 extern void GoOnClientClose(void* delegate, void* ipc_ptr, int ipc_id);
 extern void GoOnConnect(void* delegate, void* ipc_ptr, int ipc_id);
 extern void GoOnServerClose(void* delegate, void* ipc_ptr);
-extern char* GoMethodFunc(void* param, const char* request);
-extern void GoMethodCallback(void* param, int code, const char* response);
+extern char* GoMethodFunc(int param, const char* request);
+extern void GoMethodCallback(int param, int code, const char* response);
 
 struct IPCServerInterface {
 	OnAcceptNewClient on_accept_new_client_ptr;
@@ -53,12 +53,16 @@ void COnServerClose(void* delegate, void* ipc_ptr) {
 	GoOnServerClose(delegate, ipc_ptr);
 }
 
-void CMethodFunc(void* param, const char* request, char** response) {
-	*response = GoMethodFunc((int)param, request);
+void CMethodFunc(void* param_ptr, const char* request, char** response) {
+	int param = *((int*)param_ptr);
+	free(param_ptr);
+	*response = GoMethodFunc(param, request);
 }
 
-void CMethodCallback(void* param, int code, const char* response) {
-	GoMethodCallback((int)param, code, response);
+void CMethodCallback(void* param_ptr, int code, const char* response) {
+	int param = *((int*)param_ptr);
+	free(param_ptr);
+	GoMethodCallback(param, code, response);
 }
 
 typedef void* (*Func_NewIPCManager)();
@@ -145,14 +149,19 @@ int OpenClient(void* ipc_ptr, const char* ipc_name, void* delegate) {
 
 void RegisterMethod(void* ipc_ptr, int ipc_id, const char* method_name, void* method, int param) {
 	if (_c_registerMethod_ptr != NULL) {
-		_c_registerMethod_ptr(ipc_ptr, ipc_id, method_name, (Method)method, (void*)param);
+		int* param_ptr = (int*)malloc(sizeof(int));
+		*param_ptr = param;
+		_c_registerMethod_ptr(ipc_ptr, ipc_id, method_name, (Method)method, (void*)param_ptr);
 	}
 }
 
 void CallMethod(void* ipc_ptr, int ipc_id, const char* method_name, const char* request,
 		void* callback, int param) {
 	if (_c_callMethod_ptr != NULL) {
-		_c_callMethod_ptr(ipc_ptr, ipc_id, method_name, request, (MethodCallback)callback, (void*)param);
+		int* param_ptr = (int*)malloc(sizeof(int));
+		*param_ptr = param;
+		_c_callMethod_ptr(ipc_ptr, ipc_id, method_name, request, (MethodCallback)callback, 
+			(void*)param_ptr);
 	}
 }
 

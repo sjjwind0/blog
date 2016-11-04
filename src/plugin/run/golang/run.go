@@ -6,14 +6,27 @@ import (
 	"framework/base/shell"
 	"model"
 	"path/filepath"
+	"plugin/ipc"
 )
 
-type GolangPluginRun struct {
+type golangPluginRun struct {
+	pluginId int
 }
 
-func (h *GolangPluginRun) Run(pluginId int) error {
-	loadPluginInfo, err := model.SharePluginModel().FetchPluginByPluginID(pluginId)
+func NewGolangPluginRunner(pluginId int) *golangPluginRun {
+	return &golangPluginRun{pluginId: pluginId}
+}
+
+func (p *golangPluginRun) Run() error {
+	err := ipc.SharePluginIPCManager().OpenPluginChannel(p.pluginId)
 	if err != nil {
+		fmt.Println("open plugin channel error: ", err)
+		return err
+	}
+
+	loadPluginInfo, err := model.SharePluginModel().FetchPluginByPluginID(p.pluginId)
+	if err != nil {
+		p.Stop()
 		return err
 	}
 
@@ -28,11 +41,13 @@ func (h *GolangPluginRun) Run(pluginId int) error {
 			fmt.Println("shell err: ", errOutput)
 		} else {
 			fmt.Println("run shell error: ", err)
+			p.Stop()
 		}
 	}()
 	return nil
 }
 
-func (h *GolangPluginRun) Stop() error {
+func (p *golangPluginRun) Stop() error {
+	ipc.SharePluginIPCManager().ClosePluginChannel(p.pluginId)
 	return nil
 }

@@ -1,13 +1,16 @@
 package html
 
 import (
-	"plugin/build"
+	"plugin/build/step"
 )
 
-type HtmlBuilder struct {
+type htmlBuilder struct {
 }
 
-func (h *HtmlBuilder) BuildStep() []*build.BuildStep {
-	// html, no build step
+func NewHtmlBuilder() *htmlBuilder {
+	return new(htmlBuilder)
+}
+
+func (h *htmlBuilder) BuildStep() []step.BuildStep {
 	return nil
 }

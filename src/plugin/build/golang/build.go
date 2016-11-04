@@ -1,7 +1,11 @@
 package golang
 
 import (
-	"plugin/build"
+	"fmt"
+	"framework/base/config"
+	"os"
+	"path/filepath"
+	"plugin/build/step"
 )
 
 type GolangBuilder struct {
@@ -12,20 +16,30 @@ func NewBuilder(projectPath string) *GolangBuilder {
 	return &GolangBuilder{projectPath: projectPath}
 }
 
-func (g *GolangBuilder) BuildStep() []build.BuildStep {
-	return []build.BuildStep{
-		build.NewShellCommandStep(nil, g.projectPath, "pwd", nil),
-		build.NewShellCommandStep(nil, g.projectPath, "rm", []string{"-r", "src/handler"}),
-		build.NewShellCommandStep(nil, g.projectPath, "cp", []string{
+/*
+1. pwd log current path
+2. rm native handler
+3. copy plugin handler to src
+4. build
+5. install
+*/
+func (g *GolangBuilder) BuildStep() []step.BuildStep {
+	toolPath := config.GetDefaultConfigJsonReader().GetString("storage.file.tool")
+	toolPath = filepath.Join(toolPath, "build", "golang", "handler")
+	var GOPATH string = "/home/wind/pkg" + ":" + g.projectPath
+	var GOROOT string = "/home/wind/Application/go"
+	var PATH string = os.Getenv("PATH") + ":" + "/home/wind/Application/go/bin"
+	var golangEnv = []string{"GOROOT=" + GOROOT, "GOPATH=" + GOPATH, "PATH=" + PATH}
+	fmt.Println(golangEnv)
+	return []step.BuildStep{
+		step.NewShellCommandStep(nil, g.projectPath, "pwd", nil),
+		step.NewShellCommandStep(nil, g.projectPath, "rm", []string{"-r", "src/handler"}),
+		step.NewShellCommandStep(nil, g.projectPath, "cp", []string{
 			"-r",
-			"/home/wind/Project/blog/tools/build/golang/handler",
+			toolPath,
 			"src/",
 		}),
-		build.NewShellCommandStep([]string{
-			"GOPATH=/home/wind/pkg:/home/wind/data/go-plugin-demo",
-			"GOROOT=/home/wind/Application/go",
-			"PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/wind/Application/go/bin:/home/wind/pkg/bin:/home/wind/Application/node-v4.5.0-linux-x64/bin:/home/wind/.local/bin:/home/wind/bin",
-		}, g.projectPath, "./run.sh", nil),
-		build.NewShellCommandStep(nil, g.projectPath, "./plugin", nil),
+		step.NewShellCommandStep(golangEnv, g.projectPath, "/bin/bash", []string{"step.sh"}),
+		step.NewShellCommandStep(golangEnv, g.projectPath, "/bin/bash", []string{"install.sh"}),
 	}
 }
