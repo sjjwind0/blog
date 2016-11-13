@@ -19,6 +19,6 @@ func (h *htmlPluginRun) Run() error {
 }
 
 func (h *htmlPluginRun) Stop() error {
-	// server.ShareServerMgrInstance().UnRegisterStaticFile(h.webPath, h.localPath)
+	h.TransmissionRequestHandler.UnRegister()
 	return nil
 }

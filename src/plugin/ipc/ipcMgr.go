@@ -44,6 +44,7 @@ func SharePluginIPCManager() *pluginIPCManager {
 }
 
 func (p *pluginIPCManager) OnAcceptNewClient(manager *golang.IPCManager, ipcID int) {
+	fmt.Println("OnAcceptNewClient, ipcID: ", ipcID)
 	if _, ok := p.pluginInfoMap[ipcID]; ok {
 		fmt.Println("pluginIPCManager start success")
 		p.pluginInfoMap[ipcID].ready <- true
@@ -156,6 +157,10 @@ func (p *pluginIPCManager) ClosePluginChannel(pluginId int) {
 	if ipcID, ok := p.pluginIDIPCIDMap[pluginId]; ok {
 		fmt.Println("close plugin: ", ipcID)
 		p.ipcMgr.StopClient(ipcID)
+		delete(p.pluginIDIPCIDMap, pluginId)
+		delete(p.pluginInfoMap, ipcID)
+		delete(p.isStartingMap, pluginId)
+		delete(p.callbackList, pluginId)
 	}
 }
 

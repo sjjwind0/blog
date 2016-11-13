@@ -5,6 +5,7 @@ import (
 	"framework/base/config"
 	"framework/base/shell"
 	"model"
+	"os"
 	"path/filepath"
 	"plugin/ipc"
 	"plugin/run/handler"
@@ -18,6 +19,7 @@ const (
 type golangPluginRun struct {
 	pluginId int
 	stopType int
+	progress *os.Process
 	handler.IPCRequestHandler
 }
 
@@ -42,27 +44,17 @@ func (p *golangPluginRun) Run() error {
 	pluginRootPath := config.GetDefaultConfigJsonReader().GetString("storage.file.plugin")
 	pluginRootPath = filepath.Join(pluginRootPath, loadPluginInfo.PluginUUID)
 	binaryDir := filepath.Join(pluginRootPath, "run")
-	fmt.Println("binaryDir: ", binaryDir)
-	go func() {
-		output, errOutput, err := shell.RunShell(binaryDir, "./plugin")
-		if err == nil {
-			fmt.Println("shell out: ", output)
-			fmt.Println("shell err: ", errOutput)
-		} else {
-			fmt.Println("run shell error: ", err)
-		}
-		if p.stopType == StopBySelf {
-			fmt.Println("stop success")
-		} else {
-			fmt.Println("plugin was killed by some reason")
-			p.Stop()
-		}
-	}()
+
+	p.progress, err = shell.RunShellAsync(func(output string, errOutput string) {
+		fmt.Println("shell out: ", output)
+		fmt.Println("shell err: ", errOutput)
+	}, binaryDir, "./plugin")
 	return ipc.SharePluginIPCManager().WaitingForPluginStart(ipcId)
 }
 
 func (p *golangPluginRun) Stop() error {
 	p.stopType = StopBySelf
 	ipc.SharePluginIPCManager().ClosePluginChannel(p.pluginId)
+	p.progress.Kill()
 	return nil
 }

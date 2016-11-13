@@ -67,7 +67,6 @@ func (p *PluginController) fetchCommentContent(blogId int) (string, error) {
 func (p *PluginController) HandlerRequest(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	if strings.HasPrefix(r.URL.Path, "/plugin/") {
-		fmt.Println("PluginController HandlerRequest")
 		values := strings.Split(r.URL.Path, "/")
 		pluginId, err := strconv.Atoi(values[2])
 		if err != nil {

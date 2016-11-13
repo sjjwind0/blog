@@ -48,8 +48,11 @@ func (t *TransmissionRequestHandler) Register(pluginId int) error {
 	return nil
 }
 
+func (t *TransmissionRequestHandler) UnRegister() {
+	t.staticFileMap = nil
+}
+
 func (t *TransmissionRequestHandler) HandlePluginRequest(pluginId int, w http.ResponseWriter, r *http.Request) {
-	fmt.Println("TransmissionRequestHandler HandlePluginRequest")
 	currentPath := r.URL.Path
 	if currentPath[0] == '/' {
 		currentPath = currentPath[1:]

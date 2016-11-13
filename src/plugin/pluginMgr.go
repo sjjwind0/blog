@@ -32,6 +32,10 @@ func (p *pluginMgr) OnPluginNeedStart(pluginId int) {
 	p.LoadPlugin(pluginId)
 }
 
+func (p *pluginMgr) OnPluginNeedStop(pluginId int) {
+	p.StopPlugin(pluginId)
+}
+
 func (p *pluginMgr) OnPluginShutdown(pluginId int) {
 	if _, ok := p.pluginRunnerMap[pluginId]; ok {
 		delete(p.pluginRunnerMap, pluginId)
@@ -44,12 +48,13 @@ func (p *pluginMgr) Initialize() {
 }
 
 func (p *pluginMgr) AddNewPlugin(rawPluginPath string, callback build.ProgressCallback) error {
-	storage := storage.NewPluginStorage(rawPluginPath)
+	storage := storage.NewPluginStorage(rawPluginPath, p)
 	err := storage.Run()
 	if err != nil {
 		return err
 	}
 	pluginId := storage.GetPluginID()
+	fmt.Println("pluginID: ", pluginId)
 	buildMgr, err := build.NewBuilderMgr(pluginId)
 	if err != nil {
 		fmt.Println("get build failed: ", err)
@@ -60,7 +65,6 @@ func (p *pluginMgr) AddNewPlugin(rawPluginPath string, callback build.ProgressCa
 }
 
 func (p *pluginMgr) LoadPlugin(pluginId int) error {
-	fmt.Println("pluginMgr LoadPlugin: ", pluginId)
 	if p.pluginRunnerMap == nil {
 		p.pluginRunnerMap = make(map[int]run.PluginRun)
 	}
@@ -86,6 +90,7 @@ func (p *pluginMgr) StopPlugin(pluginId int) error {
 	fmt.Println("pluginMgr StopPlugin: ", pluginId)
 	if runner, ok := p.pluginRunnerMap[pluginId]; ok {
 		runner.Stop()
+		delete(p.pluginRunnerMap, pluginId)
 		return nil
 	}
 	fmt.Println("plugin is not running")
@@ -97,7 +102,6 @@ func (p *pluginMgr) HandleRequest(pluginId int, w http.ResponseWriter, r *http.R
 		runner.HandlePluginRequest(pluginId, w, r)
 	} else {
 		if p.LoadPlugin(pluginId) == nil {
-			fmt.Println("load success: ", pluginId)
 			p.HandleRequest(pluginId, w, r)
 		} else {
 			response.JsonResponseWithMsg(w, framework.ErrorPluginNotExist, "plugin not exist")

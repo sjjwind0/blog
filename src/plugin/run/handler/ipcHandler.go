@@ -44,7 +44,6 @@ func (i *IPCRequestHandler) HandlePluginRequest(pluginId int, w http.ResponseWri
 	singal := make(chan bool)
 	requestBytes, _ := json.Marshal(req)
 	callback := func(code int, response string) {
-		fmt.Println("handlePluginRequest callback")
 		if code == 0 {
 			// to http response
 			var js interface{} = nil

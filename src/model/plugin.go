@@ -83,6 +83,7 @@ func (b *pluginModel) UpdatePlugin(uuid string, title string, pluginType int,
 		kPluginTableName, kPluginName, kPluginType, kPluginVersion, kPluginTime, kPluginUUID)
 	result, err := database.DatabaseInstance().DB.Exec(sql, title, pluginType, pluginVersion, currentTime, uuid)
 	updateId, _ := result.RowsAffected()
+	fmt.Println("updateId: ", updateId)
 	return int(updateId), err
 }
 

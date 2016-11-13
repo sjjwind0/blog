@@ -41,7 +41,6 @@ func UnZipToPath(zipPath string, dstPath string) error {
 		if f.FileInfo().IsDir() {
 			os.MkdirAll(path, f.Mode())
 		} else {
-			fmt.Println("path: ", path)
 			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 			if err != nil {
 				return err
@@ -78,7 +77,6 @@ func UnZipToPathWithFileName(zipPath string, dstPath string) (string, error) {
 		if f.FileInfo().IsDir() {
 			os.MkdirAll(path, f.Mode())
 		} else {
-			fmt.Println("path: ", path)
 			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 			if err != nil {
 				return fileName, err
