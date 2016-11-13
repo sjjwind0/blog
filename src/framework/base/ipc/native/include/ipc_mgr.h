@@ -23,9 +23,12 @@ public:
     int OpenClient(const std::string& ipc_name, std::shared_ptr<IPCClientDelegate> delegate);
 
     void RegisterMethod(int ipc_id, const std::string& method_name, const Method& method);
-    void CallMethod(int ipc_id, const std::string& method_name, const std::string& request, const MethodCallback& callback);
+    void CallMethod(int ipc_id, const std::string& method_name, const std::string& request, 
+        const MethodCallback& callback);
 
     std::string GetNameByIPCID(int ipc_id);
+
+    bool StopClient(int ipc_id);
 private:
     static void* ThreadFunc(void* args);
 

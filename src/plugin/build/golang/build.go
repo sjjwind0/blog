@@ -39,7 +39,7 @@ func (g *GolangBuilder) BuildStep() []step.BuildStep {
 			toolPath,
 			"src/",
 		}),
-		step.NewShellCommandStep(golangEnv, g.projectPath, "/bin/bash", []string{"step.sh"}),
+		step.NewShellCommandStep(golangEnv, g.projectPath, "/bin/bash", []string{"build.sh"}),
 		step.NewShellCommandStep(golangEnv, g.projectPath, "/bin/bash", []string{"install.sh"}),
 	}
 }

@@ -36,6 +36,7 @@ void RegisterMethod(void* ipc_ptr, int ipc_id, const char* method_name, Method m
 void CallMethod(void* ipc_ptr, int ipc_id, const char* method_name, const char* request, 
 	MethodCallback callback, void* param);
 char* GetNameByIPCID(void* ipc_ptr, int ipc_id);
+bool StopClient(void* ipc_ptr, int ipc_id);
 
 #ifdef __cplusplus
 }

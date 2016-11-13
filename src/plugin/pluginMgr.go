@@ -3,7 +3,10 @@ package plugin
 import (
 	"errors"
 	"fmt"
+	"framework"
+	"framework/response"
 	"model"
+	"net/http"
 	"plugin/build"
 	"plugin/ipc"
 	"plugin/run"
@@ -25,7 +28,18 @@ func SharePluginMgrInstance() *pluginMgr {
 	return pluginMgrInstance
 }
 
+func (p *pluginMgr) OnPluginNeedStart(pluginId int) {
+	p.LoadPlugin(pluginId)
+}
+
+func (p *pluginMgr) OnPluginShutdown(pluginId int) {
+	if _, ok := p.pluginRunnerMap[pluginId]; ok {
+		delete(p.pluginRunnerMap, pluginId)
+	}
+}
+
 func (p *pluginMgr) Initialize() {
+	ipc.SharePluginIPCManager().SetDelegate(p)
 	ipc.SharePluginIPCManager().StartListener()
 }
 
@@ -46,6 +60,10 @@ func (p *pluginMgr) AddNewPlugin(rawPluginPath string, callback build.ProgressCa
 }
 
 func (p *pluginMgr) LoadPlugin(pluginId int) error {
+	fmt.Println("pluginMgr LoadPlugin: ", pluginId)
+	if p.pluginRunnerMap == nil {
+		p.pluginRunnerMap = make(map[int]run.PluginRun)
+	}
 	if _, ok := p.pluginRunnerMap[pluginId]; ok {
 		fmt.Println("plugin is running")
 		return nil
@@ -65,6 +83,7 @@ func (p *pluginMgr) LoadPlugin(pluginId int) error {
 }
 
 func (p *pluginMgr) StopPlugin(pluginId int) error {
+	fmt.Println("pluginMgr StopPlugin: ", pluginId)
 	if runner, ok := p.pluginRunnerMap[pluginId]; ok {
 		runner.Stop()
 		return nil
@@ -73,9 +92,15 @@ func (p *pluginMgr) StopPlugin(pluginId int) error {
 	return errors.New("plugin is not runner")
 }
 
-func (p *pluginMgr) CallMethod(pluginId int, request string, callback ipc.MethodCallback) {
-	if _, ok := p.pluginRunnerMap[pluginId]; !ok {
-		p.LoadPlugin(pluginId)
+func (p *pluginMgr) HandleRequest(pluginId int, w http.ResponseWriter, r *http.Request) {
+	if runner, ok := p.pluginRunnerMap[pluginId]; ok {
+		runner.HandlePluginRequest(pluginId, w, r)
+	} else {
+		if p.LoadPlugin(pluginId) == nil {
+			fmt.Println("load success: ", pluginId)
+			p.HandleRequest(pluginId, w, r)
+		} else {
+			response.JsonResponseWithMsg(w, framework.ErrorPluginNotExist, "plugin not exist")
+		}
 	}
-	ipc.SharePluginIPCManager().CallMethod(pluginId, request, callback)
 }

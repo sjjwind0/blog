@@ -3,6 +3,7 @@ package run
 import (
 	"fmt"
 	"info"
+	"net/http"
 	"plugin/run/golang"
 	"plugin/run/html"
 )
@@ -10,6 +11,7 @@ import (
 type PluginRun interface {
 	Run() error
 	Stop() error
+	HandlePluginRequest(pluginId int, w http.ResponseWriter, r *http.Request)
 }
 
 func NewPluginRunner(pluginType int, pluginId int) PluginRun {

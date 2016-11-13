@@ -73,6 +73,7 @@ typedef void (*Func_RegisterMethod)(void* ipc_ptr, int ipc_id, const char* metho
 typedef void (*Func_CallMethod)(void* ipc_ptr, int ipc_id, const char* method_name,
 	const char* request, MethodCallback callback, void* param);
 typedef char* (*Func_GetNameByIPCID)(void* ipc_ptr, int ipc_id);
+typedef int (*Func_StopClient)(void* ipc_ptr, int ipc_id);
 
 Func_NewIPCManager _c_newIPCManager_ptr = NULL;
 Func_StartListener _c_startListener_ptr = NULL;
@@ -81,6 +82,7 @@ Func_OpenClient _c_openClient_ptr = NULL;
 Func_RegisterMethod _c_registerMethod_ptr = NULL;
 Func_CallMethod _c_callMethod_ptr = NULL;
 Func_GetNameByIPCID _c_getNameByIPCID_ptr = NULL;
+Func_StopClient _c_stopClient_ptr = NULL;
 
 const char* lib_path = "/home/wind/Project/blog/src/framework/base/ipc/native/libipc.so";
 void* handle = NULL;
@@ -94,6 +96,7 @@ void LoadLibrary() {
 		_c_registerMethod_ptr = (Func_RegisterMethod)dlsym(handle, "RegisterMethod");
 		_c_callMethod_ptr = (Func_CallMethod)dlsym(handle, "CallMethod");
 		_c_getNameByIPCID_ptr = (Func_GetNameByIPCID)dlsym(handle, "GetNameByIPCID");
+		_c_stopClient_ptr = (Func_StopClient)dlsym(handle, "StopClient");
 		printf("load so success!\n");
 	} else {
 		printf("load so failed!\n");
@@ -170,6 +173,13 @@ char* GetNameByIPCID(void* ipc_ptr, int ipc_id) {
 		return _c_getNameByIPCID_ptr(ipc_ptr, ipc_id);
 	}
 	return NULL;
+}
+
+int StopClient(void* ipc_ptr, int ipc_id) {
+	if (_c_stopClient_ptr != NULL) {
+		return _c_stopClient_ptr(ipc_ptr, ipc_id);
+	}
+	return 0;
 }
 
 #endif

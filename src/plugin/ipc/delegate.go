@@ -1,6 +1,6 @@
 package ipc
 
 type PluginDelegate interface {
-	OnPluginReady(pluginId int)
+	OnPluginNeedStart(pluginId int)
 	OnPluginShutdown(pluginId int)
 }

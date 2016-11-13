@@ -31,7 +31,6 @@ type serverMgr struct {
 	webSocketControllerMap    map[string]WebSocketController
 	childHandlerControllerMap map[string]Controller
 	port                      int
-	staticFileMapLock         sync.Mutex
 }
 
 var serverMgrInstance *serverMgr = nil
@@ -99,8 +98,6 @@ func (s *serverMgr) RegisterWebSocketController(controller WebSocketController) 
 }
 
 func (s *serverMgr) RegisterStaticFile(webPath string, localPath string) {
-	s.staticFileMapLock.Lock()
-	defer s.staticFileMapLock.Unlock()
 	if s.staticFileMap == nil {
 		s.staticFileMap = make(map[string]string)
 	}
@@ -108,7 +105,6 @@ func (s *serverMgr) RegisterStaticFile(webPath string, localPath string) {
 		fmt.Println("static file has beed registered!")
 		return
 	}
-	// walkPath := filepath.Join(localPath, webPath)
 	walkPath := localPath
 	filepath.Walk(walkPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
@@ -121,8 +117,6 @@ func (s *serverMgr) RegisterStaticFile(webPath string, localPath string) {
 }
 
 func (s *serverMgr) UnRegisterStaticFile(webPath string, localPath string) {
-	s.staticFileMapLock.Lock()
-	defer s.staticFileMapLock.Unlock()
 }
 
 func (s *serverMgr) SetServerPort(port int) {
@@ -138,8 +132,6 @@ func (s *serverMgr) handlerWebsocketReq(w http.ResponseWriter, r *http.Request) 
 }
 
 func (s *serverMgr) handlerStatisFileReq(w http.ResponseWriter, currentPath string) bool {
-	s.staticFileMapLock.Lock()
-	defer s.staticFileMapLock.Unlock()
 	if currentPath[0] == '/' {
 		currentPath = currentPath[1:]
 	}
@@ -175,13 +167,13 @@ func (s *serverMgr) handlerStatisFileReq(w http.ResponseWriter, currentPath stri
 
 func (s *serverMgr) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	currentPath := r.URL.Path
-	// 1. 首先在controller里面寻找
-	if controller, ok := s.controllerMap[currentPath]; ok {
-		controller.HandlerRequest(w, r)
+	// 1. 在static file 里面寻找
+	if s.handlerStatisFileReq(w, currentPath) {
 		return
 	}
-	// 2. 在static file 里面寻找
-	if s.handlerStatisFileReq(w, currentPath) {
+	// 2. 首先在controller里面寻找
+	if controller, ok := s.controllerMap[currentPath]; ok {
+		controller.HandlerRequest(w, r)
 		return
 	}
 	// 3. 逐级分解，看是不是某个controller的子集

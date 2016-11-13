@@ -39,7 +39,6 @@ void* IPCManager::ThreadFunc(void* args) {
 }
 
 void IPCManager::StartListener() {
-    // std::cout << "StartListener" << std::endl;
     pthread_t id;
     int ret = pthread_create(&id, NULL, IPCManager::ThreadFunc, this);
     if (ret) {
@@ -102,6 +101,7 @@ std::string IPCManager::GetNameByIPCID(int ipc_id) {
 }
 
 void IPCManager::HandleMessage(int show_id, const std::string& data) {
+    // TODO: adjust to protobuf
     ParseData(data);
     while (true) {
         std::string next_message = "";
@@ -157,7 +157,8 @@ void IPCManager::HandleMessage(int show_id, const std::string& data) {
                 std::string method = json["method"].string_value();
                 if (ipc_info_map_[show_id].method_callback_map.find(method) != ipc_info_map_[show_id].method_callback_map.end()) {
                     int req_id = json["id"].int_value();
-                    if (ipc_info_map_[show_id].method_callback_map[method].find(req_id) != ipc_info_map_[show_id].method_callback_map[method].end()) {
+                    if (ipc_info_map_[show_id].method_callback_map[method].find(req_id) 
+                        != ipc_info_map_[show_id].method_callback_map[method].end()) {
                         ErrorCode code = ErrorCode((json["code"].int_value()));
                         if (code == ErrorOK) {
                             std::string req = json["response"].string_value();
@@ -170,6 +171,9 @@ void IPCManager::HandleMessage(int show_id, const std::string& data) {
                 }
             } else if (action == "close") {
                 // 关闭
+                if (ipc_info_map_[show_id].client_delegate != nullptr) {
+                    ipc_info_map_[show_id].client_delegate->OnServerClose(this);
+                }
             }
         } else {
             break;
@@ -205,4 +209,17 @@ bool IPCManager::GetNextMessage(std::string& data) {
 
 int IPCManager::GetShowIDByReadFD(int read_fd) {
     return read_fd_map_[read_fd];
+}
+
+bool IPCManager::StopClient(int ipc_id) {
+    if (ipc_info_map_.find(ipc_id) == ipc_info_map_.end()) {
+        return false;
+    }
+    if (ipc_info_map_[ipc_id].fifo->Write("{\"action\": \"close\"}") == 0) {
+        if (ipc_info_map_[ipc_id].server_delegate != nullptr) {
+            ipc_info_map_[ipc_id].server_delegate->OnClientClose(this, ipc_id);
+        }
+        return true;
+    }
+    return true;
 }

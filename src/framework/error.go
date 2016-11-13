@@ -17,7 +17,8 @@ const (
 	ErrorPluginNotExist   = 2000
 	ErrorPluginParseError = 2001
 	ErrorPluginBuildError = 2002
-	ErrorPluginLoadError  = 2002
+	ErrorPluginLoadError  = 2003
+	ErrorPluginPathError  = 2004
 
 	// runtime
 	ErrorRunTimeError = 3000

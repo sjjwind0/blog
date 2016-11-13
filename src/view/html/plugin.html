@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="/css/talk.css">
 	<link rel="stylesheet" href="/css/global.css" />
 	<link rel="shortcut icon" href="/img/facvicon.ico" />
-	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+	<script src="http://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 	<script src="{{.Host.Host}}/js/plugin.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
@@ -39,8 +39,13 @@
 			</div>
 		</header>
 		<div class="plugin">
-			<iframe id="plugin" onload="javascript:SetCwinHeight();" src="{{.Host.Host}}/plugin/{{.PluginID}}/index" scrolling="auto" width="100%" frameborder="0">
+			{{if .IsHtml}}
+			<iframe id="plugin" onload="javascript:SetCwinHeightAndBase('{{.Host.Host}}/plugin/{{.PluginID}}');" src="{{.Host.Host}}/plugin/{{.PluginID}}/index.html" scrolling="auto" width="100%" height="600px" frameborder="0">
 			</iframe>
+			{{else}}
+			<iframe id="plugin" onload="javascript:SetCwinHeight();" height="600px" src="{{.Host.Host}}/plugin/{{.PluginID}}/index" scrolling="auto" width="100%" frameborder="0">
+			</iframe>
+			{{end}}
 		</div>
 		<div class="talk">
 				{{if .User.IsLogin}}

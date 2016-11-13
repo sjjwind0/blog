@@ -101,3 +101,8 @@ char* GetNameByIPCID(void* ipc_ptr, int ipc_id) {
 	strcmp(ret_name, name.c_str());
 	return ret_name;
 }
+
+bool StopClient(void* ipc_ptr, int ipc_id) {
+	IPCManager* manager = reinterpret_cast<IPCManager*>(ipc_ptr);
+	return manager->StopClient(ipc_id);
+}

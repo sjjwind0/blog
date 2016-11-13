@@ -113,3 +113,10 @@ func (i *IPCManager) CallMethod(ipcID int, methodName string, request string, ca
 func (i *IPCManager) GetNameByIPCID(ipcID int) string {
 	return C.GoString(C.GetNameByIPCID(i.ipcPtr, C.int(ipcID)))
 }
+
+func (i *IPCManager) StopClient(ipcID int) bool {
+	if C.StopClient(i.ipcPtr, C.int(ipcID)) == 0 {
+		return false
+	}
+	return true
+}
