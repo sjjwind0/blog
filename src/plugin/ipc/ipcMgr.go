@@ -194,7 +194,10 @@ func (p *pluginIPCManager) CallMethod(pluginId int, request string, callback Met
 
 func (p *pluginIPCManager) CallMethodInternal(pluginId int, request string, callback MethodCallback) {
 	if ipcID, ok := p.pluginIDIPCIDMap[pluginId]; ok {
+		fmt.Println("request: ", request)
 		p.ipcMgr.CallMethod(ipcID, "HttpRequest", request, func(code int, response string) {
+			fmt.Println("code: ", code)
+			fmt.Println("response: ", response)
 			callback(code, response)
 		})
 	} else {

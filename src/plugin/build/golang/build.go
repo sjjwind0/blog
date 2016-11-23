@@ -12,7 +12,7 @@ type GolangBuilder struct {
 	projectPath string
 }
 
-func NewBuilder(projectPath string) *GolangBuilder {
+func NewGolangBuilder(projectPath string) *GolangBuilder {
 	return &GolangBuilder{projectPath: projectPath}
 }
 

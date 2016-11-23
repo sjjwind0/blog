@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"plugin/run/golang"
 	"plugin/run/html"
+	"plugin/run/node"
 )
 
 type PluginRun interface {
@@ -20,6 +21,8 @@ func NewPluginRunner(pluginType int, pluginId int) PluginRun {
 		return golang.NewGolangPluginRunner(pluginId)
 	case info.PluginType_H5:
 		return html.NewHtmlPluginRunner(pluginId)
+	case info.PluginType_Node:
+		return node.NewNodePluginRunner(pluginId)
 	default:
 		fmt.Println("not support now")
 		return nil

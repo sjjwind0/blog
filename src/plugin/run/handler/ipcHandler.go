@@ -79,4 +79,5 @@ func (i *IPCRequestHandler) HandlePluginRequest(pluginId int, w http.ResponseWri
 	}
 	ipc.SharePluginIPCManager().CallMethod(pluginId, string(requestBytes), callback)
 	<-singal
+	fmt.Println("end")
 }

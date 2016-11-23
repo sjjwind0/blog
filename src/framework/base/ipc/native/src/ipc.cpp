@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <memory>
 #include <cstring>
+#include <iostream>
 #include "include/ipc_mgr.h"
 
 class IPCServerProxyDelegate : public IPCServerDelegate {
