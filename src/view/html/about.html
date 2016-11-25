@@ -6,6 +6,16 @@
 	<title>小风的个人博客 - 关于</title>
 	<link rel="stylesheet" href="/css/global.css" />
 	<link rel="shortcut icon" href="/img/facvicon.ico" />
+	<script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+	<script type="text/javascript" charset="utf-8">
+		window.onload = function() {
+			$(".clear li").hover(function() {
+				$(this).addClass("nav-open");
+			}, function() {
+				$(this).removeClass("nav-open");
+			});
+		}
+	</script>
 </head>
 <body>
 	<div class="body">
@@ -13,15 +23,31 @@
 			<img class="icon" src="{{.Host.Host}}/img/icon.png"/>
 			<div class="nav-center">
 				<ul class="clear">
-					<li><a href="{{.Host.Host}}/index">博客</a></li>
-					<li><a href="{{.Host.Host}}/play">High玩</a></li>
-					<li class="active"><a href="{{.Host.Host}}/about">关于自己</a></li>
+					<li>
+						<a class="menu-name" href="{{.Host.Host}}/index">博客</a>
+						<div class="dropdown dropdown-navbar">
+							<ul class="ul-nav ul-nav-navbar">
+								<li><a class="menu-text" href="https://windyx.com/sort?type=Golang">Golang</a></li>
+								<li><a class="menu-text" href="https://windyx.com/sort?type=C%2b%2b">C++</a></li>
+								<li><a class="menu-text" href="https://windyx.com/sort?type=机器学习">机器学习</a></li>
+								<li><a class="menu-text" href="https://windyx.com/sort?type=Node">Node</a></li>
+								<li><a class="menu-text" href="https://windyx.com/sort?type=Android">Android</a></li>
+								<li><a class="menu-text" href="https://windyx.com/sort?type=其它">其它</a></li>
+							</ul>
+						</div>
+					</li>
+					<li>
+						<a class="menu-name" href="{{.Host.Host}}/play">High玩</a>
+					</li>
+					<li class="active">
+						<a class="menu-name" href="{{.Host.Host}}/about">关于自己</a>
+					</li>
 				</ul>
 			</div>
 		</div>
 		<div style="margin: 0 auto; width: 80%; margin-top: 40px;  background: #fff; border-width: 1px; padding: 20px 15px 30px 20px;">
 			<div style="margin-top: 30px;">
-				<img style="border-radius: 50%;margin: 0 auto; height: 80px; width: 80px; display: block; " src="http://tva3.sinaimg.cn/crop.0.0.180.180.180/a148c78cjw1e8qgp5bmzyj2050050aa8.jpg" alt="">
+				<img style="border-radius: 50%;margin: 0 auto; height: 80px; width: 80px; display: block; " src="https://tva3.sinaimg.cn/crop.0.0.180.180.180/a148c78cjw1e8qgp5bmzyj2050050aa8.jpg" alt="">
 			</div>
 			<p style="margin: 10px 0 15px 0; text-align: center; font-size: 16px;">小风</p>
 			<p style="padding-top: 30px; font-size: 19px; margin: 0 auto; width: 300px; text-align: center;">应当静如水</p>
