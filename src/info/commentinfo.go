@@ -1,8 +1,8 @@
 package info
 
 const (
-	CommentType_Blog   = iota
-	CommentType_Plugin = iota
+	CommentType_Blog   = 0
+	CommentType_Plugin = 1
 )
 
 type CommentInfo struct {

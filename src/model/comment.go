@@ -68,9 +68,10 @@ func (c *commentModel) AddComment(commentType int, userId int, blogId int, comme
 	stat, err := database.DatabaseInstance().DB.Prepare(sql)
 	if err == nil {
 		defer stat.Close()
-		result, err := stat.Exec(userId, blogId, commentId, commentContent, time.Now().Unix())
+		result, err := stat.Exec(commentType, userId, blogId, commentId, commentContent, time.Now().Unix())
 		if err == nil {
 			insertId, err := result.LastInsertId()
+			fmt.Println("insert id: ", insertId)
 			return int(insertId), err
 		}
 	}
@@ -85,6 +86,9 @@ func (c *commentModel) DeleteAllBlogComment(commentType int, blogId int) error {
 
 func (c *commentModel) FetchCommentByCommentId(commentType int, commentId int) (*info.CommentInfo, error) {
 	sql := fmt.Sprintf("select * from %s where %s = ? and %s = ?", kCommentTableName, kCommentType, kCommentId)
+	fmt.Println("sql: ", sql)
+	fmt.Println("type: ", commentType)
+	fmt.Println("commentId: ", commentId)
 	rows, err := database.DatabaseInstance().DB.Query(sql, commentType, commentId)
 	if err == nil {
 		defer rows.Close()

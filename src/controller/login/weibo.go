@@ -57,6 +57,7 @@ func (l *loginByWeb) getTokenByCode(code string) (string, string, error) {
 	var accessToken string
 	var uid string
 	parse := json.NewJsonReader(string(data))
+	fmt.Println("parse: ", parse)
 	accessToken = parse.Get("access_token").(string)
 	uid = parse.Get("uid").(string)
 	return accessToken, uid, err

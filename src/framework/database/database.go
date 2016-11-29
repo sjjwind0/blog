@@ -8,7 +8,7 @@ import (
 
 const (
 	kDatabaseName  = "blog"
-	kConnectString = "root:123456@tcp(localhost:3306)/blog?charset=utf8"
+	kConnectString = "root:12256@tcp(localhost:3306)/blog?charset=utf8"
 )
 
 type Database struct {
@@ -48,8 +48,8 @@ func (this *Database) Close() {
 
 func (this *Database) DoesTableExist(tableName string) bool {
 	rows, err := this.DB.Query("select * from `INFORMATION_SCHEMA`.`TABLES` where table_name =? and TABLE_SCHEMA=?", tableName, kDatabaseName)
-	defer rows.Close()
 	if err == nil {
+		defer rows.Close()
 		if rows.Next() {
 			return true
 		}

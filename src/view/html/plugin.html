@@ -20,7 +20,7 @@
 	</script>
 </head>
 <body>
-	<div class="body">
+	<div class="body clearfix">
 		<div id="nav">
 			<img class="icon" src="{{.Host.Host}}/img/icon.png"/>
 			<div class="nav-center">
@@ -47,127 +47,131 @@
 				</ul>
 			</div>
 		</div>
-	</div>
-	<div class="container">
-		<div class="plugin-content">
-		<div class="breadcrumbs">
-			<a title="返回首页" href=".">
-				<i class="fa fa-home"></i>
-				</a> <small>&gt;</small><a href="{{.Host.Host}}/index">High玩</a> <small></small>  <small>&gt;</small>
-				<span class="muted">{{.PluginName}}</span>
-		</div>
-		<header class="article-header">
-			<h1 class="article-title"><a href="{{.Host.Host}}/plugin?id={{.PluginID}}#comment">{{.PluginName}}</a></h1>
-			<div class="meta">
-				<span class="muted"><i class="fa fa-user"></i> <a href="{{.Host.Host}}/about">{{.Author}}</a></span>
-				<time class="muted"><i class="fa fa-clock-o"></i>{{.DisplayTime}}</time>
-				<span class="muted"><i class="fa fa-eye"></i> {{.PluginVisitCount}}</span>
-				<span class="muted"><i class="fa fa-comments-o"></i> <a href="{{.Host.Host}}/plugin?id={{.PluginID}}#comment">{{.PluginCommentCount}}条评论</a></span>
+		<div class="container">
+			<div class="plugin-content">
+			<div class="breadcrumbs">
+				<a title="返回首页" href=".">
+					<i class="fa fa-home"></i>
+					</a> <small>&gt;</small><a href="{{.Host.Host}}/index">High玩</a> <small></small>  <small>&gt;</small>
+					<span class="muted">{{.PluginName}}</span>
 			</div>
-		</header>
-		<div class="plugin">
-			{{if .IsHtml}}
-			<iframe id="plugin" onload="javascript:SetCwinHeightAndBase('{{.Host.Host}}/plugin/{{.PluginID}}');" src="{{.Host.Host}}/plugin/{{.PluginID}}/index.html" scrolling="auto" width="100%" height="600px" frameborder="0">
-			</iframe>
-			{{else}}
-			<iframe id="plugin" onload="javascript:SetCwinHeight();" height="600px" src="{{.Host.Host}}/plugin/{{.PluginID}}/index" scrolling="auto" width="100%" frameborder="0">
-			</iframe>
-			{{end}}
-		</div>
-		<div class="talk">
-				{{if .User.IsLogin}}
+			<header class="article-header">
+				<h1 class="article-title"><a href="{{.Host.Host}}/plugin?id={{.PluginID}}#comment">{{.PluginName}}</a></h1>
+				<div class="meta">
+					<span class="muted"><i class="fa fa-user"></i> <a href="{{.Host.Host}}/about">{{.Author}}</a></span>
+					<time class="muted"><i class="fa fa-clock-o"></i>{{.DisplayTime}}</time>
+					<span class="muted"><i class="fa fa-eye"></i> {{.PluginVisitCount}}</span>
+					<span class="muted"><i class="fa fa-comments-o"></i> <a href="{{.Host.Host}}/plugin?id={{.PluginID}}#comment">{{.PluginCommentCount}}条评论</a></span>
+				</div>
+			</header>
+			<div class="plugin">
+				{{if .IsHtml}}
+				<iframe id="plugin" onload="javascript:SetCwinHeightAndBase('{{.Host.Host}}/plugin/{{.PluginID}}');" src="{{.Host.Host}}/plugin/{{.PluginID}}/index.html" scrolling="auto" width="100%" height="600px" frameborder="0">
+				</iframe>
 				{{else}}
-				<div class="ds-login-buttons">
-				  <p>社交帐号登录:</p>
-				  <div class="ds-social-links">
-				   <ul class="ds-service-list">
-				     <li><a href="javascript:void(0);" rel="nofollow" class="ds-service-link ds-weixin">微信</a></li>
-				     <li><a href="javascript:void(0);" rel="nofollow" class="ds-service-link ds-weibo">微博</a></li>
-				     <li><a href="javascript:void(0);" rel="nofollow" class="ds-service-link ds-qq">QQ</a></li>
-				   </ul>
-				  </div>
-			   </div>
+				<iframe id="plugin" onload="javascript:SetCwinHeight();" height="600px" src="{{.Host.Host}}/plugin/{{.PluginID}}/index" scrolling="auto" width="100%" frameborder="0">
+				</iframe>
 				{{end}}
-				<div id="SOHUCS" sid="{{.PluginID}}" style="width: 100%; height: auto;">
-				 <div id="SOHU_MAIN">
-				  <div id="SOHU-comment-main" class="sohu-comment-wrapper">
-				   <div id="article_info_sohu">
-				    <div id="comment" class="reset-g clear-g section-title-w  section-title-logoutStyle">
-				     <div class="title-join-w">
-				      <div class="join-wrap-w join-wrap-b">
-				       <strong class="wrap-name-w wrap-name-b">评论</strong>
-				       <span class="wrap-join-w wrap-join-b">(<em class="join-strong-gw join-strong-bg">{{.PluginCommentPeopleCount}}</em><span node-type="involved">人参与</span><i class="gap-b">，</i><em class="join-strong-gw join-strong-bg">{{.PluginCommentCount}}</em><span node-type="comments">条评论</span>)</span>
-				       {{if .User.IsLogin}}
-						<a href="javascript:void(0);" rel="nofollow" id="logout" class="no-user-name-login user-is-login user-logout wrap-name-logout">登出</a>
-						<strong class="no-user-name-login user-is-login wrap-name-nick">{{.User.NickName}}</strong>
-					   {{else}}
-					    <a style="display:none;" href="javascript:void(0);" rel="nofollow" id="logout" class="user-name-login user-logout wrap-name-logout">登出</a>
-						<strong style="display:none;" class="user-name-login wrap-name-nick"></strong>
-				       {{end}}
-				      </div>
-				     </div>
-				    </div>
+			</div>
+			<div class="talk">
+					{{if .User.IsLogin}}
+					{{else}}
+					<div class="ds-login-buttons">
+					  <p>社交帐号登录:</p>
+					  <div class="ds-social-links">
+					   <ul class="ds-service-list">
+					     <li><a href="javascript:void(0);" rel="nofollow" class="ds-service-link ds-weixin">微信</a></li>
+					     <li><a href="javascript:void(0);" rel="nofollow" class="ds-service-link ds-weibo">微博</a></li>
+					     <li><a href="javascript:void(0);" rel="nofollow" class="ds-service-link ds-qq">QQ</a></li>
+					   </ul>
+					  </div>
 				   </div>
-				   <div id="login_sohu"></div>
-				   <div id="comment_sohu">
-				    <div class="reset-g section-cbox-w">
-				     <div style="width:1px;height:1px;overflow:hidden;">
-				      <img src="http://changyan.itc.cn/v2.5/v20160405176/src/css/imgs/vcode.jpg" style="visibility:hidden;width:1px;height:1px;" />
-				     </div>
-				     <div class="clear-g cbox-block-w">
-				      <div class="block-head-w">
-				       <div class="head-img-w">
-				        <a node-type="user-avatar" href="javascript:void(0)" target="_self">
-				        {{if .User.IsLogin}}
-				        <img class="userPic" src="{{.User.Pic}}" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
-				        {{else}}
-				        <img class="userPic" src="http://assets.changyan.sohu.com/upload/asset/scs/images/pic/pic42_null.gif" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
-				        {{end}}
-				        </a>
-				       </div>
-				      </div>
-				      <div class="block-post-w">
-				       <div class="post-default-w post-default-b" style="border: 1px solid rgb(204, 212, 217);">
-				        <div class="clear-g default-wrap-w">
-				         <input type="text" name="" placeholder="来说两句吧..." class="wrap-text-f " />
-				         <button class="btn-fw btn-bf single-btn-bf btn-send">发布</button>
-				        </div>
-				       </div>
-				      </div>
-				     </div>
-				    </div>
-				   </div>
-				   <div id="list_sort_sohu"></div>
-				   <div id="list_sohu" topicid="1011815160">
-				    <div class="reset-g section-list-w">
-				     <div class="list-block-gw list-newest-w list-newest-b">
-				      <div class="block-title-gw">
-				       <ul class="clear-g">
-				        <li><strong class="title-name-gw title-name-bg">最新评论</strong></li>
-				       </ul>
-				      </div>
-				      {{.PluginCommentContent}}
-				     </div>
-				    </div>
-				   </div>
-				   <div id="list_hot"></div>
-				   <div id="page_sohu"></div>
-				   <div id="more_list_sohu"></div>
-				   <div id="powerby_sohu">
-				    <div class="reset-g section-service-w">
-				     <div class="service-wrap-w service-wrap-b">
-				     </div>
-				    </div>
-				   </div>
-				  </div>
-				 </div>
+					{{end}}
+					<div id="SOHUCS" sid="{{.PluginID}}" style="width: 100%; height: auto;">
+					 <div id="SOHU_MAIN">
+					  <div id="SOHU-comment-main" class="sohu-comment-wrapper">
+					   <div id="article_info_sohu">
+					    <div id="comment" class="reset-g clear-g section-title-w  section-title-logoutStyle">
+					     <div class="title-join-w">
+					      <div class="join-wrap-w join-wrap-b">
+					       <strong class="wrap-name-w wrap-name-b">评论</strong>
+					       <span class="wrap-join-w wrap-join-b">(<em class="join-strong-gw join-strong-bg">{{.PluginCommentPeopleCount}}</em><span node-type="involved">人参与</span><i class="gap-b">，</i><em class="join-strong-gw join-strong-bg">{{.PluginCommentCount}}</em><span node-type="comments">条评论</span>)</span>
+					       {{if .User.IsLogin}}
+							<a href="javascript:void(0);" rel="nofollow" id="logout" class="no-user-name-login user-is-login user-logout wrap-name-logout">登出</a>
+							<strong class="no-user-name-login user-is-login wrap-name-nick">{{.User.NickName}}</strong>
+						   {{else}}
+						    <a style="display:none;" href="javascript:void(0);" rel="nofollow" id="logout" class="user-name-login user-logout wrap-name-logout">登出</a>
+							<strong style="display:none;" class="user-name-login wrap-name-nick"></strong>
+					       {{end}}
+					      </div>
+					     </div>
+					    </div>
+					   </div>
+					   <div id="login_sohu"></div>
+					   <div id="comment_sohu">
+					    <div class="reset-g section-cbox-w">
+					     <div style="width:1px;height:1px;overflow:hidden;">
+					      <img src="http://changyan.itc.cn/v2.5/v20160405176/src/css/imgs/vcode.jpg" style="visibility:hidden;width:1px;height:1px;" />
+					     </div>
+					     <div class="clear-g cbox-block-w">
+					      <div class="block-head-w">
+					       <div class="head-img-w">
+					        <a node-type="user-avatar" href="javascript:void(0)" target="_self">
+					        {{if .User.IsLogin}}
+					        <img class="userPic" src="{{.User.Pic}}" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
+					        {{else}}
+					        <img class="userPic" src="http://assets.changyan.sohu.com/upload/asset/scs/images/pic/pic42_null.gif" onerror="SOHUCS.isImgErr(this)" width="42" height="42" alt="" />
+					        {{end}}
+					        </a>
+					       </div>
+					      </div>
+					      <div class="block-post-w">
+					       <div class="post-default-w post-default-b" style="border: 1px solid rgb(204, 212, 217);">
+					        <div class="clear-g default-wrap-w">
+					         <input type="text" name="" placeholder="来说两句吧..." class="wrap-text-f " />
+					         <button class="btn-fw btn-bf single-btn-bf btn-send">发布</button>
+					        </div>
+					       </div>
+					      </div>
+					     </div>
+					    </div>
+					   </div>
+					   <div id="list_sort_sohu"></div>
+					   <div id="list_sohu" topicid="1011815160">
+					    <div class="reset-g section-list-w">
+					     <div class="list-block-gw list-newest-w list-newest-b">
+					      <div class="block-title-gw">
+					       <ul class="clear-g">
+					        <li><strong class="title-name-gw title-name-bg">最新评论</strong></li>
+					       </ul>
+					      </div>
+					      {{.PluginCommentContent}}
+					     </div>
+					    </div>
+					   </div>
+					   <div id="list_hot"></div>
+					   <div id="page_sohu"></div>
+					   <div id="more_list_sohu"></div>
+					   <div id="powerby_sohu">
+					    <div class="reset-g section-service-w">
+					     <div class="service-wrap-w service-wrap-b">
+					     </div>
+					    </div>
+					   </div>
+					  </div>
+					 </div>
+					</div>
 				</div>
 			</div>
 		</div>
-		<div class="body-bottom">
-			<p>Written by <a class="write" target="_blank" href="https://golang.org">Golang</a><a class="gov" target="_blank" href="http://www.miitbeian.gov.cn/">浙ICP备16031285号</a></p>
-		</div>
 	</div>
+	<div class="body-bottom">
+		<div class="sep"></div>
+		<p>© 2016 小风的个人博客
+			<a class="gov" target="_blank" href="https://www.miitbeian.gov.cn/">浙ICP备16031285号</a>
+		</p>
+		<p class="golang">Written by <a class="write" target="_blank" href="https://golang.org">Golang</a></p>
+		<p class="aliyun">本站由<a href="https://aliyun.com">阿里云</a>提供计算服务与安全服务</p>
 	</div>
 </body>
 </html>

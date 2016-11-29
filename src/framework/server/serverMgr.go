@@ -106,6 +106,7 @@ func (s *serverMgr) RegisterStaticFile(webPath string, localPath string) {
 		return
 	}
 	walkPath := localPath
+	fmt.Println("walkPath: ", walkPath)
 	filepath.Walk(walkPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			rel, _ := filepath.Rel(localPath, path)

@@ -45,7 +45,7 @@ func StartServer() {
 	server.ShareServerMgrInstance().RegisterStaticFile("font", filepath.Join(localWebResourcePath, "font"))
 
 	// for CA cert
-	server.ShareServerMgrInstance().RegisterStaticFile(".well-known", filepath.Join(localWebResourcePath, ".well-known"))
+	// server.ShareServerMgrInstance().RegisterStaticFile(".well-known", filepath.Join(localWebResourcePath, ".well-known"))
 
 	/*
 		// plugin

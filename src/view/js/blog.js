@@ -159,7 +159,7 @@ Account.logout = function() {
 			$(".ds-login-buttons").css("display", "block");
 			$(".no-user-name-login").css("display", "blog");
 			$(".user-name-login").css("display", "none");
-			$(".userPic").attr("src", "http://assets.changyan.sohu.com/upload/asset/scs/images/pic/pic42_null.gif");
+			$(".userPic").attr("src", "https://assets.changyan.sohu.com/upload/asset/scs/images/pic/pic42_null.gif");
 		} else {
 			alert("login failed", data.msg);
 		}
